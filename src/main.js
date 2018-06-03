@@ -27,7 +27,8 @@ Game.prototype.startBattle = function () {
   this.battle = new Battle(0);
   let partyHeros = [];
   let battleItems = [];
-  for(let i = 0;i < this.userHeroList.length;i++) {
+  let i = 0;
+  for(i = 0;i < this.userHeroList.length;i++) {
     if(this.userHeroList[i].isInParty) {
       this.userHeroList[i].setPosition(100, 130+40*i);
       partyHeros.push(this.userHeroList[i]);
@@ -93,7 +94,8 @@ Battle.prototype.update = function(gameTime, elapsedTime) {
   switch(this.battleState){
     case "waiting for input":
       let pass = true;
-      for(let i =0;i< this.battleSurManager.heroManager.assetList.length;i++){
+	  let  i = 0;
+      for(i =0;i< this.battleSurManager.heroManager.assetList.length;i++){
         if(!this.battleSurManager.heroManager.assetList[i].isActionConfirmed) {
           pass = false;
         }
@@ -258,7 +260,8 @@ function Combat(surManager) {
 }
 Combat.prototype.victoryCheck = function() {
   this.isVictory = true;
-  for(let i = 0 ; i < this.surManager.monsterManager.assetList.length ; i++) {
+  let i = 0;
+  for(i = 0 ; i < this.surManager.monsterManager.assetList.length ; i++) {
     if(this.surManager.monsterManager.assetList[i].isAlive) {
       this.isVictory = false;
     }
@@ -272,7 +275,8 @@ Combat.prototype.victoryCheck = function() {
 }
 Combat.prototype.defeatCheck = function() {
   this.isDefeat = true;
-  for(let i = 0 ; i < this.surManager.heroManager.assetList.length ; i++) {
+  let i  = 0;
+  for(i = 0 ; i < this.surManager.heroManager.assetList.length ; i++) {
     if(this.surManager.heroManager.assetList[i].isAlive) {
       this.isDefeat = false;
     }
@@ -421,12 +425,14 @@ Combat.prototype.checkTarget = function() {
     this.blockCheck(this.currentTurn);
   }
   let currentTarget = this.turnOrder[this.currentTurn].currentlySelectedTarget;
+  let  i = 0;
   if(!currentTarget.isAlive){
     //skip to next random target of same type (heros/monsters);
     if(currentTarget.role == "monster") {
       let potentialTargetsNum = 0;
       let newlyApplicableMonsters = [];
-      for(let i = 0 ; i < this.applicableMonsters.length ; i++) {
+
+      for(i = 0 ; i < this.applicableMonsters.length ; i++) {
         if(this.applicableMonsters[i].isAlive) {
           newlyApplicableMonsters.push(this.applicableMonsters[i]);
           potentialTargetsNum++;
@@ -438,7 +444,7 @@ Combat.prototype.checkTarget = function() {
     else {
       let potentialTargetsNum = 0;
       let newlyApplicableHeros = [];
-      for(let i = 0 ; i < this.applicableHeros.length ; i++) {
+      for(i = 0 ; i < this.applicableHeros.length ; i++) {
         if(this.applicableHeros[i].isAlive) {
           newlyApplicableHeros.push(this.applicableHeros[i]);
           potentialTargetsNum++;
@@ -450,7 +456,8 @@ Combat.prototype.checkTarget = function() {
   }
 }
 Combat.prototype.setMonsterActions = function() {
-  for(let i = 0 ; i < this.applicableMonsters.length ; i++) {
+	let i = 0;
+  for(i = 0 ; i < this.applicableMonsters.length ; i++) {
     let currentMonster = this.applicableMonsters[i];
     currentMonster.isActionSelected = true;
     currentMonster.currentlySelectedAction = "Attack";
@@ -460,7 +467,7 @@ Combat.prototype.setMonsterActions = function() {
 Combat.prototype.setTurnOrder = function(){
   this.turnOrder = [];
   let maxSpeed = 0;
-
+  let i = 0;
   for (i = 0 ; i < this.applicableMonsters.length ; i++) {
     if(this.applicableMonsters[i].combatStats.speed > maxSpeed) {
       maxSpeed = this.applicableMonsters[i].baseStats.speed;
@@ -652,7 +659,8 @@ InitiativeDisplay.prototype.refresh = function() {
 }
 InitiativeDisplay.prototype.draw = function(ctx) {
   ctx.fillStyle = "rgb(200, 0, 200)";
-  for(let i = 0 ; i < this.currentTurnOrder.length ; i++) {
+  let  i = 0;
+  for(i = 0 ; i < this.currentTurnOrder.length ; i++) {
     let currentx = 40*i;
     let currenty = 0;
     for(let j = 0 ; j < this.currentTurnOrder[i].length ; j++) {
@@ -677,13 +685,15 @@ Manager.prototype.load = function() {
 }
 //This is the Manager's main update method, it is responsible for calling the update method for each of its assigned assets
 Manager.prototype.update = function(gameTime, elapsedTime) {
-  for(let i=0;i<this.assetList.length;i++) {
+	let  i = 0;
+  for(i=0;i<this.assetList.length;i++) {
     this.assetList[i].update(gameTime, elapsedTime);
   }
 }
 //This is the Manager's main draw method
 Manager.prototype.draw = function(ctx) {
-  for(let i = 0 ; i< this.assetList.length; i++) {
+	let i = 0;
+  for(i = 0 ; i< this.assetList.length; i++) {
     this.assetList[i].draw(ctx);
   }
 }
@@ -697,12 +707,14 @@ HeroManager.prototype.constructor = HeroManager;
 //This is the HeroManager's main load method, it is responsible for assigning the partyHero's to the manager's assetList
 HeroManager.prototype.load = function(partyHeros) {
   this.assetList = partyHeros;
-  for(let i = 0; i < partyHeros.length ; i++) {
+  let i = 0;
+  for(i = 0; i < partyHeros.length ; i++) {
     partyHeros[i].setSurManager(this.surManager);
   }
 }
 HeroManager.prototype.newRound = function() {
-  for(let i = 0 ; i < this.assetList.length ; i++) {
+  let i = 0;
+  for(i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].combatReset();
   }
 }
@@ -721,12 +733,14 @@ MonsterManager.prototype.load = function(battleID) {
 
   //this code numbers similarly named enemies
   let k = 1;
-  for(let i = 0; i<this.assetList.length;i++){
+  let i = 0;
+  for(i = 0; i<this.assetList.length;i++){
     this.assetList[i].setSurManager(this.surManager);
     this.assetList[i].setPosition(500, 130+40*i);
     let name = this.assetList[i].name;
     let match = false;
-    for(let j = 0 ; j<this.assetList.length;j++) {
+	let j = 0;
+    for(j = 0 ; j<this.assetList.length;j++) {
       if (i!=j) {
         if(name == this.assetList[j].name) {
           k++;
@@ -742,7 +756,8 @@ MonsterManager.prototype.load = function(battleID) {
   }
 }
 MonsterManager.prototype.newRound = function() {
-  for(let i = 0 ; i < this.assetList.length ; i++) {
+	let  i = 0;
+  for(i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].combatReset();
   }
 }
@@ -823,14 +838,16 @@ BattleMenuManager.prototype.load = function(){
   this.assetList.push(confirmTurnButton);
 }
 BattleMenuManager.prototype.update = function(gameTime, elapsedTime) {
-  for(let i=0;i<this.assetList.length;i++) {
+	let  i = 0;
+  for(i=0;i<this.assetList.length;i++) {
     this.assetList[i].update(gameTime, elapsedTime);
   }
   this.cursorHoverCheck();
 }
 BattleMenuManager.prototype.cursorHoverCheck = function() {
   let cursorHover = false;
-  for(let i = 0; i<this.assetList.length; i++) {
+  let  i =0;
+  for(i = 0; i<this.assetList.length; i++) {
     this.assetList[i].hoverCheck();
     if (this.assetList[i].cursorHover) {
       cursorHover = true;
@@ -845,7 +862,8 @@ BattleMenuManager.prototype.cursorHoverCheck = function() {
 }
 BattleMenuManager.prototype.handleClick = function(){
   //heroSelectionMenu (i=0); ActionMenu(i=1); Special Move Menu (i=2); Item  Menu(i=3); MonsterTargetMenu (i=4); HeroTargetMenu(i=5); ConfirmTurn Button (i=6);
-  for(let i =0 ; i< this.assetList.length; i++) {
+  let  i = 0;
+  for(i = 0 ; i< this.assetList.length; i++) {
 
     for(let j = 0 ; j< this.assetList[i].menuButtonList.length; j++) {
       if(this.assetList[i].menuButtonList[j].cursorHover) {
@@ -1281,7 +1299,8 @@ BattleMenuManager.prototype.handleClick = function(){
 }
 BattleMenuManager.prototype.areAllHerosReady = function() {
   let test = true;
-  for(let i = 0 ; i < this.surManager.heroManager.assetList.length ; i++) {
+  let i = 0;
+  for(i = 0 ; i < this.surManager.heroManager.assetList.length ; i++) {
     if(!this.surManager.heroManager.assetList[i].isTargetSelected && this.surManager.heroManager.assetList[i].isAlive) {
       test = false;
     }
@@ -1289,7 +1308,8 @@ BattleMenuManager.prototype.areAllHerosReady = function() {
   return test;
 }
 BattleMenuManager.prototype.newRound = function() {
-  for(let i = 0 ; i< this.assetList.length; i++) {
+	let i = 0;
+  for(i = 0 ; i< this.assetList.length; i++) {
     this.assetList[i].resetMenu();
     this.assetList[i].verifyApplicability();
   }
@@ -1336,7 +1356,8 @@ Menu.prototype.setOptions = function(options) {
 //This method is called after a new options list is set, it is responsible for completing the menuButtonsList and giving them the proper location
 Menu.prototype.compileMenu = function(){
   this.menuButtonList = [];
-  for(let i = 0;i<this.optionList.length;i++) {
+  let i = 0;
+  for(i = 0;i<this.optionList.length;i++) {
     let menuButton = new MenuButton(this.optionList[i]);
     menuButton.setPosition(this.position.x+5, this.position.y+5 + (25*i));
     menuButton.setSurManager(this.surManager);
@@ -1363,7 +1384,8 @@ Menu.prototype.select = function(i) {
 Menu.prototype.update = function(gameTime, elapsedTime) {
   this.verifyApplicability();
   if(this.isActive) {
-    for(let i = 0 ; i < this.menuButtonList.length;i++) {
+	  let i = 0;
+    for(i = 0 ; i < this.menuButtonList.length;i++) {
       this.menuButtonList[i].update(gameTime, elapsedTime);
     }
 
@@ -1373,14 +1395,16 @@ Menu.prototype.update = function(gameTime, elapsedTime) {
   }
 }
 Menu.prototype.verifyApplicability = function() {
-  for(let i = 0 ; i < this.menuButtonList.length;i++) {
+	let i = 0;
+  for(i = 0 ; i < this.menuButtonList.length;i++) {
     this.menuButtonList[i].verifyApplicability();
   }
 }
 Menu.prototype.hoverCheck = function(){
   this.cursorHover = false;
   if(this.isActive) {
-    for(let i =0; i < this.menuButtonList.length; i++) {
+	  let i = 0;
+    for(i = 0; i < this.menuButtonList.length; i++) {
       this.menuButtonList[i].hoverCheck();
       if (this.menuButtonList[i].cursorHover){
         this.cursorHover = true;
@@ -1391,7 +1415,8 @@ Menu.prototype.hoverCheck = function(){
 Menu.prototype.clickCheck = function () {
   this.menuClicked = false;
   if(this.isActive) {
-    for(let i = 0 ; i<this.menuButtonList.length; i++) {
+	  let i = 0 ;
+    for(i = 0 ; i<this.menuButtonList.length; i++) {
       if(this.menuButtonList[i].isClicked) {
         this.menuClicked = true;
       }
@@ -1402,14 +1427,16 @@ Menu.prototype.clickCheck = function () {
 Menu.prototype.resetMenu = function() {
   this.menuClicked = false;
   this.target = -1;
-  for(let i = 0 ; i<this.menuButtonList.length; i++) {
+  let i = 0;
+  for(i = 0 ; i<this.menuButtonList.length; i++) {
     this.menuButtonList[i].isClicked = false;
     this.menuButtonList[i].cursorHover = false;
   }
 }
 //This method allows the menuManager to set the menu to be clicked on a particular target
 Menu.prototype.setSelection = function(target) {
-  for(let i = 0 ; i<this.menuButtonList.length; i++) {
+	let i = 0;
+  for(i = 0 ; i<this.menuButtonList.length; i++) {
     if(this.menuButtonList[i].target == target) {
       this.menuButtonList[i].isClicked = true;
     }
@@ -1421,7 +1448,8 @@ Menu.prototype.setSelectionByIndex = function (i) {
   this.menuButtonList[i].isClicked = true;
 }
 Menu.prototype.setSelectionByString = function(label) {
-  for(let i = 0 ; i<this.menuButtonList.length; i++) {
+	let i = 0;
+  for(i = 0 ; i<this.menuButtonList.length; i++) {
     if(this.menuButtonList[i].label == label) {
       this.menuButtonList[i].isClicked = true;
     }
@@ -1432,7 +1460,8 @@ Menu.prototype.draw = function(ctx) {
   if(this.isVisible) {
     ctx.fillStyle = this.menuColor;
     ctx.fillRect(this.position.x, this.position.y, 160, 240);
-    for(let i = 0 ; i<this.menuButtonList.length; i++) {
+	let i = 0;
+    for(i = 0 ; i<this.menuButtonList.length; i++) {
       this.menuButtonList[i].draw(ctx);
     }
   }
@@ -1478,7 +1507,8 @@ SpecialMenu.prototype.load = function() {
 SpecialMenu.prototype.setOptions = function(options) {
   let optionListPlus = [];
   optionListPlus.push({name: "Back", applicableTarget: true});
-  for(let i = 0 ; i < options.length ; i++) {
+  let i = 0;
+  for(i = 0 ; i < options.length ; i++) {
     optionListPlus.push(options[i]);
   }
   this.optionList = optionListPlus;
@@ -1502,7 +1532,8 @@ ItemMenu.prototype.setOptions = function(options) {
   this.compileMenu();
 }
 ItemMenu.prototype.checkRemainingItems = function(currentHero){
-  for(let i = 1 ; i < this.optionList.length ; i++) {
+	let i = 0;
+  for(i = 1 ; i < this.optionList.length ; i++) {
     this.menuButtonList[i].target.checkApplicability(this.surManager.heroManager.assetList, currentHero);
   }
   this.verifyApplicability();
@@ -1669,7 +1700,8 @@ BattleItem.prototype.checkApplicability = function(heroList, currentHero) {
   }
   else {
     let toBeUsedThisTurn = 0;
-    for(let i = 0 ; i < heroList.length; i++) {
+	let i = 0;
+    for(i = 0 ; i < heroList.length; i++) {
       if(heroList[i].currentlySelectedSpecialOrItem != null) {
         if(heroList[i].currentlySelectedSpecialOrItem.name == this.name) {
           toBeUsedThisTurn++;
@@ -2004,7 +2036,8 @@ Unit.prototype.setSurManager = function(surManager) {
   this.surManager = surManager;
 }
 Unit.prototype.isAfflictedWith = function(statusName) {
-  for(let i = 0 ; i < this.statusEffectList.length ; i ++) {
+	let i = 0;
+  for(i = 0 ; i < this.statusEffectList.length ; i ++) {
     if(this.statusEffectList[i].name == statusName) {
       return true;
     }
@@ -2014,7 +2047,8 @@ Unit.prototype.isAfflictedWith = function(statusName) {
 Unit.prototype.calculateCombatStats = function() {
   this.combatStats.empty();
   this.equippedStats.empty();
-  for(let i = 0 ; i < this.equipment.length ; i++) {
+  let i = 0;
+  for(i = 0 ; i < this.equipment.length ; i++) {
     this.equippedStats.combineStats(this.equippedStats, this.equipment[i].stats);
   }
   this.combatStats.combineStats(this.baseStats, this.equippedStats);
@@ -2066,7 +2100,8 @@ Unit.prototype.deathCheck = function() {
   }
 }
 Unit.prototype.moveApplicabilityCheck = function() {
-  for(let i = 0 ; i < this.specialMoveList.length ; i++) {
+	let i = 0;
+  for(i = 0 ; i < this.specialMoveList.length ; i++) {
     this.specialMoveList[i].applicableTarget = true;
   }
 }
@@ -2233,7 +2268,8 @@ HealthBar.prototype.calculatePotentialDamage = function() {
   let potentialDamage = 0;
   this.isPotentiallyFullySlain = false;
   this.isPotentiallyFullyHealed = false;
-  for(let i = 0 ; i < heroList.length ; i++) {
+  let i = 0;
+  for(i = 0 ; i < heroList.length ; i++) {
     if(heroList[i].currentlySelectedTarget == owner) {
       switch(heroList[i].currentlySelectedAction) {
         case "Attack":
