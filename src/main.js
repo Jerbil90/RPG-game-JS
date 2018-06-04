@@ -614,62 +614,151 @@ DamageDisplay.prototype.draw = function(ctx) {
 function InitiativeDisplay(surManager) {
   this.surManager = surManager;
   this.currentState = "passive";
+  this.unitList = null;
+  this.initiativeSpriteArray = null;
+  this.switchingStartTime = null;
   this.currentTurnOrder = [];
 }
 InitiativeDisplay.prototype.update = function(gameTime, elapsedTime) {
+  let i = 0;
+  if(this.initiativeSpriteArray != null) {
+    for(i = 0 ; i < this.initiativeSpriteArray.length; i++) {
+      if(this.initiativeSpriteArray[i] != null) {
+        this.initiativeSpriteArray[i].update(gameTime, elapsedTime);
+      }
+
+    }
+  }
+  else {
+    this.unitList = [];
+    for(i=0; i<this.surManager.heroManager.assetList.length; i++) {
+      if( this.surManager.heroManager.assetList[i].isAlive) {
+        this.unitList.push(this.surManager.heroManager.assetList[i]);
+      }
+    }
+    for(i = 0 ; i<this.surManager.monsterManager.assetList.length ; i++) {
+      if(this.surManager.monsterManager.assetList[i].isAlive) {
+        this.unitList.push(this.surManager.monsterManager.assetList[i]);
+      }
+    }
+    this.initiativeSpriteArray = [];
+    console.log("making money!!");
+    for(i=0;i<this.unitList.length;i++) {
+      let initiativeSprite = new InitiativeSprite(this.unitList[i]);
+      this.unitList[i].initiativeSprite = initiativeSprite;
+      this.initiativeSpriteArray.push(initiativeSprite);
+      console.log("initiativeSprite pushed on " + this.unitList[i].name);
+    }
+  }
   switch(this.currentState) {
     case "passive" :
       this.refresh();
       break;
+	  case "switching" :
+	  this.updatePositions(gameTime, elapsedTime);
+    if(this.switchingStartTime == null) {
+      this.switchingStartTime = gameTime;
+    }
+    else {
+      if (gameTime > this.switchingStartTime  + 1000) {
+        this.switchingStartTime = null;
+        this.currentState = "passive";
+      }
+    }
+	  break;
+	  default:
+	  console.log("Error, Initiativedisplay current state is invalid");
+	  break;
+  }
+  
+  for(i=0;i<this.unitList.length;i++) {
+    if(!this.unitList[i].isAlive){
+      this.initiativeSpriteArray[i] = null;
+    }
   }
 }
+InitiativeDisplay.prototype.updatePositions = function(gameTime, elapsedTime) {
+	let i = 0;
+	for(i=0 ; i<this.currentTurnOrder ; i++) {
+    
+	}
+}
 InitiativeDisplay.prototype.refresh = function() {
-  let unitList = [];
-  this.currentTurnOrder = [];
-  let i = 0;
-  for(i=0; i<this.surManager.heroManager.assetList.length; i++) {
-    if( this.surManager.heroManager.assetList[i].isAlive) {
-      unitList.push(this.surManager.heroManager.assetList[i]);
-    }
-  }
-  for(i = 0 ; i<this.surManager.monsterManager.assetList.length ; i++) {
-    if(this.surManager.monsterManager.assetList[i].isAlive) {
-      unitList.push(this.surManager.monsterManager.assetList[i]);
-    }
-  }
+  //this.currentTurnOrder = [];
+  let newTurnOrder = [];
   let topSpeed = 0;
-  for(i=0;i<unitList.length;i++){
-    if(unitList[i].combatStats.speed>topSpeed) {
-      topSpeed = unitList[i].combatStats.speed;
+  let i = 0;
+  for(i=0;i<this.unitList.length;i++){
+    if(this.unitList[i].combatStats.speed>topSpeed) {
+      topSpeed = this.unitList[i].combatStats.speed;
     }
   }
   i=0;
+  let j = 0;
   let k = topSpeed;
-  while(i<unitList.length) {
+  while(i<this.unitList.length) {
     let unitsAtThisSpeed = [];
-    for(let j = 0 ; j < unitList.length ; j++) {
-      if(unitList[j].combatStats.speed == k) {
-        unitsAtThisSpeed.push(unitList[j]);
+    for(j = 0 ; j < this.unitList.length ; j++) {
+      if(this.unitList[j].combatStats.speed == k) {
+        if(this.unitList[j].isAlive) {
+          unitsAtThisSpeed.push(this.unitList[j]);
+        }
+        
         i++;
       }
     }
     if(unitsAtThisSpeed.length != 0) {
-      this.currentTurnOrder.push(unitsAtThisSpeed);
+      newTurnOrder.push(unitsAtThisSpeed);
     }
     k--;
   }
+
+  if(!this.compareOrder(newTurnOrder, this.currentTurnOrder)) {
+    this.currentTurnOrder = newTurnOrder;
+    this.currentState = "switching";
+    console.log("new initiative!");
+    //this.switchingStartTime = null this is set in the update method at the end of a switch
+    for(i = 0 ; i < this.currentTurnOrder.length ; i++) {
+      for(j = 0 ; j < this.currentTurnOrder[i].length ; j++) {
+        this.currentTurnOrder[i][j].initiativeSprite.moveTo(40*i, 40*j, 1000);
+      }
+    }
+  }
+}
+InitiativeDisplay.prototype.compareOrder = function(newTurnOrder, oldTurnOrder) {
+  let i = 0;
+  let j = 0;
+  var test = true;
+  for(i = 0 ; i < newTurnOrder.length ; i++) {
+    for(j = 0 ; j < newTurnOrder[i].length ; j++) {
+      //console.log("testing " + newTurnOrder[i][j].name + " against " oldTurnOrder[i]);
+      if(oldTurnOrder[i] != null) {
+        if(oldTurnOrder[i][j] != null) {
+          if(newTurnOrder[i][j].name != oldTurnOrder[i][j].name) {
+            test = false;
+            console.log("test failed");
+          }
+        }
+        else {
+          test = false;
+          console.log("test failed");
+        }
+      }
+      else {
+        test = false;
+      }
+    }
+  }
+  return test;
 }
 InitiativeDisplay.prototype.draw = function(ctx) {
   ctx.fillStyle = "rgb(200, 0, 200)";
   let  i = 0;
-  for(i = 0 ; i < this.currentTurnOrder.length ; i++) {
-    let currentx = 40*i;
-    let currenty = 0;
-    for(let j = 0 ; j < this.currentTurnOrder[i].length ; j++) {
-      currenty = 40*j;
-      ctx.fillRect(currentx, currenty, 40, 40);
-      ctx.drawImage(this.currentTurnOrder[i][j].image, currentx + 4, currenty + 4);
+  for(i = 0 ; i < this.unitList.length ; i++) {
+    if(this.unitList[i].initiativeSprite != null) {
+      this.unitList[i].initiativeSprite.draw(ctx);
     }
+
   }
 }
 
@@ -2033,6 +2122,7 @@ function Unit(name){
   this.currentlySelectedTarget = null;
   this.isActionConfirmed = false;
   this.damageDisplay = null;
+  this.initiativeSprite = null;
 }
 Unit.prototype.setSurManager = function(surManager) {
   this.surManager = surManager;
@@ -2096,6 +2186,7 @@ Unit.prototype.deathCheck = function() {
   if(this.remainingHP<=0) {
     this.isAlive = false;
     this.applicableTarget = false;
+    this.initiativeSprite = null;
   }
   else {
     this.isAlive = true;
@@ -2122,8 +2213,11 @@ Unit.prototype.update = function(gameTime, elapsedTime) {
 //This is the units main draw function
 Unit.prototype.draw = function(ctx) {
   if (this.image != null) {
-    ctx.drawImage(this.image, this.position.x, this.position.y);
-    this.healthBar.draw(ctx);
+    if(this.isAlive) {
+      ctx.drawImage(this.image, this.position.x, this.position.y);
+      this.healthBar.draw(ctx);
+    }
+
   }
   else {
     console.log("image failed: " + this.name);
@@ -2348,6 +2442,64 @@ HealthBar.prototype.draw = function(ctx) {
   ctx.fillRect(this.position.x + this.borderWidth + this.remainingHPLength - this.potentialDamageLength, this.position.y+ this.borderWidth, this.potentialDamageLength, this.height);
   //ctx.fillRect(this.position.x + this.borderWidth + this.remainingHPLength - this.potentialDamageLength, this.position.y + this.borderLength, this.potentialDamageLength, this.height);
 }
+
+function Sprite() {
+  this.image = null;
+  this.position = {x:0, y:0};
+  this.startingPosition = null;
+  this.targetPosition = null;
+  this.moveStartTime = null;
+  this.moveDuration = 0;
+  this.isMoving = false;
+  this.isNewMove = false;
+}
+Sprite.prototype.update = function(gameTime, elapsedTime) {
+  if(this.isNewMove) {
+    this.isNewMove = false;
+    this.moveStartTime = gameTime;
+  }
+  if(this.isMoving) {
+    if(gameTime > this.moveStartTime + this.moveDuration) {
+      this.isMoving = false;
+      this.position = this.targetPosition;
+    }
+    else {
+      let fraction = ((gameTime - this.moveStartTime) / this.moveDuration);
+      this.position.x = this.startingPosition.x + fraction * (this.targetPosition.x - this.startingPosition.x);
+      this.position.y = this.startingPosition.y + fraction * (this.targetPosition.y - this.startingPosition.y);
+    }
+
+  }
+}
+Sprite.prototype.draw = function(ctx) {
+  ctx.drawImage(this.image, this.position.x, this.position.y);
+}
+Sprite.prototype.setPosition = function(x, y) {
+  this.position.x = x;
+  this.position.y = y;
+}
+Sprite.prototype.moveTo = function(x, y, duration) {
+  this.startingPosition = this.position;
+  this.targetPosition = {x: x, y: y};
+  this.moveDuration = duration;
+  this.isMoving = true;
+  this.isNewMove = true;
+}
+
+function InitiativeSprite(owner) {
+  Sprite.call(this);
+  this.owner = owner;
+  this.image = owner.image;
+}
+InitiativeSprite.prototype = Object.create(Sprite.prototype);
+InitiativeSprite.prototype.constructor = InitiativeSprite;
+
+function BattleSprite(owner) {
+  Sprite.call(this);
+}
+BattleSprite.prototype = Object.create(Sprite.prototype);
+BattleSprite.prototype.constructor = BattleSprite;
+
 
 $(document).ready(function() {
   var game = new Game();
