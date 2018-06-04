@@ -562,7 +562,7 @@ CombatStance.prototype.update = function(gameTime, elapsedTime) {
 
 function DamageDisplay(damageDealt, position) {
   this.damageDealt = damageDealt;
-  this.color = "rgb(200, 200, 200)"
+  this.color = "rgb(250, 250, 250)"
   this.hasBounced = false;
   if(damageDealt < 0) {
     this.damageDealt *= -1;
@@ -572,41 +572,43 @@ function DamageDisplay(damageDealt, position) {
   //given position will refer to the units poition so the text needs to be centered properly
   this.position = {x: position.x + 16, y: position.y};
   console.log(position);
-  this.velocity = -100;
-  this.acceleration = 100;
+  this.velocity = -50;
+  this.acceleration = 200;
   this.landingTime = null;
   this.hasLanded = false;
   this.isExpired = false;
 }
 DamageDisplay.prototype.update = function(gameTime, elapsedTime) {
   if(!this.hasLanded) {
-    this.position.y += this.velocity*elapsedTime;
-    this.velocity += this.acceleration*elapsedTime;
-    //console.log(elapsedTime);
-    if((this.position.y <= this.unitPosition.y) && (!this.hasBounced)) {
+    this.position.y += (this.velocity*elapsedTime)/1000;
+    this.velocity += (this.acceleration*elapsedTime)/1000;
+    if((this.position.y >= this.unitPosition.y) && (!this.hasBounced)) {
       this.position.y = this.unitPosition.y;
       this.velocity *= -0.5;
       this.hasBounced = true;
+
     }
-    else if(this.position.y <= this.unitPosition.y && this.hasBounced){
+    else if(this.position.y >= this.unitPosition.y && this.hasBounced){
       this.position.y = this.unitPosition.y;
       this.velocity = 0;
       this.acceleration = 0;
       this.landingTime = gameTime;
-      this.hasLanaded = true;
+      this.hasLanded = true;
     }
   }
   else {
-    if(gameTime > this.landingTime + 1) {
+    if(gameTime > this.landingTime + 1000) {
       this.isExpired = true;
     }
   }
-  //console.log("hasLanded: " + this.hasLanded);
 }
 DamageDisplay.prototype.draw = function(ctx) {
   ctx.fillStyle = this.color
-  //ctx.fillText("I am here", this.position.x, this.position.y);
-  //console.log("damage display drawing..." + this.position.x + " " + this.position.y);
+  ctx.strokeStyle = "rgb(150, 150, 150)";
+  ctx.lineWidth = 2;
+  ctx.font="30px Arial";
+  ctx.fillText(this.damageDealt, this.position.x, this.position.y);
+  ctx.strokeText(this.damageDealt, this.position.x, this.position.y);
 }
 
 function InitiativeDisplay(surManager) {
