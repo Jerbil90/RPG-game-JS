@@ -167,7 +167,7 @@ function BattleSurManager(){
   this.battleState = "waiting for input";
   this.battleMenuManager = null;
   this.combat = null;
-  this.initiativeDisplay = new InitiativeDisplay(this);
+  this.initiativeDisplay = null;
 }
 BattleSurManager.prototype = Object.create(SurManager.prototype);
 BattleSurManager.prototype.constructor = BattleSurManager;
@@ -189,6 +189,10 @@ BattleSurManager.prototype.load = function(partyHeros, battleItems, battleID) {
   this.battleMenuManager = new BattleMenuManager();
   this.battleMenuManager.setSurManager(this);
   this.battleMenuManager.load();
+  //Then load battleSprites
+  this.heroManager.loadBattleSprites();
+  this.monsterManager.loadBattleSprites();
+  this.initiativeDisplay =  new InitiativeDisplay(this);
 }
 BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
   SurManager.prototype.update.call(this, gameTime, elapsedTime);
@@ -731,17 +735,14 @@ InitiativeDisplay.prototype.compareOrder = function(newTurnOrder, oldTurnOrder) 
   var test = true;
   for(i = 0 ; i < newTurnOrder.length ; i++) {
     for(j = 0 ; j < newTurnOrder[i].length ; j++) {
-      //console.log("testing " + newTurnOrder[i][j].name + " against " oldTurnOrder[i]);
       if(oldTurnOrder[i] != null) {
         if(oldTurnOrder[i][j] != null) {
           if(newTurnOrder[i][j].name != oldTurnOrder[i][j].name) {
             test = false;
-            console.log("test failed");
           }
         }
         else {
           test = false;
-          console.log("test failed");
         }
       }
       else {
@@ -809,6 +810,12 @@ HeroManager.prototype.newRound = function() {
     this.assetList[i].combatReset();
   }
 }
+HeroManager.prototype.loadBattleSprites = function() {
+  let i = 0 ;
+  for(i=0;i<this.assetList.length ; i++) {
+    this.assetList[i].loadBattleSprite();
+  }
+}
 
 //This is the constructor function for the MonsterManager class, this class is responsible for listing Monsters in a manorExplore(bestiary) or a battle(active enemies) scene
 function MonsterManager() {
@@ -850,6 +857,12 @@ MonsterManager.prototype.newRound = function() {
 	let  i = 0;
   for(i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].combatReset();
+  }
+}
+MonsterManager.prototype.loadBattleSprites = function() {
+  let i = 0 ;
+  for(i=0;i<this.assetList.length ; i++) {
+    this.assetList[i].loadBattleSprite();
   }
 }
 
@@ -2123,6 +2136,7 @@ function Unit(name){
   this.isActionConfirmed = false;
   this.damageDisplay = null;
   this.initiativeSprite = null;
+  this.battleSprite = null;
 }
 Unit.prototype.setSurManager = function(surManager) {
   this.surManager = surManager;
@@ -2214,6 +2228,9 @@ Unit.prototype.update = function(gameTime, elapsedTime) {
 Unit.prototype.draw = function(ctx) {
   if (this.image != null) {
     if(this.isAlive) {
+      if(this.battleSprite != null) {
+        this.battleSprite.draw(ctx);
+      }
       ctx.drawImage(this.image, this.position.x, this.position.y);
       this.healthBar.draw(ctx);
     }
@@ -2259,6 +2276,9 @@ Unit.prototype.loadStats = function() {
   this.baseStats = new Stats(this);
   this.equippedStats = new EquippedStats(this);
   this.combatStats = new CombatStats(this);
+}
+Unit.prototype.loadBattleSprite = function() {
+  this.battleSprite = new BattleSprite(this);
 }
 
 //This is the constructor function for the Hero class, this class is responsible for describing the User's playable characters
@@ -2489,16 +2509,38 @@ Sprite.prototype.moveTo = function(x, y, duration) {
 function InitiativeSprite(owner) {
   Sprite.call(this);
   this.owner = owner;
-  this.image = owner.image;
+  this.image = owner.battleSprite.image;
 }
 InitiativeSprite.prototype = Object.create(Sprite.prototype);
 InitiativeSprite.prototype.constructor = InitiativeSprite;
 
 function BattleSprite(owner) {
   Sprite.call(this);
+  this.owner = owner;
+  this.loadBattleSprite();
 }
 BattleSprite.prototype = Object.create(Sprite.prototype);
 BattleSprite.prototype.constructor = BattleSprite;
+BattleSprite.prototype.loadBattleSprite = function() {
+    switch(this.owner.role) {
+    case "monster":
+    this.image = new Image();
+    //this.image.src = "C:\Users\Jeremy\Projects\jeremygame\assets\myMonsterSymbol.png";
+    this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myFighterSymbol.png";
+    break;
+    case "knight":
+    this.image = new Image();
+    this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myKnightSymbol.png";
+    break;
+    case "fighter":
+    this.image = new Image();
+    this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myFighterSymbol.png";
+    break;
+    default:
+    console.log("error loading battle sprites: " + this.name + " has invalid role: " + this.role);
+    break;
+  }
+}
 
 
 $(document).ready(function() {
