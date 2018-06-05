@@ -30,7 +30,7 @@ Game.prototype.startBattle = function () {
   let i = 0;
   for(i = 0;i < this.userHeroList.length;i++) {
     if(this.userHeroList[i].isInParty) {
-      this.userHeroList[i].setPosition(100, 130+40*i);
+      this.userHeroList[i].setPartyPosition(i);
       partyHeros.push(this.userHeroList[i]);
     }
   }
@@ -219,7 +219,6 @@ BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
 BattleSurManager.prototype.draw = function(ctx) {
   SurManager.prototype.draw.call(this, ctx);
   this.battleMenuManager.draw(ctx);
-  this.initiativeDisplay.draw(ctx);
   if(this.combat != null) {
     if(this.combat.isVictory) {
       ctx.font = "40px serif";
@@ -344,7 +343,7 @@ this.turnOrder[this.currentTurn].currentlySelectedSpecialOrItem.effect(this.turn
       this.victoryCheck();
       this.defeatCheck();
       if(this.isCombatOver) {
-
+        
       }
       else {
         let test = true;
@@ -752,16 +751,6 @@ InitiativeDisplay.prototype.compareOrder = function(newTurnOrder, oldTurnOrder) 
   }
   return test;
 }
-InitiativeDisplay.prototype.draw = function(ctx) {
-  ctx.fillStyle = "rgb(200, 0, 200)";
-  let  i = 0;
-  for(i = 0 ; i < this.unitList.length ; i++) {
-    if(this.unitList[i].initiativeSprite != null) {
-      this.unitList[i].initiativeSprite.draw(ctx);
-    }
-
-  }
-}
 
 //This is the constructor function for the Manager class, this class is the parent for all manager classes and is responsible fore grouping together and managing different game assets (ie: HeroManager, MonsterManager, ParticleManager);
 function Manager() {
@@ -834,7 +823,7 @@ MonsterManager.prototype.load = function(battleID) {
   let i = 0;
   for(i = 0; i<this.assetList.length;i++){
     this.assetList[i].setSurManager(this.surManager);
-    this.assetList[i].setPosition(500, 130+40*i);
+    this.assetList[i].setPartyPosition(i);
     let name = this.assetList[i].name;
     let match = false;
 	let j = 0;
@@ -1832,7 +1821,7 @@ MinorHealthPotion.prototype = Object.create(BattleItem.prototype);
 MinorHealthPotion.prototype.constructor = MinorHealthPotion;
 MinorHealthPotion.prototype.effect = function(target) {
   target.remainingHP += this.healingPower;
-  target.damageDisplay = new DamageDisplay(-1*this.healingPower, target.position);
+  target.damageDisplay = new DamageDisplay(-1*this.healingPower, target.battleSprite.position);
   target.capHP();
   this.consume();
   console.log(target.name + " healed 10 points by health potion");
@@ -1855,7 +1844,7 @@ SpecialMove.prototype.loadStats = function() {
 SpecialMove.prototype.useMove = function(owner, target) {
   console.log("performing specialMove, target: " + target + "\t name: " + this.name);
   target.remainingHP -= (owner.combatStats.strength-target.combatStats.toughness);
-  target.damageDisplay = new DamageDisplay(owner.combatStats.strength-target.combatStats.toughness, target.position);
+  target.damageDisplay = new DamageDisplay(owner.combatStats.strength-target.combatStats.toughness, target.battleSprite.position);
 }
 
 
@@ -2110,8 +2099,6 @@ EquippedStats.prototype.constructor = EquippedStats;
 
 //This is the constructor function for the Unit class, this class is the parent for each unit (hero/monster) and contains the parent properties and methods required by each Unit such as load, draw, update
 function Unit(name){
-  this.position = {x:0, y:0};
-  this.image = null;
   this.maxHP = 0;
   this.isAlive = true;
   this.remainingHP = this.maxHP;
@@ -2126,6 +2113,7 @@ function Unit(name){
   this.role = "unassigned";
   this.specialMoveList = [];
   this.isInParty = true;
+  this.partyPosition = -1;
   this.applicableTarget = true;
   this.isActionSelected = false;
   this.isSpecialOrItemSelected = false;
@@ -2188,7 +2176,7 @@ Unit.prototype.capHP = function() {
 Unit.prototype.attack = function(target){
   console.log(this.role + " " + this.name + " attacks " + target.name + " with " + this.combatStats.strength +" strength!");
   target.remainingHP -= (this.combatStats.strength-target.combatStats.toughness);
-  target.damageDisplay = new DamageDisplay(this.combatStats.strength-target.combatStats.toughness, target.position);
+  target.damageDisplay = new DamageDisplay(this.combatStats.strength-target.combatStats.toughness, target.battleSprite.position);
   target.deathCheck();
   console.log("Net damage: " + (this.combatStats.strength-target.combatStats.toughness) + "\nremainingHP: " + target.remainingHP);
   if(!target.isAlive){
@@ -2226,18 +2214,20 @@ Unit.prototype.update = function(gameTime, elapsedTime) {
 }
 //This is the units main draw function
 Unit.prototype.draw = function(ctx) {
-  if (this.image != null) {
-    if(this.isAlive) {
-      if(this.battleSprite != null) {
-        this.battleSprite.draw(ctx);
-      }
-      ctx.drawImage(this.image, this.position.x, this.position.y);
-      this.healthBar.draw(ctx);
+  if(this.isAlive) {
+    if(this.battleSprite != null) {
+      this.battleSprite.draw(ctx);
     }
-
+    if(this.initiativeSprite != null) {
+      this.initiativeSprite.draw(ctx);
+    }
+    this.healthBar.draw(ctx);
   }
-  else {
-    console.log("image failed: " + this.name);
+  else if(this.role != "monster") {
+    if(this.battleSprite != null) {
+      this.battleSprite.draw(ctx);
+    }
+    this.healthBar.draw(ctx);
   }
   if(this.damageDisplay != null) {
     this.damageDisplay.draw(ctx);
@@ -2268,9 +2258,8 @@ Unit.prototype.loadImage = function() {
   }
   this.image.src = imgsrc;
 }
-Unit.prototype.setPosition = function (x, y) {
-  this.position.x = x;
-  this.position.y = y;
+Unit.prototype.setPartyPosition = function (i) {
+  this.partyPosition = i;
 }
 Unit.prototype.loadStats = function() {
   this.baseStats = new Stats(this);
@@ -2286,7 +2275,6 @@ function Hero(name, role){
   Unit.call(this, name);
   this.role = role;
   this.isInParty = true;
-  this.loadImage();
 }
 Hero.prototype = Object.create(Unit.prototype);
 Hero.prototype.constructor = Hero;
@@ -2302,10 +2290,7 @@ function Fighter(name){
 }
 Fighter.prototype = Object.create(Hero.prototype);
 Fighter.prototype.constructor = Fighter;
-Fighter.prototype.laodImage = function() {
-  this.image = new Image();
-  this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myFighterSymbol.png";
-}
+
 
 function Knight(name){
   Hero.call(this, name, "knight");
@@ -2316,24 +2301,17 @@ function Knight(name){
 }
 Knight.prototype = Object.create(Hero.prototype);
 Knight.prototype.constructor = Knight;
-Knight.prototype.laodImage = function() {
-  this.image = new Image();
-  this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myKnightSymbol.png";
-}
+
 
 //This is the constructor function for the Monster class, this class is responsible for describing the enemy monsters that the player will encounter throughout the game
 function Monster(name) {
   Unit.call(this, name);
   this.role = "monster";
   this.load();
-  this.loadImage();
 }
 Monster.prototype = Object.create(Unit.prototype);
 Monster.prototype.constructor = Monster;
-Monster.prototype.laodImage = function() {
-  this.image = new Image();
-  this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myMonsterSymbol.png";
-}
+
 //This is the constructor for the wolf class, this class is responsible for describing an enemy wolf that may be encountered
 function Wolf(){
   Monster.call(this, "Wolf");
@@ -2424,7 +2402,7 @@ HealthBar.prototype.calculatePotentialDamage = function() {
   }
 }
 HealthBar.prototype.update = function(gameTime, elapsedTime) {
-  this.position = {x: this.owner.position.x, y: this.owner.position.y-this.height - 2*this.borderWidth};
+  this.position = {x: this.owner.battleSprite.position.x, y: this.owner.battleSprite.position.y-this.height - 2*this.borderWidth};
   this.maxHP = this.owner.maxHP;
   this.remainingHP = this.owner.remainingHP;
   this.calculateRemainingHPLength();
@@ -2505,28 +2483,12 @@ Sprite.prototype.moveTo = function(x, y, duration) {
   this.isMoving = true;
   this.isNewMove = true;
 }
-
-function InitiativeSprite(owner) {
-  Sprite.call(this);
-  this.owner = owner;
-  this.image = owner.battleSprite.image;
-}
-InitiativeSprite.prototype = Object.create(Sprite.prototype);
-InitiativeSprite.prototype.constructor = InitiativeSprite;
-
-function BattleSprite(owner) {
-  Sprite.call(this);
-  this.owner = owner;
-  this.loadBattleSprite();
-}
-BattleSprite.prototype = Object.create(Sprite.prototype);
-BattleSprite.prototype.constructor = BattleSprite;
-BattleSprite.prototype.loadBattleSprite = function() {
+Sprite.prototype.loadBattleSprite = function() {
     switch(this.owner.role) {
     case "monster":
     this.image = new Image();
     //this.image.src = "C:\Users\Jeremy\Projects\jeremygame\assets\myMonsterSymbol.png";
-    this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myFighterSymbol.png";
+    this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myMonsterSymbol.png";
     break;
     case "knight":
     this.image = new Image();
@@ -2539,6 +2501,31 @@ BattleSprite.prototype.loadBattleSprite = function() {
     default:
     console.log("error loading battle sprites: " + this.name + " has invalid role: " + this.role);
     break;
+  }
+}
+
+function InitiativeSprite(owner) {
+  Sprite.call(this);
+  this.owner = owner;
+  this.loadBattleSprite();
+}
+InitiativeSprite.prototype = Object.create(Sprite.prototype);
+InitiativeSprite.prototype.constructor = InitiativeSprite;
+
+function BattleSprite(owner) {
+  Sprite.call(this);
+  this.owner = owner;
+  this.loadBattleSprite();
+  this.setPassivePosition();
+}
+BattleSprite.prototype = Object.create(Sprite.prototype);
+BattleSprite.prototype.constructor = BattleSprite;
+BattleSprite.prototype.setPassivePosition = function() {
+  if(this.owner.role == "monster") {
+    this.position = {x:450, y:100 + this.owner.partyPosition*50};
+  }
+  else{
+    this.position = {x:150, y:100 + this.owner.partyPosition*50};
   }
 }
 
