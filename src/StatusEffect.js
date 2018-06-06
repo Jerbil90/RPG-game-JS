@@ -32,7 +32,7 @@ Blocked.prototype = Object.create(StatusEffect.prototype);
 Blocked.prototype.constructor = Blocked;
 
 function Poisoned(owner) {
-  StatsEffect.call(this, owner);
+  StatusEffect.call(this, owner);
   this.name = "Poisoned";
   this.duration = 5;
   this.effectStrength = 1;

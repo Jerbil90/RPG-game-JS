@@ -45,9 +45,17 @@ HeroManager.prototype.newRound = function() {
   let i = 0;
   for(i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].combatReset();
+    for(let j = 0 ; j < this.assetList[i].statusEffectList.length ; j++) {
+      this.assetList[i].statusEffectList[j].duration--;
+    }
+    for(let j = this.assetList[i].statusEffectList.length - 1; j >= 0 ; j--) {
+      if(this.assetList[i].statusEffectList[j].duration <= 0) {
+        this.assetList[i].statusEffectList.splice(j, 1);
+      }
+    }
   }
 }
-HeroManager.prototype.loadBattleSprites = function() {
+HeroManager.prototype.setPassiveBattleSpritePosition = function() {
   let i = 0 ;
   for(i=0;i<this.assetList.length ; i++) {
     this.assetList[i].battleSprite.setPassivePosition();
@@ -63,8 +71,19 @@ MonsterManager.prototype.constructor = MonsterManager;
 //This is the MonsterManager's main load method, eventually it will accept a list of monsters loaded by from the battle of battlesurmanager class to use, atm though it uses a default set of enemies
 //This monster laoder will rename monsters if they have the same name(wolf 1 wolf 2 etc.)
 MonsterManager.prototype.load = function(battleID) {
-  this.assetList.push(new Wolf());
-  this.assetList.push(new Wolf());
+  switch(battleID) {
+    case 0:
+    this.assetList.push(new Wolf());
+    this.assetList.push(new Snake());
+    break;
+    case 1:
+    break;
+    default:
+    this.assetList.push(new Wolf());
+    this.assetList.push(new Wolf());
+    break;
+  }
+
 
   //this code numbers similarly named enemies
   let k = 1;
@@ -96,7 +115,7 @@ MonsterManager.prototype.newRound = function() {
     this.assetList[i].combatReset();
   }
 }
-MonsterManager.prototype.loadBattleSprites = function() {
+MonsterManager.prototype.setPassiveBattleSpritePosition = function() {
   let i = 0 ;
   for(i=0;i<this.assetList.length ; i++) {
     this.assetList[i].battleSprite.setPassivePosition();

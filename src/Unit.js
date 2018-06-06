@@ -83,10 +83,14 @@ Unit.prototype.capHP = function() {
 //This method is called when a unit performs a basic attack on another unit
 Unit.prototype.attack = function(target){
   console.log(this.role + " " + this.name + " attacks " + target.name + " with " + this.combatStats.strength +" strength!");
-  target.remainingHP -= (this.combatStats.strength-target.combatStats.toughness);
-  target.damageDisplay = new DamageDisplay(this.combatStats.strength-target.combatStats.toughness, target.battleSprite.position);
+  let damage = this.combatStats.strength-target.combatStats.toughness;
+  if(damage<1) {
+    damage = 1;
+  }
+  target.remainingHP -= (damage);
+  target.damageDisplay = new DamageDisplay(damage, target.battleSprite.position);
   target.deathCheck();
-  console.log("Net damage: " + (this.combatStats.strength-target.combatStats.toughness) + "\nremainingHP: " + target.remainingHP);
+  console.log("Net damage: " + (damage) + "\nremainingHP: " + target.remainingHP);
   if(!target.isAlive){
     console.log(target.role + " " + target.name + " has been slain!");
   }
@@ -214,9 +218,10 @@ function Snake() {
 Snake.prototype = Object.create(Monster.prototype);
 Snake.prototype.contructor = Snake;
 Snake.prototype.attack = function(target) {
-  Unit.attack.call(this, target);
+  Unit.prototype.attack.call(this, target);
   if(Math.random()>0.5) {
     target.statusEffectList.push(new Poisoned(target));
+    console.log(target.name + " is now poisoned!");
   }
 }
 
@@ -286,16 +291,13 @@ HealthBar.prototype.calculatePotentialDamage = function() {
       }
     }
   }
-  //console.log(potentialDamage - this.remainingHP);
   if(potentialDamage>=this.remainingHP) {
     this.potentialDamageLength = this.remainingHPLength;
     this.isPotentiallyFullySlain = true;
-    console.log("potentially fuly slain");
   }
   else if(this.remainingHP-potentialDamage>=this.maxHP && potentialDamage!=0){
     this.potentialDamageLength = -1*(this.length - this.remainingHPLength);
     this.isPotentiallyFullyHealed = true;
-    console.log("potentially fully healed");
   }
   else {
     this.potentialDamageLength = (potentialDamage/this.maxHP) * this.length;

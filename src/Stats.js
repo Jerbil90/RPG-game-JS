@@ -88,6 +88,17 @@ Stats.prototype.loadMonster = function(monster) {
       this.spirit = 0;
       this.will = 0;
       this.speed = 5;
+      break;
+      case "Snake":
+      this.strength = 5;
+      this.toughness = 2;
+      this.vigor = 2;
+      this.dexterity = 0;
+      this.cunning = 0;
+      this.spirit = 0;
+      this.will = 0;
+      this.speed = 4;
+      break;
   }
 }
 Stats.loadEquipment = function(name) {

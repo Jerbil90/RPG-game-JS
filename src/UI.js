@@ -11,7 +11,6 @@ function DamageDisplay(damageDealt, position) {
   this.unitPosition = position;
   //given position will refer to the units poition so the text needs to be centered properly
   this.position = {x: position.x + 16, y: position.y};
-  console.log(position);
   this.velocity = -50;
   this.acceleration = 200;
   this.landingTime = null;
@@ -86,7 +85,6 @@ InitiativeDisplay.prototype.update = function(gameTime, elapsedTime) {
       let initiativeSprite = new InitiativeSprite(this.unitList[i]);
       this.unitList[i].initiativeSprite = initiativeSprite;
       this.initiativeSpriteArray.push(initiativeSprite);
-      console.log("initiativeSprite pushed on " + this.unitList[i].name);
     }
   }
   switch(this.currentState) {
@@ -155,7 +153,6 @@ InitiativeDisplay.prototype.refresh = function() {
   if(!this.compareOrder(newTurnOrder, this.currentTurnOrder)) {
     this.currentTurnOrder = newTurnOrder;
     this.currentState = "switching";
-    console.log("new initiative!");
     //this.switchingStartTime = null this is set in the update method at the end of a switch
     for(i = 0 ; i < this.currentTurnOrder.length ; i++) {
       for(j = 0 ; j < this.currentTurnOrder[i].length ; j++) {

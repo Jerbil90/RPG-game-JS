@@ -72,8 +72,8 @@ BattleSurManager.prototype.load = function(partyHeros, battleItems, battleID) {
   this.battleMenuManager.setSurManager(this);
   this.battleMenuManager.load();
   //Then load battleSprites
-  this.heroManager.loadBattleSprites();
-  this.monsterManager.loadBattleSprites();
+  this.heroManager.setPassiveBattleSpritePosition();
+  this.monsterManager.setPassiveBattleSpritePosition();
   this.initiativeDisplay =  new InitiativeDisplay(this);
 }
 BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
@@ -85,6 +85,7 @@ BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
   else if(this.battleState == "combat") {
     this.combat.update(gameTime, elapsedTime);
     if(this.combat.isCombatOver){
+      //this.combat.poisonCheck();
       this.battleState = "waiting for input";
       this.battleMenuManager.newRound();
       this.heroManager.newRound();
@@ -252,6 +253,21 @@ this.turnOrder[this.currentTurn].currentlySelectedSpecialOrItem.effect(this.turn
   else {
     this.isCombatOver = true;
     console.log("Combat is over!");
+  }
+  if(this.isCombatOver) {
+    this.poisonCheck();
+  }
+}
+Combat.prototype.poisonCheck = function() {
+  for(let i = 0 ; i < this.turnOrder.length ; i++) {
+    console.log("performing poison check for " + this.turnOrder[i].name);
+    if(this.turnOrder[i].isAlive) {
+      if(this.turnOrder[i].isAfflictedWith("Poisoned")) {
+        this.turnOrder[i].remainingHP -= Math.floor(this.turnOrder[i].maxHP/5);
+        this.turnOrder[i].damageDisplay = new DamageDisplay(Math.floor(this.turnOrder[i].maxHP/5), this.turnOrder[i].battleSprite.position);
+        console.log(this.turnOrder[i].name + " takes " + Math.floor(this.turnOrder[i].maxHP/5) + " poison damage!");
+      }
+    }
   }
 }
 //This method checks to see if the current unit has been blocked this combat, if so it replaces its target with a random blocker
