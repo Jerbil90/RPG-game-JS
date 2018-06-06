@@ -2,6 +2,7 @@ import {Stats, CombatStats, EquippedStats} from './Stats';
 import {SpecialMove, PowerStrike, WindSlash, BlockOpponent, GuardAlly} from './Special';
 import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
 import {DamageDisplay, InitiativeDisplay} from './UI';
+import {StatusEffect, Guarded, Blocked, Poisoned} from './StatusEffect';
 
 //This is the constructor function for the Unit class, this class is the parent for each unit (hero/monster) and contains the parent properties and methods required by each Unit such as load, draw, update
 function Unit(name){
@@ -141,29 +142,10 @@ Unit.prototype.draw = function(ctx) {
   }
 }
 Unit.prototype.load = function() {
-  //this.loadImage(); // already loaded in hero/monster constructor
   this.loadStats();
   this.setMaxHP();
   this.healthBar = new HealthBar(this);
-}
-Unit.prototype.loadImage = function() {
-  this.image = new Image();
-  let imgsrc = "";
-  switch(this.role) {
-    case "fighter" :
-      imgsrc = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myFighterSymbol.png";
-      break;
-    case "knight" :
-      imgsrc = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myKnightSymbol.png";
-      break;
-    case "monster" :
-      imgsrc = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myMonsterSymbol.png";
-      break;
-    default:
-      console.log("load image error, undetermined role");
-      break;
-  }
-  this.image.src = imgsrc;
+  this.loadBattleSprite();
 }
 Unit.prototype.setPartyPosition = function (i) {
   this.partyPosition = i;
@@ -224,6 +206,19 @@ function Wolf(){
 }
 Wolf.prototype = Object.create(Monster.prototype);
 Wolf.prototype.constructor = Wolf;
+
+function Snake() {
+  Monster.call(this, "Snake");
+  this.baseStats = new Stats(this);
+}
+Snake.prototype = Object.create(Monster.prototype);
+Snake.prototype.contructor = Snake;
+Snake.prototype.attack = function(target) {
+  Unit.attack.call(this, target);
+  if(Math.random()>0.5) {
+    target.statusEffectList.push(new Poisoned(target));
+  }
+}
 
 function Equipment(name) {
   this.name = name;
@@ -382,4 +377,4 @@ CombatStance.prototype.update = function(gameTime, elapsedTime) {
   }
 }
 
-export {Unit, Hero, Monster, Fighter, Knight, Wolf, HealthBar, Equipment}
+export {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, HealthBar, Equipment}

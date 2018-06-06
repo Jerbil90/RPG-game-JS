@@ -44,19 +44,33 @@ Sprite.prototype.loadBattleSprite = function() {
     switch(this.owner.role) {
     case "monster":
     this.image = new Image();
-    //this.image.src = "C:\Users\Jeremy\Projects\jeremygame\assets\myMonsterSymbol.png";
-    this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myMonsterSymbol.png";
+    this.image.src = '../assets/myMonsterSymbol.png';
+    this.loadMonsterSprite();
     break;
     case "knight":
     this.image = new Image();
-    this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myKnightSymbol.png";
+    this.image.src = '../assets/myKnightSymbol.png';
     break;
     case "fighter":
     this.image = new Image();
-    this.image.src = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/myFighterSymbol.png";
+    this.image.src = '../assets/myFighterSymbol.png';
     break;
     default:
     console.log("error loading battle sprites: " + this.name + " has invalid role: " + this.role);
+    break;
+  }
+}
+Sprite.prototype.loadMonsterSprite = function() {
+  switch(this.owner.name) {
+    case "Wolf":
+    this.image.src = '../assets/myWolfSymbol.png';
+    console.log("wolf loaded");
+    break;
+    case "Snake":
+    this.image.src = '../assets/mySnakeSymbol.png';
+    break;
+    default:
+    console.log("error in loadMonsterSprite, invalid name");
     break;
   }
 }
@@ -64,7 +78,7 @@ Sprite.prototype.loadBattleSprite = function() {
 function InitiativeSprite(owner) {
   Sprite.call(this);
   this.owner = owner;
-  this.loadBattleSprite();
+  this.image = owner.battleSprite.image;
 }
 InitiativeSprite.prototype = Object.create(Sprite.prototype);
 InitiativeSprite.prototype.constructor = InitiativeSprite;
@@ -84,6 +98,7 @@ BattleSprite.prototype.setPassivePosition = function() {
   else{
     this.position = {x:150, y:100 + this.owner.partyPosition*50};
   }
+  console.log("set at y: " + (100+this.owner.partyPosition*50));
 }
 
 export {Sprite, InitiativeSprite, BattleSprite}

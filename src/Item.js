@@ -1,4 +1,5 @@
 import {Stats, CombatStats, EquippedStats} from './Stats';
+import {DamageDisplay, InitiativeDisplay} from './UI';
 
 function Item() {
   this.isBattleItem = false;

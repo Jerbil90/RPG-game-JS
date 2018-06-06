@@ -28,5 +28,14 @@ function Blocked(owner, blocker) {
   this.effectStrength = 1;
   this.blocker = blocker;
 }
+Blocked.prototype = Object.create(StatusEffect.prototype);
+Blocked.prototype.constructor = Blocked;
 
-export {StatusEffect, Guarded, Blocked}
+function Poisoned(owner) {
+  StatsEffect.call(this, owner);
+  this.name = "Poisoned";
+  this.duration = 5;
+  this.effectStrength = 1;
+}
+
+export {StatusEffect, Guarded, Blocked, Poisoned}

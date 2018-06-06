@@ -82,7 +82,6 @@ InitiativeDisplay.prototype.update = function(gameTime, elapsedTime) {
       }
     }
     this.initiativeSpriteArray = [];
-    console.log("making money!!");
     for(i=0;i<this.unitList.length;i++) {
       let initiativeSprite = new InitiativeSprite(this.unitList[i]);
       this.unitList[i].initiativeSprite = initiativeSprite;
