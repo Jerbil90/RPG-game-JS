@@ -152,7 +152,7 @@ Combat.prototype.victoryCheck = function() {
       this.isVictory = false;
     }
   }
-  if(this.isCombatOver) {
+  if(!this.isCombatOver) {
     if(this.isVictory) {
       this.isCombatOver = true;
       this.surManager.battleState = "victory";
@@ -167,7 +167,7 @@ Combat.prototype.defeatCheck = function() {
       this.isDefeat = false;
     }
   }
-  if(this.isCombatOver) {
+  if(!this.isCombatOver) {
     if(this.isDefeat) {
       this.isCombatOver = true;
       this.surManager.battleState = "defeat";
@@ -836,6 +836,8 @@ BattleMenuManager.prototype.handleClick = function(){
             this.currentlySelectedTarget = null
             currentHero.currentlySelectedTarget = null;
             currentHero.isTargetSelected = false;
+            this.assetList[4].resetMenu();
+            this.assetList[5].resetMenu();
             this.assetList[4].isVisible = false;
             this.assetList[4].isActive = false;
             this.assetList[5].isVisible = false;
@@ -867,6 +869,8 @@ BattleMenuManager.prototype.handleClick = function(){
           this.assetList[5].isActive = false;
           this.assetList[6].isActive = false;
           this.assetList[6].isVisible = false;
+          this.assetList[4].resetMenu();
+          this.assetList[5].resetMenu();
         }
         else if(i==4 && this.currentlySelectedTarget != this.assetList[4].menuButtonList[j].target) {
           console.log("new monster target selected, assigning...");
@@ -891,6 +895,9 @@ BattleMenuManager.prototype.handleClick = function(){
         }
         else if(i==5 && this.currentlySelectedTarget != this.assetList[5].menuButtonList[j].target) {
           console.log("new hero target selected, assigning...");
+
+
+
           let currentHero = this.surManager.heroManager.assetList[this.currentlySelectedHero];
           currentHero.isTargetSelected = true;
           currentHero.currentlySelectedTarget = this.assetList[5].menuButtonList[j].target;
@@ -898,6 +905,10 @@ BattleMenuManager.prototype.handleClick = function(){
           if(this.areAllHerosReady()){
             this.assetList[6].isActive = true;
             this.assetList[6].isVisible = true;
+          }
+          if(this.currentlySelectedAction == "Item") {
+            console.log("checkingApplicability of item");
+            this.currentlySelectedSpecialOrItem.checkApplicability(this.currentlySelectedTarget);
           }
         }
         else if(i==5 && this.currentlySelectedTarget == this.assetList[5].menuButtonList[j].target) {

@@ -211,7 +211,7 @@ ItemMenu.prototype.setOptions = function(options) {
 ItemMenu.prototype.checkRemainingItems = function(currentHero){
 	let i = 0;
   for(i = 1 ; i < this.optionList.length ; i++) {
-    this.menuButtonList[i].target.checkApplicability(this.surManager.heroManager.assetList, currentHero);
+    this.menuButtonList[i].target.checkAvailability(this.surManager.heroManager.assetList, currentHero);
   }
   this.verifyApplicability();
 }

@@ -71,6 +71,17 @@ Stats.prototype.load = function(role) {
       this.spirit = 0;
       this.will = 0;
       this.speed = 5;
+
+      break;
+    case "preemptiveItem":
+      this.strength = 0;
+      this.toughness = 0;
+      this.vigor = 0;
+      this.dexterity = 0;
+      this.cunning = 0;
+      this.spirit = 0;
+      this.will = 0;
+      this.speed = -5;
       break;
     default:
       console.log("error, could not load stats for role: " + role);

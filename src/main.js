@@ -3,7 +3,7 @@ import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
 import {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, HealthBar, Equipment} from './Unit';
 import {Stats, CombatStats, EquippedStats} from './Stats';
 import {DamageDisplay, InitiativeDisplay} from './UI';
-import {Item, BattleItem, MinorHealthPotion} from './Item';
+import {Item, BattleItem, MinorHealthPotion, Antidote} from './Item';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton} from './Menu';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 import {Battle} from './Battle';
@@ -76,6 +76,9 @@ Inventory.prototype.load = function(){
   let minorHealthPotion = new MinorHealthPotion();
   minorHealthPotion.quantity = 1;
   this.itemList.push(minorHealthPotion);
+  let antidote = new Antidote();
+  antidote.quantity = 1;
+  this.itemList.push(antidote);
 }
 
 //This class is responsible for managing the game while in the manorExploration phase

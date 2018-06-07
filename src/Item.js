@@ -11,7 +11,7 @@ function Item() {
 Item.prototype.consume = function() {
   this.quantity -= 1;
 }
-Item.prototype.checkApplicability = function(heroList, currentHero) {
+Item.prototype.checkAvailability = function(heroList, currentHero) {
 
 }
 
@@ -20,6 +20,7 @@ function BattleItem() {
   this.name = "unnamedBattleItem";
   this.isBattleItem = true;
   this.isUsedOnDead = false;
+  this.isBeingUsedPreemptively = false;
   this.role = "item";
   console.log("loading stats for item " + this.name);
   this.specialOrItemStats = new Stats(this);
@@ -29,7 +30,8 @@ BattleItem.prototype.constructor = BattleItem;
 BattleItem.prototype.effect = function(target){
 
 }
-BattleItem.prototype.checkApplicability = function(heroList, currentHero) {
+//This method checks to see if the item is availableFF
+BattleItem.prototype.checkAvailability = function(heroList, currentHero) {
   this.applicableTarget = true;
   if(this.quantity <= 0) {
     this.applicableTarget = false;
@@ -54,6 +56,23 @@ BattleItem.prototype.checkApplicability = function(heroList, currentHero) {
     }
   }
 }
+BattleItem.prototype.checkApplicability = function(target) {
+  if(target != null){
+    if(!this.isUsedOnOppoent) {
+      console.log("checking current target");
+      this.targetCheck(target);
+    }
+    else {
+      console.log("Item used on opponent applicability check irrelevant");
+    }
+  }
+  else {
+    console.log("no target detected for item applicability check");
+  }
+}
+BattleItem.prototype.targetCheck = function(target) {
+
+}
 
 function MinorHealthPotion() {
   BattleItem.call(this);
@@ -69,5 +88,54 @@ MinorHealthPotion.prototype.effect = function(target) {
   this.consume();
   console.log(target.name + " healed 10 points by health potion");
 }
+MinorHealthPotion.prototype.targetCheck = function(target) {
+  if(target.remainingHP == target.maxHP) {
+    this.isBeingUsedPreemptively = true;
+    this.role = "preemptiveItem";
+    this.specialOrItemStats = new Stats(this);
+    console.log("no damamge on targe detected, peremptiveItem Stats set");
+  }
+  else {
+    this.isBeingUsedPreemptively = false;
+    this.role = "item";
+    this.specialOrItemStats = new Stats(this);
+    console.log("damage on target detected, item stats set");
+  }
+}
 
-export {Item, BattleItem, MinorHealthPotion}
+function Antidote() {
+  BattleItem.call(this);
+  this.name = "Antidote";
+  this.isUsedPreemptively = true;
+  this.role = "preemptiveItem";
+  this.specialOrItemStats = new Stats(this);
+}
+Antidote.prototype = Object.create(BattleItem.prototype);
+Antidote.prototype.constructor = Antidote;
+Antidote.prototype.effect = function(target) {
+  if(target.isAfflictedWith("Poisoned")) {
+    for(let i = target.statusEffectList.length - 1 ; i >= 0 ; i--){
+      if(target.statusEffectList[i].name == "Poisoned") {
+        target.statusEffectList.splice(i, 1);
+        console.log(target.name + " has been cured of a poison status effect!");
+      }
+    }
+  }
+}
+Antidote.prototype.targetCheck = function(target){
+  if(target.isAfflictedWith("Poisoned")) {
+    this.isBeingUsedPreemptively = false;
+    this.role = "item";
+    this.specialOrItemStats = new Stats(this);
+    console.log("poison detected on target, new item stats")
+  }
+  else {
+    this.isBeingUsedPreemptively = true;
+    this.role = "preemptiveItem";
+    this.specialOrItemStats = new Stats(this);
+    console.log("poison not detected on target, premetiveItemStats set");
+  }
+}
+
+
+export {Item, BattleItem, MinorHealthPotion, Antidote};
