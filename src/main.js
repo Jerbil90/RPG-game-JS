@@ -7,6 +7,7 @@ import {Item, BattleItem, MinorHealthPotion, Antidote} from './Item';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton} from './Menu';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 import {Battle} from './Battle';
+import {BattleEndScreen} from './BattleEndScreen';
 
 //Game class constructor, this is the main object that holds and manages the game
 function Game() {
@@ -15,8 +16,11 @@ function Game() {
   this.inventory = null;
   this.gameTime = 0;
   this.elapsedTime = 0;
-  this.state = "battle";
+  this.state = "none";
+  this.targetState = "none";
   this.battle = null;
+  this.battleEndScreen = null;
+  this.fade = new Fade();
 }
 //This method is responsible for requesting the user's Heros from the server, atm it just provides default heros
 Game.prototype.loadUserData = function() {
@@ -32,7 +36,8 @@ Game.prototype.loadUserData = function() {
 //This method is responsible for creating an instance of a Battle
 Game.prototype.startBattle = function () {
   this.state = "battle";
-  this.battle = new Battle(0);
+  this.targetState = "battle";
+  this.battle = new Battle(1);
   let partyHeros = [];
   let battleItems = [];
   for(let i = 0;i < this.userHeroList.length;i++) {
@@ -48,6 +53,14 @@ Game.prototype.startBattle = function () {
   }
   this.battle.loadBattle(partyHeros, battleItems);
 }
+Game.prototype.endBattle = function(battle) {
+  if(this.targetState != "battleEndScreen") {
+    console.log("ending battle, setting up new Battleend screen");
+    this.battleEndScreen = new BattleEndScreen(battle);
+    this.targetState = "battleEndScreen";
+    this.fade.startFade();
+  }
+}
 //This is the game's main Update function it is responsible for determining gameTime and elapsedTime before calling the update functions of the appropriate managers
 Game.prototype.update = function() {
   let currentDate = new Date();
@@ -55,9 +68,27 @@ Game.prototype.update = function() {
   this.elapsedTime = currentTime - this.gameTime;
   this.gameTime = currentTime;
 
-  if(this.state=="battle") {
-    this.battle.update(this.gameTime, this.elapsedTime);
+  if(this.fade.fadeState == "none") {
+    if(this.state=="battle") {
+      this.battle.update(this.gameTime, this.elapsedTime);
+      if(this.battle.battleSurManager.battleState == "victory" || this.battle.battleSurManager.battleState == "defeat") {
+        this.endBattle(this.battle);
+      }
+    }
+    else if(this.state == "battleEndScreen") {
+      this.battleEndScreen.update(this.gameTime, this.elapsedTime);
+    }
   }
+  else {
+    this.fade.update(this.gameTime, this.elapsedTime);
+    if(this.fade.fadeState == "faded") {
+      this.state = this.targetState;
+    }
+    else if(this.fade.hasFadeEnded) {
+      this.fade.hasFadeEnded = false
+    }
+  }
+
 }
 //This is the game's main draw function
 Game.prototype.draw = function(ctx) {
@@ -65,7 +96,63 @@ Game.prototype.draw = function(ctx) {
     case "battle":
       this.battle.draw(ctx);
       break;
+      case "battleEndScreen":
+      this.battleEndScreen.draw(ctx);
+      break;
   }
+  this.fade.draw(ctx);
+}
+
+function Fade() {
+  this.alpha = 0;
+  this.stateStartTime = null;
+  this.fadeState = "none"
+  this.fadeTime = 500;
+  this.hasFadeEnded = false;
+}
+Fade.prototype.update = function(gameTime, elapsedTime) {
+  switch(this.fadeState) {
+    case "none":
+    break;
+    case "startingFade":
+    this.fadeState = "fadingOut";
+    this.stateStartTime = gameTime;
+    break;
+    case "fadingOut":
+    if(gameTime > this.stateStartTime + this.fadeTime) {
+      this.stateStartTime = gameTime;
+      this.fadeState = "faded";
+    }
+          this.alpha = ((gameTime-this.stateStartTime)/this.fadeTime);
+    break;
+    case "faded":
+    if(gameTime > this.stateStartTime + this.fadeTime) {
+      this.stateStartTime = gameTime;
+      this.fadeState = "fadingIn";
+    }
+    this.alpha = 1;
+    break;
+    case "fadingIn" :
+    if(gameTime > this.stateStartTime + this.fadeTime) {
+      this.stateStartTime = null;
+      this.fadeState = "none";
+      this.hasFadeEnded = true;
+    }
+    this.alpha = 1 - ((gameTime-this.stateStartTime)/this.fadeTime);
+    break;
+    default:
+    console.log("error in fade update method, invalid fadeState");
+    break;
+  }
+}
+Fade.prototype.draw = function(ctx) {
+  if(this.fadeState != "none") {
+    ctx.fillStyle = "rgba(0, 0, 0," + this.alpha + ")";
+    ctx.fillRect(0, 0, 640, 480);
+  }
+}
+Fade.prototype.startFade = function() {
+  this.fadeState = "startingFade";
 }
 
 function Inventory() {

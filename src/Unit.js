@@ -6,6 +6,11 @@ import {StatusEffect, Guarded, Blocked, Poisoned} from './StatusEffect';
 
 //This is the constructor function for the Unit class, this class is the parent for each unit (hero/monster) and contains the parent properties and methods required by each Unit such as load, draw, update
 function Unit(name){
+
+  this.currentXP = 0;
+  this.currentLV = 1;
+  this.experienceBar = null;
+
   this.maxHP = 0;
   this.isAlive = true;
   this.remainingHP = this.maxHP;
@@ -123,6 +128,9 @@ Unit.prototype.update = function(gameTime, elapsedTime) {
       this.damageDisplay = null;
     }
   }
+  if(this.experienceBar != null) {
+    this.experienceBar.update(gameTime, elapsedTime);
+  }
 }
 //This is the units main draw function
 Unit.prototype.draw = function(ctx) {
@@ -143,6 +151,9 @@ Unit.prototype.draw = function(ctx) {
   }
   if(this.damageDisplay != null) {
     this.damageDisplay.draw(ctx);
+  }
+  if(this.experienceBar != null) {
+    this.experienceBar.draw(ctx);
   }
 }
 Unit.prototype.load = function() {
@@ -207,6 +218,8 @@ Monster.prototype.constructor = Monster;
 function Wolf(){
   Monster.call(this, "Wolf");
   this.baseStats = new Stats(this);
+  this.currentXP = 2;
+  this.currentLV = 1;
 }
 Wolf.prototype = Object.create(Monster.prototype);
 Wolf.prototype.constructor = Wolf;
@@ -214,6 +227,8 @@ Wolf.prototype.constructor = Wolf;
 function Snake() {
   Monster.call(this, "Snake");
   this.baseStats = new Stats(this);
+  this.currentXP = 2;
+  this.currentLV = 1;
 }
 Snake.prototype = Object.create(Monster.prototype);
 Snake.prototype.contructor = Snake;

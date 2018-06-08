@@ -77,6 +77,7 @@ MonsterManager.prototype.load = function(battleID) {
     this.assetList.push(new Snake());
     break;
     case 1:
+    this.assetList.push(new Wolf());
     break;
     default:
     this.assetList.push(new Wolf());

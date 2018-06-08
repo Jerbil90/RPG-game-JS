@@ -18,6 +18,9 @@ Battle.prototype.loadBattle = function(partyHeros, battleItems) {
 //This is the Battle's main update method, responsible for calling the surManager's update function and determining the battleState
 Battle.prototype.update = function(gameTime, elapsedTime) {
   this.battleSurManager.update(gameTime, elapsedTime);
+  if(this.battleSurManager.battleState == "victory"|| this.battleSurManager.battleState == "defeat") {
+    this.battleState = "battle over";
+  }
   switch(this.battleState){
     case "waiting for input":
       let pass = true;
@@ -32,6 +35,9 @@ Battle.prototype.update = function(gameTime, elapsedTime) {
       }
       break;
       case "turn in progress":
+      break;
+      case "battle over" :
+
       break;
     default:
       console.log("battleState error, not an acceptable value for battleState!");
@@ -92,12 +98,15 @@ BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
       this.monsterManager.newRound();
     }
   }
-  else if(this.battleState == "victory") {
-    console.log("victory");
+  if(this.combat != null) {
+    if(this.combat.isVictory) {
+      this.battleState = "victory";
+    }
+    else if(this.combat.isDefeat) {
+      this.battleState = "defeat";
+    }
   }
-  else if(this.battleState == "defeat") {
-    console.log("defeat");
-  }
+
 }
 BattleSurManager.prototype.draw = function(ctx) {
   SurManager.prototype.draw.call(this, ctx);
