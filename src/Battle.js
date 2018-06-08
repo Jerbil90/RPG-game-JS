@@ -576,7 +576,7 @@ BattleMenuManager.prototype.handleClick = function(){
               }
               else {
                 this.assetList[5].isVisible = true;
-                this.assetList[5].isActive = ture;
+                this.assetList[5].isActive = true;
                 this.assetList[5].setSelection = (this.currentlySelectedTarget);
               }
             }
