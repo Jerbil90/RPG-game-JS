@@ -7,7 +7,7 @@ import {Item, BattleItem, MinorHealthPotion, Antidote} from './Item';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton} from './Menu';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 import {Battle} from './Battle';
-import {BattleEndScreen} from './BattleEndScreen';
+import {BattleEndScreen, ExperienceBar} from './BattleEndScreen';
 
 //Game class constructor, this is the main object that holds and manages the game
 function Game() {

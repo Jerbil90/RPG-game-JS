@@ -48,7 +48,7 @@ HeroManager.prototype.newRound = function() {
     for(let j = 0 ; j < this.assetList[i].statusEffectList.length ; j++) {
       this.assetList[i].statusEffectList[j].duration--;
     }
-    for(let j = this.assetList[i].statusEffectList.length - 1; j >= 0 ; j--) {
+    for(let j = this.assetList[i].statusEffectList.length - 1 ; j >= 0 ; j--) {
       if(this.assetList[i].statusEffectList[j].duration <= 0) {
         this.assetList[i].statusEffectList.splice(j, 1);
       }
@@ -56,10 +56,26 @@ HeroManager.prototype.newRound = function() {
   }
 }
 HeroManager.prototype.setPassiveBattleSpritePosition = function() {
-  let i = 0 ;
-  for(i=0;i<this.assetList.length ; i++) {
+  for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].battleSprite.setPassivePosition();
   }
+}
+HeroManager.prototype.endBattle = function() {
+  var gainedXP = this.calculateGainedXP();
+  for(let i = 0 ; i < this.assetList.length ; i++) {
+    this.assetList[i].endBattle();
+    this.assetList[i].experienceBar.gainedXP = gainedXP;
+  }
+}
+HeroManager.prototype.calculateGainedXP = function() {
+  var totalXP = 0;
+  for(let i = 0 ; i < this.surManager.monsterManager.assetList.length ; i++) {
+    totalXP += this.surManager.monsterManager.assetList[i].currentXP;
+  }
+  console.log("total XP calculated at: " + totalXP);
+  var unitXP = Math.floor(totalXP/this.assetList.length);
+  console.log("unit XP calculated at: " + unitXP);
+  return unitXP;
 }
 
 //This is the constructor function for the MonsterManager class, this class is responsible for listing Monsters in a manorExplore(bestiary) or a battle(active enemies) scene

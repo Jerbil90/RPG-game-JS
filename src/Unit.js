@@ -3,6 +3,7 @@ import {SpecialMove, PowerStrike, WindSlash, BlockOpponent, GuardAlly} from './S
 import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
 import {DamageDisplay, InitiativeDisplay} from './UI';
 import {StatusEffect, Guarded, Blocked, Poisoned} from './StatusEffect';
+import {BattleEndScreen, ExperienceBar} from './BattleEndScreen';
 
 //This is the constructor function for the Unit class, this class is the parent for each unit (hero/monster) and contains the parent properties and methods required by each Unit such as load, draw, update
 function Unit(name){
@@ -118,7 +119,10 @@ Unit.prototype.moveApplicabilityCheck = function() {
   }
 }
 Unit.prototype.update = function(gameTime, elapsedTime) {
-  this.healthBar.update(gameTime, elapsedTime);
+  if(this.healthBar != null) {
+    this.healthBar.update(gameTime, elapsedTime);
+  }
+
   this.combatStance.update(gameTime, elapsedTime);
   this.calculateCombatStats();
   this.deathCheck();
@@ -141,13 +145,19 @@ Unit.prototype.draw = function(ctx) {
     if(this.initiativeSprite != null) {
       this.initiativeSprite.draw(ctx);
     }
-    this.healthBar.draw(ctx);
+    if(this.healthBar != null) {
+      this.healthBar.draw(ctx);
+    }
+
   }
   else if(this.role != "monster") {
     if(this.battleSprite != null) {
       this.battleSprite.draw(ctx);
     }
-    this.healthBar.draw(ctx);
+    if(this.healthBar != null) {
+      this.healthBar.draw(ctx);
+    }
+
   }
   if(this.damageDisplay != null) {
     this.damageDisplay.draw(ctx);
@@ -172,6 +182,12 @@ Unit.prototype.loadStats = function() {
 }
 Unit.prototype.loadBattleSprite = function() {
   this.battleSprite = new BattleSprite(this);
+}
+Unit.prototype.endBattle = function() {
+  this.initiativeSprite = null;
+  this.battleSprite = null;
+  this.healthBar = null;
+  this.experienceBar = new ExperienceBar(this);
 }
 
 //This is the constructor function for the Hero class, this class is responsible for describing the User's playable characters

@@ -74,6 +74,9 @@ Sprite.prototype.loadMonsterSprite = function() {
     break;
   }
 }
+Sprite.prototype.setOwner = function(owner) {
+  this.owner = owner;
+}
 
 function InitiativeSprite(owner) {
   Sprite.call(this);
