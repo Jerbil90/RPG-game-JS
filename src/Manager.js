@@ -72,9 +72,9 @@ HeroManager.prototype.calculateGainedXP = function() {
   for(let i = 0 ; i < this.surManager.monsterManager.assetList.length ; i++) {
     totalXP += this.surManager.monsterManager.assetList[i].currentXP;
   }
-  console.log("total XP calculated at: " + totalXP);
   var unitXP = Math.floor(totalXP/this.assetList.length);
-  console.log("unit XP calculated at: " + unitXP);
+  for(let i = 0 ; i < this.assetList.length ; i++) {
+  }
   return unitXP;
 }
 
@@ -89,11 +89,34 @@ MonsterManager.prototype.constructor = MonsterManager;
 MonsterManager.prototype.load = function(battleID) {
   switch(battleID) {
     case 0:
-    this.assetList.push(new Wolf());
     this.assetList.push(new Snake());
     break;
     case 1:
     this.assetList.push(new Wolf());
+    break;
+    case 2:
+    this.assetList.push(new Wolf());
+    this.assetList.push(new Wolf());
+    break;
+    case 3:
+    this.assetList.push(new Wolf());
+    this.assetList.push(new Snake());
+    break;
+    case 4:
+    this.assetList.push(new Wolf());
+    this.assetList.push(new Snake());
+    this.assetList.push(new Wolf());
+    break;
+    case 5:
+    this.assetList.push(new Wolf());
+    this.assetList.push(new Snake());
+    this.assetList.push(new Snake());
+    break;
+    case 6:
+    this.assetList.push(new Wolf());
+    this.assetList.push(new Snake());
+    this.assetList.push(new Wolf());
+    this.assetList.push(new Snake());
     break;
     default:
     this.assetList.push(new Wolf());

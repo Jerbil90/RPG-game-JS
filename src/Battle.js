@@ -1,6 +1,6 @@
 import {SurManager} from './main';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
-import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton} from './Menu';
+import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu';
 import {DamageDisplay, InitiativeDisplay} from './UI';
 
 //This class is responsible for managing the game while in the battle phase

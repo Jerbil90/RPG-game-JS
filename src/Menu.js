@@ -253,6 +253,20 @@ TurnConfirmButton.prototype.load = function() {
   this.setOptions(label);
 }
 
+function BattleSelectMenu() {
+  Menu.call(this);
+  this.isVisible = true;
+  this.isActive = true;
+}
+BattleSelectMenu.prototype = Object.create(Menu.prototype);
+BattleSelectMenu.prototype.constructor = BattleSelectMenu;
+BattleSelectMenu.prototype.load = function() {
+  let label1 = {name: "Easy Battle", applicableTarget: true};
+  let label2 = {name: "Moderate Battle", applicableTarget: true};
+  let label3 = {name: "Difficult Battle", applicableTarget: true};
+  let buttonList = [label1, label2, label3];
+  this.setOptions(buttonList);
+}
 
 //This is the constructor for the MenuButton class, this class is responsible for describing a button that represents a selection on a menu
 function MenuButton(target) {
@@ -340,4 +354,4 @@ MenuButton.prototype.draw = function(ctx) {
   }
 }
 
-export {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton}
+export {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu}

@@ -4,7 +4,7 @@ import {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, HealthBar, Equipment}
 import {Stats, CombatStats, EquippedStats} from './Stats';
 import {DamageDisplay, InitiativeDisplay} from './UI';
 import {Item, BattleItem, MinorHealthPotion, Antidote} from './Item';
-import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton} from './Menu';
+import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 import {Battle} from './Battle';
 import {BattleEndScreen, ExperienceBar} from './BattleEndScreen';
@@ -34,15 +34,15 @@ Game.prototype.loadUserData = function() {
   this.userItemList = this.inventory.itemList;
 }
 //This method is responsible for creating an instance of a Battle
-Game.prototype.startBattle = function () {
-  this.state = "battle";
+Game.prototype.startBattle = function (battleID) {
   this.targetState = "battle";
-  this.battle = new Battle(1);
+  this.battle = new Battle(battleID);
   let partyHeros = [];
   let battleItems = [];
   for(let i = 0;i < this.userHeroList.length;i++) {
     if(this.userHeroList[i].isInParty) {
       this.userHeroList[i].setPartyPosition(i);
+      this.userHeroList[i].loadBattleSprite();
       partyHeros.push(this.userHeroList[i]);
     }
   }
@@ -77,6 +77,11 @@ Game.prototype.update = function() {
     }
     else if(this.state == "battleEndScreen") {
       this.battleEndScreen.update(this.gameTime, this.elapsedTime);
+      if(this.battleEndScreen.surManager.menuManager.isScreenOver) {
+        this.userHeroList = this.battleEndScreen.surManager.heroManager.assetList;
+        this.startBattle(this.battleEndScreen.surManager.menuManager.newID)
+        this.fade.startFade();
+      }
     }
   }
   else {
@@ -223,16 +228,30 @@ SurManager.prototype.draw = function(ctx) {
 $(document).ready(function() {
   var game = new Game();
   game.loadUserData();
-  game.startBattle();
+  game.state = "battle";
+  game.startBattle(1);
   var canvas = document.getElementById('gameArea');
   canvas.addEventListener("mousemove", function(event) {
     var rect = canvas.getBoundingClientRect();
     let mousex = event.clientX - rect.left;
     let mousey = event.clientY - rect.top;
     game.battle.battleSurManager.setMouseDetails(mousex, mousey);
+    if(game.battleEndScreen != null) {
+      game.battleEndScreen.surManager.setMouseDetails(mousex, mousey);
+    }
   });
   canvas.addEventListener("click", function(event) {
-    game.battle.battleSurManager.battleMenuManager.handleClick();
+    switch(game.state) {
+      case "battle":
+      game.battle.battleSurManager.battleMenuManager.handleClick();
+      break;
+      case "battleEndScreen":
+      game.battleEndScreen.surManager.menuManager.handleClick();
+      break;
+      default:
+      console.log("error in handleclick, invalid game.state");
+      break;
+    }
   });
 
   var intervalFunction = setInterval(function() {

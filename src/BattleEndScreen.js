@@ -1,8 +1,10 @@
 import {SurManager} from './main';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
+import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu'
 
 function BattleEndScreen(battle) {
+  this.endScreenStartTime = null;
   if(battle.battleSurManager.battleState == "victory") {
     this.surManager = new BattleEndSurManager(battle.battleSurManager);
     console.log("victory detected, making a real battleEndScreen")
@@ -18,6 +20,15 @@ BattleEndScreen.prototype.draw = function(ctx) {
 }
 BattleEndScreen.prototype.update = function (gameTime, elapsedTime) {
   this.surManager.update(gameTime, elapsedTime);
+  if(this.endScreenStartTime == null) {
+    this.endScreenStartTime = gameTime;
+  }
+  else {
+    if(gameTime > this.endScreenStartTime + 4000) {
+      this.surManager.menuManager.assetList[0].isActive = true;
+      this.surManager.menuManager.assetList[0].isVisible = true;
+    }
+  }
 }
 
 function BattleEndSurManager(battleSurManager) {
@@ -29,10 +40,20 @@ function BattleEndSurManager(battleSurManager) {
   this.environmentManager = new BattleEndEnvironmentManager();
   this.environmentManager.setSurManager(this);
   this.environmentManager.load();
+  this.menuManager = new BattleEndMenuManager();
+  this.menuManager.setSurManager(this);
+  this.menuManager.load();
 }
 BattleEndSurManager.prototype = Object.create(SurManager.prototype);
 BattleEndSurManager.prototype.constructor = BattleEndSurManager;
-
+BattleEndSurManager.prototype.update = function(gameTime, elapsedTime) {
+  SurManager.prototype.update.call(this, gameTime, elapsedTime);
+  this.menuManager.update(gameTime, elapsedTime);
+}
+BattleEndSurManager.prototype.draw = function(ctx) {
+  SurManager.prototype.draw.call(this, ctx);
+  this.menuManager.draw(ctx);
+}
 
 function GameOverSurManager() {
   this.environmentManager = new BattleEndEnvironmentManager();
@@ -113,9 +134,9 @@ ExperienceBar.prototype.update = function(gameTime, elapsedTime) {
     if(this.filledXP >= this.gainedXP){
       this.stateStartTime = gameTime;
       this.state = "filled";
+      this.owner.currentXP += this.gainedXP;
     }
   }
-  
 }
 ExperienceBar.prototype.draw = function(ctx) {
   this.sprite.draw(ctx);
@@ -131,6 +152,66 @@ ExperienceBar.prototype.draw = function(ctx) {
   //Then, draw the filledXP
   ctx.fillStyle = "rgb(250, 250, 250)";
   ctx.fillRect(this.position.x + 50 + Math.floor(200 * (this.oldXP/this.requiredXP)), this.position.y - 18, Math.floor(200 * (this.filledXP/this.requiredXP)), 50);
+}
+
+function BattleEndMenuManager() {
+  Manager.call(this);
+  this.isScreenOver = false;
+
+}
+BattleEndMenuManager.prototype = Object.create(Manager.prototype);
+BattleEndMenuManager.prototype.constructor = BattleEndMenuManager;
+BattleEndMenuManager.prototype.load = function() {
+  let battleSelectMenu = new BattleSelectMenu();
+  battleSelectMenu.setSurManager(this.surManager);
+  battleSelectMenu.setPosition(0, 240);
+  battleSelectMenu.load();
+  battleSelectMenu.isActive = false;
+  battleSelectMenu.isVisible = false;
+  this.assetList.push(battleSelectMenu);
+}
+BattleEndMenuManager.prototype.update = function(gameTime, elapsedTime) {
+  for(let i = 0 ; i < this.assetList.length ; i++) {
+    this.assetList[i].update(gameTime, elapsedTime);
+  }
+  this.cursorHoverCheck();
+}
+BattleEndMenuManager.prototype.cursorHoverCheck = function() {
+  let cursorHover = false;
+  for(let i = 0; i<this.assetList.length; i++) {
+    this.assetList[i].hoverCheck();
+    if (this.assetList[i].cursorHover) {
+      cursorHover = true;
+      break;
+    }
+  }
+  if(cursorHover) {
+    this.surManager.enableHandPointer();
+  }
+  else {
+    this.surManager.disableHandPointer();
+  }
+}
+BattleEndMenuManager.prototype.handleClick = function() {
+  this.newID = -1;
+  for(let i = 0 ; i< this.assetList.length ; i++) {
+
+    for(let j = 0 ; j < this.assetList[i].menuButtonList.length ; j++) {
+      if(this.assetList[i].menuButtonList[j].cursorHover) {
+        this.assetList[i].select(j);
+        this.isScreenOver = true;
+        if(j==0) {
+          this.newID = Math.floor(Math.random()*2);
+        }
+        else if(j==1) {
+          this.newID = 2 + Math.floor(Math.random()*2);
+        }
+        else if(j==2) {
+          this.newID = 4 + Math.floor(Math.random()*4);
+        }
+      }
+    }
+  }
 }
 
 export {BattleEndScreen, ExperienceBar}

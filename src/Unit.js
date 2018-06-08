@@ -182,13 +182,18 @@ Unit.prototype.loadStats = function() {
 }
 Unit.prototype.loadBattleSprite = function() {
   this.battleSprite = new BattleSprite(this);
+  this.experienceBar = null;
+  this.healthBar = new HealthBar(this);
 }
 Unit.prototype.endBattle = function() {
   this.initiativeSprite = null;
   this.battleSprite = null;
   this.healthBar = null;
+  this.remainingHP = this.maxHP;
+  this.statusEffectList = [];
   this.experienceBar = new ExperienceBar(this);
 }
+
 
 //This is the constructor function for the Hero class, this class is responsible for describing the User's playable characters
 function Hero(name, role){
