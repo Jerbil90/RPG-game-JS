@@ -231,34 +231,34 @@ Stats.prototype.loadFighter = function(level) {
 Stats.prototype.loadKnight = function(level) {
   switch(level) {
     case 1:
-    this.strength = 8;
-    this.toughness = 3;
-    this.vigor = 4;
-    this.dexterity = 0;
-    this.cunning = 0;
-    this.spirit = 0;
-    this.will = 0;
-    this.speed = 4;
-    break;
-    case 2:
-    this.strength = 9;
+    this.strength = 6;
     this.toughness = 4;
     this.vigor = 5;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
     this.will = 0;
-    this.speed = 5;
+    this.speed = 3;
     break;
-    case 3:
-    this.strength = 11;
+    case 2:
+    this.strength = 8;
     this.toughness = 5;
     this.vigor = 6;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
     this.will = 0;
-    this.speed = 5;
+    this.speed = 4;
+    break;
+    case 3:
+    this.strength = 10;
+    this.toughness = 5;
+    this.vigor = 6;
+    this.dexterity = 0;
+    this.cunning = 0;
+    this.spirit = 0;
+    this.will = 0;
+    this.speed = 6;
     break;
     case 4:
     this.strength = 12;
@@ -268,7 +268,7 @@ Stats.prototype.loadKnight = function(level) {
     this.cunning = 0;
     this.spirit = 0;
     this.will = 0;
-    this.speed = 6;
+    this.speed = 7;
     break;
     case 5:
     this.strength = 14;
@@ -278,7 +278,7 @@ Stats.prototype.loadKnight = function(level) {
     this.cunning = 0;
     this.spirit = 0;
     this.will = 0;
-    this.speed = 7;
+    this.speed = 8;
     break;
     case 6:
     this.strength = 8;
