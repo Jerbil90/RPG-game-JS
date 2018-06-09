@@ -99,6 +99,7 @@ function ExperienceBar(owner) {
   this.position = {x:100, y: 100 + 65 * owner.partyPosition};
   this.sprite.setPosition(this.position.x, this.position.y);
 
+  this.hasLeveledUp = false;
   this.state = "waiting";
   this.stateStartTime = null;
   this.waitTime = 1500;
@@ -111,6 +112,45 @@ ExperienceBar.prototype.calculateRequiredXP = function() {
     break;
     case 2:
     this.requiredXP = 10;
+    break;
+    case 3:
+    this.requiredXP = 20;
+    break;
+    case 4:
+    this.requiredXP = 50;
+    break;
+    case 5:
+    this.requiredXP = 100;
+    break;
+    case 6:
+    this.requiredXP = 250;
+    break;
+    case 7:
+    this.requiredXP = 450;
+    break;
+    case 8:
+    this.requiredXP = 700;
+    break;
+    case 9:
+    this.requiredXP = 1000;
+    break;
+    case 10:
+    this.requiredXP = 1400;
+    break;
+    case 11:
+    this.requiredXP = 1900;
+    break;
+    case 12:
+    this.requiredXP = 2500;
+    break;
+    case 13:
+    this.requiredXP = 3200;
+    break;
+    case 14:
+    this.requiredXP = 4000;
+    break;
+    case 15:
+    this.requiredXP = 5000;
     break;
     default:
     console.log("error in calculateRequiredXP, currentLV not valid");
@@ -131,6 +171,16 @@ ExperienceBar.prototype.update = function(gameTime, elapsedTime) {
   }
   else if(this.state == "filling") {
     this.filledXP = this.gainedXP * ((gameTime - this.stateStartTime)/this.fillTime);
+    if(this.filledXP+this.oldXP>=this.requiredXP){
+      this.hasLeveledUp = true;
+      this.gainedXP -= (this.requiredXP-this.oldXP);
+      this.owner.levelUp();
+      this.oldXP = 0;
+      this.fillTime -= (gameTime-this.stateStartTime);
+      this.stateStartTime = gameTime;
+      this.calculateRequiredXP();
+      this.filledXP = 0;
+    }
     if(this.filledXP >= this.gainedXP){
       this.stateStartTime = gameTime;
       this.state = "filled";
@@ -141,7 +191,12 @@ ExperienceBar.prototype.update = function(gameTime, elapsedTime) {
 ExperienceBar.prototype.draw = function(ctx) {
   this.sprite.draw(ctx);
   //Draw the XPbar border
-  ctx.fillStyle = "rgb(150, 150, 150)";
+  if(this.hasLeveledUp) {
+    ctx.fillStyle = "rgb(255, 215, 0)";
+  }
+  else {
+    ctx.fillStyle = "rgb(150, 150, 150)";
+  }
   ctx.fillRect(this.position.x+45, this.position.y-23, 210, 60);
   //Next draw the empty ExperienceBar
   ctx.fillStyle = "rgb(50, 50, 50)";
@@ -157,7 +212,6 @@ ExperienceBar.prototype.draw = function(ctx) {
 function BattleEndMenuManager() {
   Manager.call(this);
   this.isScreenOver = false;
-
 }
 BattleEndMenuManager.prototype = Object.create(Manager.prototype);
 BattleEndMenuManager.prototype.constructor = BattleEndMenuManager;

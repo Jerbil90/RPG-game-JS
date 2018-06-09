@@ -127,6 +127,7 @@ Fade.prototype.update = function(gameTime, elapsedTime) {
     if(gameTime > this.stateStartTime + this.fadeTime) {
       this.stateStartTime = gameTime;
       this.fadeState = "faded";
+      this.alpha = 1;
     }
           this.alpha = ((gameTime-this.stateStartTime)/this.fadeTime);
     break;

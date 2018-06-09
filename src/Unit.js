@@ -203,6 +203,12 @@ function Hero(name, role){
 }
 Hero.prototype = Object.create(Unit.prototype);
 Hero.prototype.constructor = Hero;
+Hero.prototype.levelUp = function() {
+  this.currentLV++;
+  this.currentXP = 0;
+  this.baseStats = new Stats(this);
+
+}
 
 //This is the constructor function for the Fighter class, this class is responsible for describing the Hero's of the role fighter
 //Fighters are balanced heros, strong attacks make them useful damage dealers and they possess moderate defensive abilities
@@ -239,7 +245,7 @@ Monster.prototype.constructor = Monster;
 function Wolf(){
   Monster.call(this, "Wolf");
   this.baseStats = new Stats(this);
-  this.currentXP = 2;
+  this.currentXP = 4;
   this.currentLV = 1;
 }
 Wolf.prototype = Object.create(Monster.prototype);
@@ -248,7 +254,7 @@ Wolf.prototype.constructor = Wolf;
 function Snake() {
   Monster.call(this, "Snake");
   this.baseStats = new Stats(this);
-  this.currentXP = 2;
+  this.currentXP = 4;
   this.currentLV = 1;
 }
 Snake.prototype = Object.create(Monster.prototype);
