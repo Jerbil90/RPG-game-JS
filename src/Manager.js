@@ -218,10 +218,10 @@ EnvironmentManager.prototype = Object.create(Manager.prototype);
 EnvironmentManager.prototype.constructor = EnvironmentManager;
 EnvironmentManager.prototype.load = function(battleID) {
   if (battleID>=0 && battleID < 7) {
-    this.backgroundImageSource = "../assets/myGrasslandBattleScene.png";
+    this.backgroundImageSource = require('../assets/myGrasslandBattleScene.png');
   }
   else if(battleID >= 7 && battleID < 15) {
-    this.backgroundImageSource = "../assets/myBeachBattleScene.png";
+    this.backgroundImageSource = require('../assets/myBeachBattleScene.png');
   }
 
   this.backgroundImage = new Image();

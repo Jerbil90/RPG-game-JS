@@ -75,7 +75,7 @@ BattleEndEnvironmentManager.prototype = Object.create(Manager.prototype);
 BattleEndEnvironmentManager.prototype.constructor = BattleEndEnvironmentManager;
 BattleEndEnvironmentManager.prototype.load = function() {
   this.backgroundImage = new Image();
-  this.backgroundImage.src = "../assets/myBattleEndBackground.png";
+  this.backgroundImage.src = require('../assets/myBattleEndBackground.png');
 }
 BattleEndEnvironmentManager.prototype.update = function(gameTime, elapsedTime) {
 

@@ -44,16 +44,16 @@ Sprite.prototype.loadBattleSprite = function() {
     switch(this.owner.role) {
     case "monster":
     this.image = new Image();
-    this.image.src = '../assets/myMonsterSymbol.png';
+    this.image.src = require('../assets/myMonsterSymbol.png');
     this.loadMonsterSprite();
     break;
     case "knight":
     this.image = new Image();
-    this.image.src = '../assets/myKnightSymbol.png';
+    this.image.src = require('../assets/myKnightSymbol.png');
     break;
     case "fighter":
     this.image = new Image();
-    this.image.src = '../assets/myFighterSymbol.png';
+    this.image.src = require('../assets/myFighterSymbol.png');
     break;
     default:
     console.log("error loading battle sprites: " + this.name + " has invalid role: " + this.role);
@@ -63,22 +63,22 @@ Sprite.prototype.loadBattleSprite = function() {
 Sprite.prototype.loadMonsterSprite = function() {
   switch(this.owner.name) {
     case "Wolf":
-    this.image.src = '../assets/myWolfSymbol.png';
+    this.image.src = require('../assets/myWolfSymbol.png');
     break;
     case "Snake":
-    this.image.src = '../assets/mySnakeSymbol.png';
+    this.image.src = require('../assets/mySnakeSymbol.png');
     break;
     case "Mr Snips":
-    this.image.src = '../assets/myMisterSnipsSymbol.png';
+    this.image.src = require('../assets/myMisterSnipsSymbol.png');
     break;
     case "Highwayman":
-    this.image.src = '../assets/myHighwaymanSymbol.png';
+    this.image.src = require('../assets/myHighwaymanSymbol.png');
     break;
     case "Zombie Sailor":
-    this.image.src = '../assets/myZombieSailorSymbol.png';
+    this.image.src = require('../assets/myZombieSailorSymbol.png');
     break;
     case "Zombie Pirate":
-    this.image.src = '../assets/myZombiePirateSymbol.png';
+    this.image.src = require('../assets/myZombiePirateSymbol.png');
     break;
     default:
     console.log("error in loadMonsterSprite, invalid name");
