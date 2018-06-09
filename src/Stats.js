@@ -404,6 +404,49 @@ Stats.prototype.loadMonster = function(monster) {
       this.will = 0;
       this.speed = 4;
       break;
+      case "Highwayman":
+      this.strength = 12;
+      this.toughness = 8;
+      this.vigor = 4;
+      this.dexterity = 0;
+      this.cunning = 0;
+      this.spirit = 0;
+      this.will = 0;
+      this.speed = 6;
+      break;
+      case "Mr Snips":
+      this.strength = 12;
+      this.toughness = 10;
+      this.vigor = 5;
+      this.dexterity = 0;
+      this.cunning = 0;
+      this.spirit = 0;
+      this.will = 0;
+      this.speed = 8;
+      break;
+      case "Zombie Sailor":
+      this.strength = 12;
+      this.toughness = 10;
+      this.vigor = 5;
+      this.dexterity = 0;
+      this.cunning = 0;
+      this.spirit = 0;
+      this.will = 0;
+      this.speed = 5;
+      break;
+      case "Zombie Pirate":
+      this.strength = 15;
+      this.toughness = 11;
+      this.vigor = 7;
+      this.dexterity = 0;
+      this.cunning = 0;
+      this.spirit = 0;
+      this.will = 0;
+      this.speed = 8;
+      break;
+      default:
+      console.log("Error in Stats.loadmonster, invalid name");
+      break;
   }
 }
 Stats.loadEquipment = function(name) {

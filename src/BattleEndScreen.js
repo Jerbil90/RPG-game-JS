@@ -261,7 +261,16 @@ BattleEndMenuManager.prototype.handleClick = function() {
           this.newID = 2 + Math.floor(Math.random()*2);
         }
         else if(j==2) {
-          this.newID = 4 + Math.floor(Math.random()*4);
+          this.newID = 4 + Math.floor(Math.random()*3);
+        }
+        else if(j==3) {
+          this.newID = 7 + Math.floor(Math.random()*3);
+        }
+        else if(j==4) {
+          this.newID = 10 + Math.floor(Math.random()*3);
+        }
+        else if(j==5) {
+          this.newID = 13 + Math.floor(Math.random()*2);
         }
       }
     }

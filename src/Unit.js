@@ -184,6 +184,7 @@ Unit.prototype.loadBattleSprite = function() {
   this.battleSprite = new BattleSprite(this);
   this.experienceBar = null;
   this.healthBar = new HealthBar(this);
+  this.setMaxHP();
 }
 Unit.prototype.endBattle = function() {
   this.initiativeSprite = null;
@@ -266,6 +267,42 @@ Snake.prototype.attack = function(target) {
     console.log(target.name + " is now poisoned!");
   }
 }
+
+function Highwayman() {
+  Monster.call(this, "Highwayman");
+  this.baseStats = new Stats(this);
+  this.currentXP = 12;
+  this.currentLV = 3;
+}
+Highwayman.prototype = Object.create(Monster.prototype);
+Highwayman.prototype.costructor = Highwayman;
+
+function MrSnips() {
+  Monster.call(this, "Mr Snips");
+  this.baseStats = new Stats(this);
+  this.currentLV = 5;
+  this.currentXP = 24;
+}
+MrSnips.prototype = Object.create(Monster.prototype);
+MrSnips.prototype.constructor = MrSnips;
+
+function ZombieSailor() {
+  Monster.call(this, "Zombie Sailor");
+  this.baseStats = new Stats(this);
+  this.currentLV = 4;
+  this.currentXP = 16;
+}
+ZombieSailor.prototype = Object.create(Monster.prototype);
+ZombieSailor.prototype.constructor = ZombieSailor;
+
+function ZombiePirate() {
+  Monster.call(this, "Zombie Pirate");
+  this.baseStats = new Stats(this);
+  this.currentLV = 7;
+  this.currentXP = 36;
+}
+ZombiePirate.prototype = Object.create(Monster.prototype);
+ZombiePirate.prototype.constructor = ZombiePirate;
 
 function Equipment(name) {
   this.name = name;
@@ -421,4 +458,4 @@ CombatStance.prototype.update = function(gameTime, elapsedTime) {
   }
 }
 
-export {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, HealthBar, Equipment}
+export {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, Highwayman, ZombieSailor, MrSnips, ZombiePirate, HealthBar, Equipment}

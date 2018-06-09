@@ -64,10 +64,21 @@ Sprite.prototype.loadMonsterSprite = function() {
   switch(this.owner.name) {
     case "Wolf":
     this.image.src = '../assets/myWolfSymbol.png';
-    console.log("wolf loaded");
     break;
     case "Snake":
     this.image.src = '../assets/mySnakeSymbol.png';
+    break;
+    case "Mr Snips":
+    this.image.src = '../assets/myMisterSnipsSymbol.png';
+    break;
+    case "Highwayman":
+    this.image.src = '../assets/myHighwaymanSymbol.png';
+    break;
+    case "Zombie Sailor":
+    this.image.src = '../assets/myZombieSailorSymbol.png';
+    break;
+    case "Zombie Pirate":
+    this.image.src = '../assets/myZombiePirateSymbol.png';
     break;
     default:
     console.log("error in loadMonsterSprite, invalid name");

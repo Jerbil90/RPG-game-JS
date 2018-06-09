@@ -1,4 +1,4 @@
-import {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, HealthBar, Equipment} from './Unit';
+import {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, Highwayman, ZombieSailor, MrSnips, ZombiePirate, HealthBar, Equipment} from './Unit';
 
 //This is the constructor function for the Manager class, this class is the parent for all manager classes and is responsible fore grouping together and managing different game assets (ie: HeroManager, MonsterManager, ParticleManager);
 function Manager() {
@@ -90,33 +90,66 @@ MonsterManager.prototype.load = function(battleID) {
   switch(battleID) {
     case 0:
     this.assetList.push(new Snake());
+    this.assetList.push(new Snake());
     break;
     case 1:
+    this.assetList.push(new Wolf());
     this.assetList.push(new Wolf());
     break;
     case 2:
     this.assetList.push(new Wolf());
     this.assetList.push(new Wolf());
+    this.assetList.push(new Snake());
     break;
     case 3:
     this.assetList.push(new Wolf());
-    this.assetList.push(new Snake());
+    this.assetList.push(new Highwayman());
     break;
     case 4:
     this.assetList.push(new Wolf());
-    this.assetList.push(new Snake());
+    this.assetList.push(new Highwayman());
     this.assetList.push(new Wolf());
     break;
     case 5:
     this.assetList.push(new Wolf());
-    this.assetList.push(new Snake());
-    this.assetList.push(new Snake());
+    this.assetList.push(new Highwayman());
+    this.assetList.push(new Highwayman());
     break;
     case 6:
     this.assetList.push(new Wolf());
     this.assetList.push(new Snake());
-    this.assetList.push(new Wolf());
-    this.assetList.push(new Snake());
+    this.assetList.push(new Highwayman);
+    break;
+    case 7:
+    this.assetList.push(new ZombieSailor);
+    break;
+    case 8:
+    this.assetList.push(new ZombieSailor);
+    this.assetList.push(new ZombieSailor);
+    break;
+    case 9:
+    this.assetList.push(new ZombieSailor);
+    this.assetList.push(new MrSnips);
+    break;
+    case 10:
+    this.assetList.push(new ZombiePirate);
+    break;
+    case 11:
+    this.assetList.push(new ZombiePirate);
+    this.assetList.push(new ZombieSailor);
+    break;
+    case 12:
+    this.assetList.push(new ZombiePirate);
+    this.assetList.push(new MrSnips);
+    break;
+    case 13:
+    this.assetList.push(new ZombiePirate);
+    this.assetList.push(new ZombiePirate);
+    break;
+    case 14:
+    this.assetList.push(new ZombiePirate);
+    this.assetList.push(new ZombieSailor);
+    this.assetList.push(new MrSnips);
     break;
     default:
     this.assetList.push(new Wolf());
@@ -184,7 +217,13 @@ function EnvironmentManager() {
 EnvironmentManager.prototype = Object.create(Manager.prototype);
 EnvironmentManager.prototype.constructor = EnvironmentManager;
 EnvironmentManager.prototype.load = function(battleID) {
-  this.backgroundImageSource = "https://raw.githubusercontent.com/Jerbil90/Rpg-Game/master/RPG%20game2/bin/Debug/GrasslandBattle.png";
+  if (battleID>=0 && battleID < 7) {
+    this.backgroundImageSource = "../assets/myGrasslandBattleScene.png";
+  }
+  else if(battleID >= 7 && battleID < 15) {
+    this.backgroundImageSource = "../assets/myBeachBattleScene.png";
+  }
+
   this.backgroundImage = new Image();
   this.backgroundImage.src = this.backgroundImageSource;
 }

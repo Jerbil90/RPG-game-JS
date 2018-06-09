@@ -261,10 +261,13 @@ function BattleSelectMenu() {
 BattleSelectMenu.prototype = Object.create(Menu.prototype);
 BattleSelectMenu.prototype.constructor = BattleSelectMenu;
 BattleSelectMenu.prototype.load = function() {
-  let label1 = {name: "Easy Battle", applicableTarget: true};
-  let label2 = {name: "Moderate Battle", applicableTarget: true};
-  let label3 = {name: "Difficult Battle", applicableTarget: true};
-  let buttonList = [label1, label2, label3];
+  let label1 = {name: "Grass (Easy)", applicableTarget: true};
+  let label2 = {name: "Grass (Moderate)", applicableTarget: true};
+  let label3 = {name: "Grass (Difficult)", applicableTarget: true};
+  let label4 = {name: "Beach (Easy)", applicableTarget: true};
+  let label5 = {name: "Beach (Moderate)", applicableTarget: true};
+  let label6 = {name: "Beach (Difficult)", applicableTarget: true};
+  let buttonList = [label1, label2, label3, label4, label5, label6];
   this.setOptions(buttonList);
 }
 
