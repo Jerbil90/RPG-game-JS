@@ -89,7 +89,7 @@ MonsterManager.prototype.constructor = MonsterManager;
 MonsterManager.prototype.load = function(battleID) {
   switch(battleID) {
     case -1:
-    this.assetList.push(new MrSnips());
+    this.assetList.push(new Wolf());
     break;
     case 0:
     this.assetList.push(new Snake());
