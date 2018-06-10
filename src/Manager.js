@@ -88,6 +88,10 @@ MonsterManager.prototype.constructor = MonsterManager;
 //This monster laoder will rename monsters if they have the same name(wolf 1 wolf 2 etc.)
 MonsterManager.prototype.load = function(battleID) {
   switch(battleID) {
+    case -1:
+    this.assetList.push(new Snake());
+    this.assetList.push(new Snake());
+    break;
     case 0:
     this.assetList.push(new Snake());
     this.assetList.push(new Snake());
@@ -222,6 +226,9 @@ EnvironmentManager.prototype.load = function(battleID) {
   }
   else if(battleID >= 7 && battleID < 15) {
     this.backgroundImageSource = "../assets/myBeachBattleScene.png";
+  }
+  else {
+    this.backgroundImageSource = "../assets/mySecretRoom.png";
   }
 
   this.backgroundImage = new Image();

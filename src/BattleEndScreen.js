@@ -1,17 +1,15 @@
 import {SurManager} from './main';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
-import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite} from './Sprite';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu'
 
 function BattleEndScreen(battle) {
   this.endScreenStartTime = null;
   if(battle.battleSurManager.battleState == "victory") {
     this.surManager = new BattleEndSurManager(battle.battleSurManager);
-    console.log("victory detected, making a real battleEndScreen")
   }
   else {
     this.surManager = new GameOverSurManager();
-    console.log("defeat detected, making a minimalist battleEndScreen");
   }
 }
 BattleEndScreen.prototype.draw = function(ctx) {

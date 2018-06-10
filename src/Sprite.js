@@ -85,6 +85,9 @@ Sprite.prototype.loadMonsterSprite = function() {
     break;
   }
 }
+Sprite.prototype.loadEffectSprite = function() {
+
+}
 Sprite.prototype.setOwner = function(owner) {
   this.owner = owner;
 }
@@ -112,7 +115,43 @@ BattleSprite.prototype.setPassivePosition = function() {
   else{
     this.position = {x:150, y:100 + this.owner.partyPosition*50};
   }
-  console.log("set at y: " + (100+this.owner.partyPosition*50));
 }
 
-export {Sprite, InitiativeSprite, BattleSprite}
+function EffectSprite() {
+  Sprite.call(this);
+  this.lifeTime = 500;
+  this.spawnTime = null;
+  this.hasExpired = false;
+}
+EffectSprite.prototype = Object.create(Sprite.prototype);
+EffectSprite.prototype.constructor = EffectSprite;
+EffectSprite.prototype.update = function(gameTime, elapsedTime) {
+  Sprite.prototype.update.call(this, gameTime, elapsedTime);
+  if(this.spawnTime == null) {
+    this.spawnTime = gameTime;
+  }
+  else {
+    if(gameTime > this.spawnTime + this.lifeTime) {
+      this.hasExpired = true;
+    }
+  }
+}
+
+function PoisonEffectSprite(origin) {
+  EffectSprite.call(this);
+  this.loadEffectSprite();
+  this.position = {x: origin.x-10 + Math.floor(Math.random() * 50), y: origin.y + 30 + Math.floor(Math.random() * 15)};
+  //this.moveTo(this.position.x-5 + Math.floor(Math.random*10), this.position.y - (95 + Math.floor(Math.random() * 10)), 3000);
+this.moveTo(this.position.x, this.position.y-50, 500);
+}
+PoisonEffectSprite.prototype = Object.create(EffectSprite.prototype);
+PoisonEffectSprite.prototype.constructor = PoisonEffectSprite;
+PoisonEffectSprite.prototype.update = function(gameTime, elapsedTime) {
+  EffectSprite.prototype.update.call(this, gameTime, elapsedTime);
+}
+PoisonEffectSprite.prototype.loadEffectSprite = function() {
+  this.image = new Image();
+  this.image.src = '../assets/myPoisonEffectSymbol.png'
+}
+
+export {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite}

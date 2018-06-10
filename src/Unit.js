@@ -1,7 +1,7 @@
 import {Stats, CombatStats, EquippedStats} from './Stats';
 import {SpecialMove, PowerStrike, WindSlash, BlockOpponent, GuardAlly} from './Special';
-import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
-import {DamageDisplay, InitiativeDisplay} from './UI';
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite} from './Sprite';
+import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
 import {StatusEffect, Guarded, Blocked, Poisoned} from './StatusEffect';
 import {BattleEndScreen, ExperienceBar} from './BattleEndScreen';
 
@@ -135,6 +135,10 @@ Unit.prototype.update = function(gameTime, elapsedTime) {
   if(this.experienceBar != null) {
     this.experienceBar.update(gameTime, elapsedTime);
   }
+
+  for(let  i = 0 ; i < this.statusEffectList.length ; i++) {
+    this.statusEffectList[i].update(gameTime, elapsedTime);
+  }
 }
 //This is the units main draw function
 Unit.prototype.draw = function(ctx) {
@@ -164,6 +168,9 @@ Unit.prototype.draw = function(ctx) {
   }
   if(this.experienceBar != null) {
     this.experienceBar.draw(ctx);
+  }
+  for(let  i = 0 ; i < this.statusEffectList.length ; i++) {
+    this.statusEffectList[i].draw(ctx);
   }
 }
 Unit.prototype.load = function() {

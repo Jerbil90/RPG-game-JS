@@ -1,7 +1,7 @@
 import {SurManager} from './main';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu';
-import {DamageDisplay, InitiativeDisplay} from './UI';
+import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
 
 //This class is responsible for managing the game while in the battle phase
 function Battle(battleID) {
@@ -513,7 +513,7 @@ BattleMenuManager.prototype.handleClick = function(){
       if(this.assetList[i].menuButtonList[j].cursorHover) {
         this.assetList[i].select(j);
         //If a different or new Hero is chosen from the the heroSelectionMenu, activate the action Menu, and set this.currentlySelectedHero, find the targets and currentlySelectedAction from the hero if they exist
-        //console.log("currentlySelectedAction: "  + this.currentlySelectedAction + "\tlabel: " + this.assetList[1].menuButtonList[j].label);
+
         if(i==0 && this.currentlySelectedHero != j) {
           console.log("Different or new Hero selected, assigning...");
           this.currentlySelectedHero = j;

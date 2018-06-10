@@ -1,8 +1,8 @@
 import $ from 'jquery';
-import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite} from './Sprite';
 import {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, HealthBar, Equipment} from './Unit';
 import {Stats, CombatStats, EquippedStats} from './Stats';
-import {DamageDisplay, InitiativeDisplay} from './UI';
+import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
 import {Item, BattleItem, MinorHealthPotion, Antidote} from './Item';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
@@ -55,7 +55,6 @@ Game.prototype.startBattle = function (battleID) {
 }
 Game.prototype.endBattle = function(battle) {
   if(this.targetState != "battleEndScreen") {
-    console.log("ending battle, setting up new Battleend screen");
     this.battleEndScreen = new BattleEndScreen(battle);
     this.targetState = "battleEndScreen";
     this.fade.startFade();
@@ -230,7 +229,7 @@ $(document).ready(function() {
   var game = new Game();
   game.loadUserData();
   game.state = "battle";
-  game.startBattle(1);
+  game.startBattle(-1);
   var canvas = document.getElementById('gameArea');
   canvas.addEventListener("mousemove", function(event) {
     var rect = canvas.getBoundingClientRect();
