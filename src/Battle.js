@@ -53,7 +53,7 @@ Battle.prototype.draw = function(ctx) {
 function BattleSurManager(){
   SurManager.call(this);
   this.battleState = "waiting for input";
-  this.battleMenuManager = null;
+  this.menuManager = null;
   this.combat = null;
   this.initiativeDisplay = null;
 }
@@ -74,9 +74,9 @@ BattleSurManager.prototype.load = function(partyHeros, battleItems, battleID) {
   this.environmentManager = new EnvironmentManager();
   this.environmentManager.setSurManager(this);
   this.environmentManager.load(battleID);
-  this.battleMenuManager = new BattleMenuManager();
-  this.battleMenuManager.setSurManager(this);
-  this.battleMenuManager.load();
+  this.menuManager = new BattleMenuManager();
+  this.menuManager.setSurManager(this);
+  this.menuManager.load();
   //Then load battleSprites
   this.heroManager.setPassiveBattleSpritePosition();
   this.monsterManager.setPassiveBattleSpritePosition();
@@ -85,15 +85,13 @@ BattleSurManager.prototype.load = function(partyHeros, battleItems, battleID) {
 BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
   SurManager.prototype.update.call(this, gameTime, elapsedTime);
   this.initiativeDisplay.update(gameTime, elapsedTime);
-  if(this.battleState == "waiting for input") {
-    this.battleMenuManager.update(gameTime, elapsedTime);
-  }
-  else if(this.battleState == "combat") {
+
+  if(this.battleState == "combat") {
     this.combat.update(gameTime, elapsedTime);
     if(this.combat.isCombatOver){
       //this.combat.poisonCheck();
       this.battleState = "waiting for input";
-      this.battleMenuManager.newRound();
+      this.menuManager.newRound();
       this.heroManager.newRound();
       this.monsterManager.newRound();
     }
@@ -110,7 +108,6 @@ BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
 }
 BattleSurManager.prototype.draw = function(ctx) {
   SurManager.prototype.draw.call(this, ctx);
-  this.battleMenuManager.draw(ctx);
   if(this.combat != null) {
     if(this.combat.isVictory) {
       ctx.font = "40px serif";
@@ -484,16 +481,16 @@ BattleMenuManager.prototype.load = function(){
   this.assetList.push(confirmTurnButton);
 }
 BattleMenuManager.prototype.update = function(gameTime, elapsedTime) {
-	let  i = 0;
-  for(i=0;i<this.assetList.length;i++) {
-    this.assetList[i].update(gameTime, elapsedTime);
+  if(this.surManager.battleState == "waiting for input") {
+    for(let i = 0 ; i < this.assetList.length ; i++) {
+      this.assetList[i].update(gameTime, elapsedTime);
+    }
+    this.cursorHoverCheck();
   }
-  this.cursorHoverCheck();
 }
 BattleMenuManager.prototype.cursorHoverCheck = function() {
   let cursorHover = false;
-  let  i =0;
-  for(i = 0; i<this.assetList.length; i++) {
+  for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].hoverCheck();
     if (this.assetList[i].cursorHover) {
       cursorHover = true;

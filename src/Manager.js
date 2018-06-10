@@ -240,4 +240,21 @@ EnvironmentManager.prototype.draw = function(ctx) {
   ctx.drawImage(this.backgroundImage, 0, 0);
 }
 
-export {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager}
+function MenuEnvironmentManager() {
+
+}
+MenuEnvironmentManager.prototype = Object.create(Manager.prototype);
+MenuEnvironmentManager.prototype.constructor = MenuEnvironmentManager;
+MenuEnvironmentManager.prototype.load = function() {
+  this.backgroundImage = new Image();
+  this.backgroundImage.src = "../assets/myBattleEndBackground.png";
+}
+MenuEnvironmentManager.prototype.update = function(gameTime, elapsedTime) {
+
+}
+MenuEnvironmentManager.prototype.draw = function(ctx) {
+  if(this.backgroundImage != null) {
+    ctx.drawImage(this.backgroundImage, 0, 0);
+  }
+}
+export {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuEnvironmentManager}

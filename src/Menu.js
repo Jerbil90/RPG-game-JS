@@ -267,7 +267,8 @@ BattleSelectMenu.prototype.load = function() {
   let label4 = {name: "Beach (Easy)", applicableTarget: true};
   let label5 = {name: "Beach (Moderate)", applicableTarget: true};
   let label6 = {name: "Beach (Difficult)", applicableTarget: true};
-  let buttonList = [label1, label2, label3, label4, label5, label6];
+  let label7 = {name: "MainMenu", applicableTarget: true};
+  let buttonList = [label1, label2, label3, label4, label5, label6, label7];
   this.setOptions(buttonList);
 }
 
