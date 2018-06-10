@@ -1,13 +1,14 @@
 import $ from 'jquery';
-import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite';
 import {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, HealthBar, Equipment} from './Unit';
 import {Stats, CombatStats, EquippedStats} from './Stats';
-import {DamageDisplay, InitiativeDisplay} from './UI';
+import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
 import {Item, BattleItem, MinorHealthPotion, Antidote} from './Item';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu';
-import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
+import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuEnvironmentManager} from './Manager';
 import {Battle} from './Battle';
 import {BattleEndScreen, ExperienceBar} from './BattleEndScreen';
+import {MainMenuScreen} from './MainMenuScreen';
 
 //Game class constructor, this is the main object that holds and manages the game
 function Game() {
@@ -20,6 +21,7 @@ function Game() {
   this.targetState = "none";
   this.battle = null;
   this.battleEndScreen = null;
+  this.mainMenuScreen = null;
   this.fade = new Fade();
 }
 //This method is responsible for requesting the user's Heros from the server, atm it just provides default heros
@@ -55,7 +57,6 @@ Game.prototype.startBattle = function (battleID) {
 }
 Game.prototype.endBattle = function(battle) {
   if(this.targetState != "battleEndScreen") {
-    console.log("ending battle, setting up new Battleend screen");
     this.battleEndScreen = new BattleEndScreen(battle);
     this.targetState = "battleEndScreen";
     this.fade.startFade();
@@ -78,10 +79,19 @@ Game.prototype.update = function() {
     else if(this.state == "battleEndScreen") {
       this.battleEndScreen.update(this.gameTime, this.elapsedTime);
       if(this.battleEndScreen.surManager.menuManager.isScreenOver) {
-        this.userHeroList = this.battleEndScreen.surManager.heroManager.assetList;
-        this.startBattle(this.battleEndScreen.surManager.menuManager.newID)
-        this.fade.startFade();
+        if(this.battleEndScreen.surManager.menuManager.newID != 100) {
+          this.userHeroList = this.battleEndScreen.surManager.heroManager.assetList;
+          this.startBattle(this.battleEndScreen.surManager.menuManager.newID)
+          this.fade.startFade();
+        }
+        else{
+          this.openMainMenu();
+        }
+
       }
+    }
+    else if(this.state == "mainMenuScreen") {
+      this.mainMenuScreen.update(this.gameTime, this.elapsedTime);
     }
   }
   else {
@@ -95,6 +105,12 @@ Game.prototype.update = function() {
   }
 
 }
+Game.prototype.openMainMenu = function() {
+  this.mainMenuScreen = new MainMenuScreen(this.battleEndScreen);
+  this.targetState = "mainMenuScreen";
+  this.fade.startFade();
+}
+
 //This is the game's main draw function
 Game.prototype.draw = function(ctx) {
   switch(this.state) {
@@ -103,6 +119,9 @@ Game.prototype.draw = function(ctx) {
       break;
       case "battleEndScreen":
       this.battleEndScreen.draw(ctx);
+      break;
+      case "mainMenuScreen":
+      this.mainMenuScreen.draw(ctx);
       break;
   }
   this.fade.draw(ctx);
@@ -211,26 +230,45 @@ SurManager.prototype.load = function() {
 }
 //This is surManager's main update function, responsible for calling all the managers individual update functions
 SurManager.prototype.update = function(gameTime, elapsedTime){
-  this.heroManager.update(gameTime, elapsedTime);
-  this.monsterManager.update(gameTime, elapsedTime);
-  this.logManager.update(gameTime, elapsedTime);
+  if(this.heroManager != null) {
+    this.heroManager.update(gameTime, elapsedTime);
+  }
+  if(this.monsterManager != null) {
+    this.monsterManager.update(gameTime, elapsedTime);
+  }
+  if(this.logManager != null) {
+    this.logManager.update(gameTime, elapsedTime);
+  }
   this.environmentManager.update(gameTime, elapsedTime);
-  //this.menuManager.update(gameTime, elapsedTime);
+  if(this.menuManager != null) {
+    this.menuManager.update(gameTime, elapsedTime);
+
+  }
+
 }
 //This is surManager's main draw function
 SurManager.prototype.draw = function(ctx) {
   this.environmentManager.draw(ctx);
-  this.heroManager.draw(ctx);
-  this.monsterManager.draw(ctx);
-  this.logManager.draw(ctx);
-  //this.menuManager.draw(ctx);
+  if(this.heroManager != null) {
+    this.heroManager.draw(ctx);
+  }
+  if(this.monsterManager != null) {
+    this.monsterManager.draw(ctx);
+  }
+  if(this.logManager != null) {
+    this.logManager.draw(ctx);
+  }
+  if(this.menuManager != null) {
+    this.menuManager.draw(ctx);
+  }
+
 }
 
 $(document).ready(function() {
   var game = new Game();
   game.loadUserData();
   game.state = "battle";
-  game.startBattle(1);
+  game.startBattle(-1);
   var canvas = document.getElementById('gameArea');
   canvas.addEventListener("mousemove", function(event) {
     var rect = canvas.getBoundingClientRect();
@@ -240,14 +278,20 @@ $(document).ready(function() {
     if(game.battleEndScreen != null) {
       game.battleEndScreen.surManager.setMouseDetails(mousex, mousey);
     }
+    if(game.mainMenuScreen != null) {
+      game.mainMenuScreen.surManager.setMouseDetails(mousex, mousey);
+    }
   });
   canvas.addEventListener("click", function(event) {
     switch(game.state) {
       case "battle":
-      game.battle.battleSurManager.battleMenuManager.handleClick();
+      game.battle.battleSurManager.menuManager.handleClick();
       break;
       case "battleEndScreen":
       game.battleEndScreen.surManager.menuManager.handleClick();
+      break;
+      case "mainMenuScreen":
+        game.mainMenuScreen.surManager.menuManager.handleClick();
       break;
       default:
       console.log("error in handleclick, invalid game.state");

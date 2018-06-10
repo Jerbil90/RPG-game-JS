@@ -1,4 +1,4 @@
-import {Sprite, InitiativeSprite, BattleSprite} from './Sprite'
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite'
 
 function DamageDisplay(damageDealt, position) {
   this.damageDealt = damageDealt;
@@ -49,6 +49,23 @@ DamageDisplay.prototype.draw = function(ctx) {
   ctx.fillText(this.damageDealt, this.position.x, this.position.y);
   ctx.strokeText(this.damageDealt, this.position.x, this.position.y);
 }
+
+function PoisonedDisplayIndicator(position) {
+  DamageDisplay.call(this, 0, position);
+  this.position.y += 20;
+  this.unitPosition.y += 20;
+}
+PoisonedDisplayIndicator.prototype = Object.create(DamageDisplay.prototype);
+PoisonedDisplayIndicator.prototype.constructor = PoisonedDisplayIndicator;
+PoisonedDisplayIndicator.prototype.draw = function(ctx) {
+  ctx.fillstyle = "rgb(0, 127, 14)";
+  ctx.strokeStyle = "rgb(0, 61, 7)";
+  ctx.lineWidth = 2;
+  ctx.font = "30px Arial";
+  ctx.fillText("Poisoned!", this.position.x, this.position.y);
+  ctx.strokeText("Poisoned!", this.position.x, this.position.y);
+}
+
 
 function InitiativeDisplay(surManager) {
   this.surManager = surManager;
@@ -185,4 +202,4 @@ InitiativeDisplay.prototype.compareOrder = function(newTurnOrder, oldTurnOrder) 
   return test;
 }
 
-export {DamageDisplay, InitiativeDisplay}
+export {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay}

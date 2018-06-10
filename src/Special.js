@@ -1,6 +1,6 @@
 import {Stats, CombatStats, EquippedStats} from './Stats';
-import {DamageDisplay, InitiativeDisplay} from './UI';
-import {StatusEffect, Guarded, Blocked} from './StatusEffect';
+import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
+import {StatusEffect, Guarded, Blocked, Stunned} from './StatusEffect';
 
 function SpecialMove() {
   this.name = "unnamedSpecialMove";
@@ -10,7 +10,6 @@ function SpecialMove() {
   this.isUsedOnDead = false;
 }
 SpecialMove.prototype.loadStats = function() {
-  console.log("loading stats for special move " + this.name);
   this.specialOrItemStats = new Stats(this);
 }
 SpecialMove.prototype.useMove = function(owner, target) {

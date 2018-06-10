@@ -1,17 +1,15 @@
 import {SurManager} from './main';
-import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
-import {Sprite, InitiativeSprite, BattleSprite} from './Sprite';
+import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuEnvironmentManager} from './Manager';
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu'
 
 function BattleEndScreen(battle) {
   this.endScreenStartTime = null;
   if(battle.battleSurManager.battleState == "victory") {
     this.surManager = new BattleEndSurManager(battle.battleSurManager);
-    console.log("victory detected, making a real battleEndScreen")
   }
   else {
     this.surManager = new GameOverSurManager();
-    console.log("defeat detected, making a minimalist battleEndScreen");
   }
 }
 BattleEndScreen.prototype.draw = function(ctx) {
@@ -37,7 +35,7 @@ function BattleEndSurManager(battleSurManager) {
   this.heroManager.endBattle();
   this.monsterManager = battleSurManager.monsterManager;
   this.logManager = battleSurManager.logManager;
-  this.environmentManager = new BattleEndEnvironmentManager();
+  this.environmentManager = new MenuEnvironmentManager();
   this.environmentManager.setSurManager(this);
   this.environmentManager.load();
   this.menuManager = new BattleEndMenuManager();
@@ -48,15 +46,13 @@ BattleEndSurManager.prototype = Object.create(SurManager.prototype);
 BattleEndSurManager.prototype.constructor = BattleEndSurManager;
 BattleEndSurManager.prototype.update = function(gameTime, elapsedTime) {
   SurManager.prototype.update.call(this, gameTime, elapsedTime);
-  this.menuManager.update(gameTime, elapsedTime);
 }
 BattleEndSurManager.prototype.draw = function(ctx) {
   SurManager.prototype.draw.call(this, ctx);
-  this.menuManager.draw(ctx);
 }
 
 function GameOverSurManager() {
-  this.environmentManager = new BattleEndEnvironmentManager();
+  this.environmentManager = new MenuEnvironmentManager();
   this.environmentManager.setSurManager(this);
   this.environmentManager.load();
 }
@@ -67,24 +63,9 @@ GameOverSurManager.prototype.draw = function(ctx) {
   ctx.fillText("Game Over", 200, 200);
 }
 
-function BattleEndEnvironmentManager() {
 
-}
 
-BattleEndEnvironmentManager.prototype = Object.create(Manager.prototype);
-BattleEndEnvironmentManager.prototype.constructor = BattleEndEnvironmentManager;
-BattleEndEnvironmentManager.prototype.load = function() {
-  this.backgroundImage = new Image();
-  this.backgroundImage.src = require('../assets/myBattleEndBackground.png');
-}
-BattleEndEnvironmentManager.prototype.update = function(gameTime, elapsedTime) {
 
-}
-BattleEndEnvironmentManager.prototype.draw = function(ctx) {
-  if(this.backgroundImage != null) {
-    ctx.drawImage(this.backgroundImage, 0, 0);
-  }
-}
 
 
 function ExperienceBar(owner) {
@@ -271,6 +252,9 @@ BattleEndMenuManager.prototype.handleClick = function() {
         }
         else if(j==5) {
           this.newID = 13 + Math.floor(Math.random()*2);
+        }
+        else if(j==6) {
+          this.newID = 100;
         }
       }
     }

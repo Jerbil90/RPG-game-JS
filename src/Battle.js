@@ -1,7 +1,7 @@
 import {SurManager} from './main';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu';
-import {DamageDisplay, InitiativeDisplay} from './UI';
+import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
 
 //This class is responsible for managing the game while in the battle phase
 function Battle(battleID) {
@@ -53,7 +53,7 @@ Battle.prototype.draw = function(ctx) {
 function BattleSurManager(){
   SurManager.call(this);
   this.battleState = "waiting for input";
-  this.battleMenuManager = null;
+  this.menuManager = null;
   this.combat = null;
   this.initiativeDisplay = null;
 }
@@ -74,9 +74,9 @@ BattleSurManager.prototype.load = function(partyHeros, battleItems, battleID) {
   this.environmentManager = new EnvironmentManager();
   this.environmentManager.setSurManager(this);
   this.environmentManager.load(battleID);
-  this.battleMenuManager = new BattleMenuManager();
-  this.battleMenuManager.setSurManager(this);
-  this.battleMenuManager.load();
+  this.menuManager = new BattleMenuManager();
+  this.menuManager.setSurManager(this);
+  this.menuManager.load();
   //Then load battleSprites
   this.heroManager.setPassiveBattleSpritePosition();
   this.monsterManager.setPassiveBattleSpritePosition();
@@ -85,15 +85,13 @@ BattleSurManager.prototype.load = function(partyHeros, battleItems, battleID) {
 BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
   SurManager.prototype.update.call(this, gameTime, elapsedTime);
   this.initiativeDisplay.update(gameTime, elapsedTime);
-  if(this.battleState == "waiting for input") {
-    this.battleMenuManager.update(gameTime, elapsedTime);
-  }
-  else if(this.battleState == "combat") {
+
+  if(this.battleState == "combat") {
     this.combat.update(gameTime, elapsedTime);
     if(this.combat.isCombatOver){
       //this.combat.poisonCheck();
       this.battleState = "waiting for input";
-      this.battleMenuManager.newRound();
+      this.menuManager.newRound();
       this.heroManager.newRound();
       this.monsterManager.newRound();
     }
@@ -110,7 +108,6 @@ BattleSurManager.prototype.update = function(gameTime, elapsedTime) {
 }
 BattleSurManager.prototype.draw = function(ctx) {
   SurManager.prototype.draw.call(this, ctx);
-  this.battleMenuManager.draw(ctx);
   if(this.combat != null) {
     if(this.combat.isVictory) {
       ctx.font = "40px serif";
@@ -248,11 +245,14 @@ this.turnOrder[this.currentTurn].currentlySelectedSpecialOrItem.effect(this.turn
           }
           else {
             this.turnOrder[this.currentTurn].deathCheck();
-            if(this.turnOrder[this.currentTurn].isAlive) {
+            if(this.turnOrder[this.currentTurn].isAlive && !this.turnOrder[this.currentTurn].isAfflictedWith("Stunned")) {
               test = false;
               this.turnOrder[this.currentTurn].combatStance.isCurrentTurn = true;
               this.isCurrentTurnTargeted = false;
               this.isCurrentTurnAttacked = false;
+            }
+            else if(this.turnOrder[this.currentTurn].isAfflictedWith("Stunned")){
+              console.log(this.turnOrder[this.currentTurn].name + " cannot move because they are stunned this turn");
             }
           }
         }
@@ -481,16 +481,16 @@ BattleMenuManager.prototype.load = function(){
   this.assetList.push(confirmTurnButton);
 }
 BattleMenuManager.prototype.update = function(gameTime, elapsedTime) {
-	let  i = 0;
-  for(i=0;i<this.assetList.length;i++) {
-    this.assetList[i].update(gameTime, elapsedTime);
+  if(this.surManager.battleState == "waiting for input") {
+    for(let i = 0 ; i < this.assetList.length ; i++) {
+      this.assetList[i].update(gameTime, elapsedTime);
+    }
+    this.cursorHoverCheck();
   }
-  this.cursorHoverCheck();
 }
 BattleMenuManager.prototype.cursorHoverCheck = function() {
   let cursorHover = false;
-  let  i =0;
-  for(i = 0; i<this.assetList.length; i++) {
+  for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].hoverCheck();
     if (this.assetList[i].cursorHover) {
       cursorHover = true;
@@ -513,7 +513,7 @@ BattleMenuManager.prototype.handleClick = function(){
       if(this.assetList[i].menuButtonList[j].cursorHover) {
         this.assetList[i].select(j);
         //If a different or new Hero is chosen from the the heroSelectionMenu, activate the action Menu, and set this.currentlySelectedHero, find the targets and currentlySelectedAction from the hero if they exist
-        //console.log("currentlySelectedAction: "  + this.currentlySelectedAction + "\tlabel: " + this.assetList[1].menuButtonList[j].label);
+
         if(i==0 && this.currentlySelectedHero != j) {
           console.log("Different or new Hero selected, assigning...");
           this.currentlySelectedHero = j;

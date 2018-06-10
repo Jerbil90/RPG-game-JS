@@ -88,6 +88,9 @@ MonsterManager.prototype.constructor = MonsterManager;
 //This monster laoder will rename monsters if they have the same name(wolf 1 wolf 2 etc.)
 MonsterManager.prototype.load = function(battleID) {
   switch(battleID) {
+    case -1:
+    this.assetList.push(new Wolf());
+    break;
     case 0:
     this.assetList.push(new Snake());
     this.assetList.push(new Snake());
@@ -223,6 +226,9 @@ EnvironmentManager.prototype.load = function(battleID) {
   else if(battleID >= 7 && battleID < 15) {
     this.backgroundImageSource = require('../assets/myBeachBattleScene.png');
   }
+  else {
+    this.backgroundImageSource = "../assets/mySecretRoom.png";
+  }
 
   this.backgroundImage = new Image();
   this.backgroundImage.src = this.backgroundImageSource;
@@ -234,4 +240,21 @@ EnvironmentManager.prototype.draw = function(ctx) {
   ctx.drawImage(this.backgroundImage, 0, 0);
 }
 
-export {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager}
+function MenuEnvironmentManager() {
+
+}
+MenuEnvironmentManager.prototype = Object.create(Manager.prototype);
+MenuEnvironmentManager.prototype.constructor = MenuEnvironmentManager;
+MenuEnvironmentManager.prototype.load = function() {
+  this.backgroundImage = new Image();
+  this.backgroundImage.src = "../assets/myBattleEndBackground.png";
+}
+MenuEnvironmentManager.prototype.update = function(gameTime, elapsedTime) {
+
+}
+MenuEnvironmentManager.prototype.draw = function(ctx) {
+  if(this.backgroundImage != null) {
+    ctx.drawImage(this.backgroundImage, 0, 0);
+  }
+}
+export {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuEnvironmentManager}
