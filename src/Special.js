@@ -1,6 +1,6 @@
 import {Stats, CombatStats, EquippedStats} from './Stats';
 import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
-import {StatusEffect, Guarded, Blocked} from './StatusEffect';
+import {StatusEffect, Guarded, Blocked, Stunned} from './StatusEffect';
 
 function SpecialMove() {
   this.name = "unnamedSpecialMove";

@@ -23,7 +23,6 @@ Sprite.prototype.update = function(gameTime, elapsedTime) {
       this.position.x = this.startingPosition.x + fraction * (this.targetPosition.x - this.startingPosition.x);
       this.position.y = this.startingPosition.y + fraction * (this.targetPosition.y - this.startingPosition.y);
     }
-
   }
 }
 Sprite.prototype.draw = function(ctx) {
@@ -154,4 +153,53 @@ PoisonEffectSprite.prototype.loadEffectSprite = function() {
   this.image.src = '../assets/myPoisonEffectSymbol.png'
 }
 
-export {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite}
+function StunnedEffectSprite(position) {
+  EffectSprite.call(this);
+  this.setUpSpriteArray(position);
+}
+StunnedEffectSprite.prototype = Object.create(EffectSprite.prototype);
+StunnedEffectSprite.prototype.constructor = StunnedEffectSprite;
+StunnedEffectSprite.prototype.setUpSpriteArray = function(centre) {
+  this.spriteArray = [];
+  for(let i = 0 ; i < 3 ; i++) {
+    this.spriteArray.push(new StunnedEffectPart(i, centre))
+  }
+}
+StunnedEffectSprite.prototype.draw = function(ctx) {
+  for(let i = 0 ; i < this.spriteArray.length ; i++) {
+    this.spriteArray[i].draw(ctx);
+  }
+}
+StunnedEffectSprite.prototype.update = function(gameTime, elapsedTime) {
+  for(let i = 0 ; i < this.spriteArray.length ; i++) {
+    this.spriteArray[i].update(gameTime, elapsedTime);
+  }
+}
+
+function StunnedEffectPart(index, centre) {
+  Sprite.call(this);
+  this.loadEffectSprite();
+  this.centre = centre;
+  this.xRadius = 15;
+  this.yRadius = 5;
+  this.animationStartTime = null;
+  this.animationPeriod = 1500;
+  this.index = index;
+}
+StunnedEffectPart.prototype = Object.create(Sprite.prototype);
+StunnedEffectPart.prototype.constructor = StunnedEffectPart;
+StunnedEffectPart.prototype.update = function(gameTime, elapsedTime) {
+  if(this.animationStartTime == null) {
+    this.animationStartTime = gameTime;
+    this.animationStartTime -= this.index*(this.animationPeriod/3);
+  }
+  else {
+    this.setPosition(this.centre.x + this.xRadius * Math.cos(2*Math.PI * (gameTime - this.animationStartTime)/this.animationPeriod), this.centre.y+ this.yRadius * Math.sin(2*Math.PI * (gameTime - this.animationStartTime)/this.animationPeriod));
+  }
+}
+StunnedEffectPart.prototype.loadEffectSprite = function() {
+  this.image = new Image();
+  this.image.src = '../assets/myStunnedEffectSymbol.png'
+}
+
+export {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite}

@@ -1,4 +1,4 @@
-import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite} from './Sprite'
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite'
 
 function DamageDisplay(damageDealt, position) {
   this.damageDealt = damageDealt;

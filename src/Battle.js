@@ -248,11 +248,14 @@ this.turnOrder[this.currentTurn].currentlySelectedSpecialOrItem.effect(this.turn
           }
           else {
             this.turnOrder[this.currentTurn].deathCheck();
-            if(this.turnOrder[this.currentTurn].isAlive) {
+            if(this.turnOrder[this.currentTurn].isAlive && !this.turnOrder[this.currentTurn].isAfflictedWith("Stunned")) {
               test = false;
               this.turnOrder[this.currentTurn].combatStance.isCurrentTurn = true;
               this.isCurrentTurnTargeted = false;
               this.isCurrentTurnAttacked = false;
+            }
+            else if(this.turnOrder[this.currentTurn].isAfflictedWith("Stunned")){
+              console.log(this.turnOrder[this.currentTurn].name + " cannot move because they are stunned this turn");
             }
           }
         }

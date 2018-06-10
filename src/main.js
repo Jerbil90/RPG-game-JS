@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite} from './Sprite';
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite';
 import {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, HealthBar, Equipment} from './Unit';
 import {Stats, CombatStats, EquippedStats} from './Stats';
 import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';

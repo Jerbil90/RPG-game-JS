@@ -1,4 +1,4 @@
-import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite} from './Sprite'
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite'
 
 function StatusEffect(owner) {
   this.owner = owner;
@@ -72,4 +72,27 @@ Poisoned.prototype.spawnPoisonEffectSprite = function() {
   this.statusEffectSprites.push(new PoisonEffectSprite(this.owner.battleSprite.position));
 }
 
-export {StatusEffect, Guarded, Blocked, Poisoned}
+function Stunned(owner) {
+  StatusEffect.call(this, owner);
+  this.name = "Stunned";
+  this.duration = 1;
+  this.effectStrength = 1;
+  this.effectSpriteSpawnTime = null;
+}
+Stunned.prototype = Object.create(StatusEffect.prototype);
+Stunned.prototype.constructor = Stunned;
+Stunned.prototype.update = function(gameTime, elapsedTime) {
+  StatusEffect.prototype.update.call(this, gameTime, elapsedTime);
+  if(this.effectSpriteSpawnTime == null) {
+    this.effectSpriteSpawnTime = gameTime;
+    this.spawnStunnedEffectSprites(this.owner.battleSprite.position);
+  }
+  else {
+
+  }
+}
+Stunned.prototype.spawnStunnedEffectSprites = function(position) {
+  this.statusEffectSprites.push(new StunnedEffectSprite(position));
+}
+
+export {StatusEffect, Guarded, Blocked, Poisoned, Stunned}

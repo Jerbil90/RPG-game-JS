@@ -1,8 +1,8 @@
 import {Stats, CombatStats, EquippedStats} from './Stats';
 import {SpecialMove, PowerStrike, WindSlash, BlockOpponent, GuardAlly} from './Special';
-import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite} from './Sprite';
+import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite';
 import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
-import {StatusEffect, Guarded, Blocked, Poisoned} from './StatusEffect';
+import {StatusEffect, Guarded, Blocked, Poisoned, Stunned} from './StatusEffect';
 import {BattleEndScreen, ExperienceBar} from './BattleEndScreen';
 
 //This is the constructor function for the Unit class, this class is the parent for each unit (hero/monster) and contains the parent properties and methods required by each Unit such as load, draw, update
@@ -292,6 +292,13 @@ function MrSnips() {
 }
 MrSnips.prototype = Object.create(Monster.prototype);
 MrSnips.prototype.constructor = MrSnips;
+MrSnips.prototype.attack = function(target) {
+  Unit.prototype.attack.call(this, target);
+  if(Math.random()>0) {
+    target.statusEffectList.push(new Stunned(target));
+    console.log(target.name + " is now stunned!");
+  }
+}
 
 function ZombieSailor() {
   Monster.call(this, "Zombie Sailor");
