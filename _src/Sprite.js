@@ -27,9 +27,7 @@ Sprite.prototype.update = function(gameTime, elapsedTime) {
   }
 }
 Sprite.prototype.draw = function(ctx) {
-  if(this.image != null) {
-    ctx.drawImage(this.image, this.position.x, this.position.y);
-  }
+  ctx.drawImage(this.image, this.position.x, this.position.y);
 }
 Sprite.prototype.setPosition = function(x, y) {
   this.position.x = x;
@@ -46,16 +44,16 @@ Sprite.prototype.loadBattleSprite = function() {
     switch(this.owner.role) {
     case "monster":
     this.image = new Image();
-    this.image.src = require('../assets/myMonsterSymbol.png');
+    this.image.src = '../assets/myMonsterSymbol.png';
     this.loadMonsterSprite();
     break;
     case "knight":
     this.image = new Image();
-    this.image.src = require('../assets/myKnightSymbol.png');
+    this.image.src = '../assets/myKnightSymbol.png';
     break;
     case "fighter":
     this.image = new Image();
-    this.image.src = require('../assets/myFighterSymbol.png');
+    this.image.src = '../assets/myFighterSymbol.png';
     break;
     default:
     console.log("error loading battle sprites: " + this.name + " has invalid role: " + this.role);
@@ -65,22 +63,22 @@ Sprite.prototype.loadBattleSprite = function() {
 Sprite.prototype.loadMonsterSprite = function() {
   switch(this.owner.name) {
     case "Wolf":
-    this.image.src = require('../assets/myWolfSymbol.png');
+    this.image.src = '../assets/myWolfSymbol.png';
     break;
     case "Snake":
-    this.image.src = require('../assets/mySnakeSymbol.png');
+    this.image.src = '../assets/mySnakeSymbol.png';
     break;
     case "Mr Snips":
-    this.image.src = require('../assets/myMisterSnipsSymbol.png');
+    this.image.src = '../assets/myMisterSnipsSymbol.png';
     break;
     case "Highwayman":
-    this.image.src = require('../assets/myHighwaymanSymbol.png');
+    this.image.src = '../assets/myHighwaymanSymbol.png';
     break;
     case "Zombie Sailor":
-    this.image.src = require('../assets/myZombieSailorSymbol.png');
+    this.image.src = '../assets/myZombieSailorSymbol.png';
     break;
     case "Zombie Pirate":
-    this.image.src = require('../assets/myZombiePirateSymbol.png');
+    this.image.src = '../assets/myZombiePirateSymbol.png';
     break;
     default:
     console.log("error in loadMonsterSprite, invalid name");
@@ -89,22 +87,6 @@ Sprite.prototype.loadMonsterSprite = function() {
 }
 Sprite.prototype.setOwner = function(owner) {
   this.owner = owner;
-}
-Sprite.prototype.loadEffectSprite = function(name, position) {
-  this.image = new Image();
-  position
-  var imgsrc = "";
-  switch(name) {
-    case "Poisoned":
-    imgsrc = '../assets/myPoisonEffectSymbol.png';
-    console.log("Poison effect image loaded");
-    break;
-    case "Stunned":
-    imgsrc = '../assets/myStunnedEffectSymbol.png';
-    break;
-  }
-  this.image.src = imgsrc;
-  this.setPosition(position.x, position.y);
 }
 
 function InitiativeSprite(owner) {
@@ -133,42 +115,4 @@ BattleSprite.prototype.setPassivePosition = function() {
   console.log("set at y: " + (100+this.owner.partyPosition*50));
 }
 
-function EffectSprite(position) {
-  Sprite.call(this);
-  this.effectStartTime = null;
-  this.setPosition(position.x, position.y);
-}
-EffectSprite.prototype = Object.create(Sprite.prototype);
-EffectSprite.prototype.constructor = EffectSprite;
-
-function PoisonEffectSprite(position) {
-  EffectSprite.call(this, position);
-  this.expirationTime = 500;
-  this.hasExpired = false;
-}
-PoisonEffectSprite.prototype = Object.create(EffectSprite.prototype);
-PoisonEffectSprite.prototype.constructor = PoisonEffectSprite;
-PoisonEffectSprite.prototype.update = function(gameTime, elapsedTime) {
-  if(this.effectStartTime == null) {
-    this.loadEffectSprite("Poisoned", this.position);
-    this.effectStartTime = gameTime;
-    let origin = {x: this.position.x, y: this.position.y};
-    origin.x += (-5 + Math.floor(Math.random()*42));
-    this.setPosition(origin.x, origin.y);
-    this.moveTo(origin.x , origin.y - 50, 1000);
-  }
-  else {
-    EffectSprite.prototype.update.call(this, gameTime, elapsedTime);
-    if(gameTime > this.effectStartTime + this.expirationTime) {
-      this.hasExpired = true;
-    }
-  }
-}
-
-function StunnedEffectSprite() {
-
-}
-StunnedEffectSprite.prototype = Object.create(EffectSprite);
-StunnedEffectSprite.prototype.constructor = StunnedEffectSprite;
-
-export {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite}
+export {Sprite, InitiativeSprite, BattleSprite}
