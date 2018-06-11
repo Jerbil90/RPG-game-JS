@@ -1,12 +1,13 @@
 import {Unit, Hero, Monster, Fighter, Knight, Wolf, Snake, Highwayman, ZombieSailor, MrSnips, ZombiePirate, HealthBar, Equipment} from './Unit';
 
 //This is the constructor function for the Manager class, this class is the parent for all manager classes and is responsible fore grouping together and managing different game assets (ie: HeroManager, MonsterManager, ParticleManager);
-function Manager() {
+function Manager(screen) {
+  this.screen = screen;
   this.assetList = [];
 }
 //This method is resposible for populating the surManager property with the instance of the surManager, enabling the managers to be able to talk to each other via the surmanager
-Manager.prototype.setSurManager = function(surManager) {
-  this.surManager = surManager;
+Manager.prototype.setCurrentScreen = function(screen) {
+  this.screen = screen;
 }
 //This is the Manager's main load method
 Manager.prototype.load = function() {
@@ -14,36 +15,33 @@ Manager.prototype.load = function() {
 }
 //This is the Manager's main update method, it is responsible for calling the update method for each of its assigned assets
 Manager.prototype.update = function(gameTime, elapsedTime) {
-	let  i = 0;
-  for(i=0;i<this.assetList.length;i++) {
+  for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].update(gameTime, elapsedTime);
   }
 }
 //This is the Manager's main draw method
 Manager.prototype.draw = function(ctx) {
-	let i = 0;
-  for(i = 0 ; i< this.assetList.length; i++) {
+  for(let i = 0 ; i< this.assetList.length; i++) {
     this.assetList[i].draw(ctx);
   }
 }
 
 //This is the constructor function for the HeroManager class, this class is responsible for managing lists of Heros in either the ManorExplore or the Battle scenes
-function HeroManager() {
-  Manager.call(this);
+function HeroManager(screen) {
+  Manager.call(this, screen);
 }
 HeroManager.prototype = Object.create(Manager.prototype)
 HeroManager.prototype.constructor = HeroManager;
-//This is the HeroManager's main load method, it is responsible for assigning the partyHero's to the manager's assetList
-HeroManager.prototype.load = function(partyHeros) {
-  this.assetList = partyHeros;
-  let i = 0;
-  for(i = 0; i < partyHeros.length ; i++) {
-    partyHeros[i].setSurManager(this.surManager);
+//This is the HeroManager's main load method, it is responsible for assigning the given heroes to the manager's assetList
+HeroManager.prototype.load = function(heroes) {
+  this.assetList = heroes;
+  for(let i = 0 ; i < this.assetList.length ; i++) {
+    this.assetList[i].setCurrentScreen(this.screen);
   }
 }
+//This method is called on the battleScreen and resets all the heros ready for a new turn
 HeroManager.prototype.newRound = function() {
-  let i = 0;
-  for(i = 0 ; i < this.assetList.length ; i++) {
+  for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].combatReset();
     for(let j = 0 ; j < this.assetList[i].statusEffectList.length ; j++) {
       this.assetList[i].statusEffectList[j].duration--;
@@ -69,8 +67,8 @@ HeroManager.prototype.endBattle = function() {
 }
 HeroManager.prototype.calculateGainedXP = function() {
   var totalXP = 0;
-  for(let i = 0 ; i < this.surManager.monsterManager.assetList.length ; i++) {
-    totalXP += this.surManager.monsterManager.assetList[i].currentXP;
+  for(let i = 0 ; i < this.screen.monsterManager.assetList.length ; i++) {
+    totalXP += this.screen.monsterManager.assetList[i].currentXP;
   }
   var unitXP = Math.floor(totalXP/this.assetList.length);
   for(let i = 0 ; i < this.assetList.length ; i++) {
@@ -79,14 +77,14 @@ HeroManager.prototype.calculateGainedXP = function() {
 }
 
 //This is the constructor function for the MonsterManager class, this class is responsible for listing Monsters in a manorExplore(bestiary) or a battle(active enemies) scene
-function MonsterManager() {
-  Manager.call(this);
+function MonsterManager(screen) {
+  Manager.call(this, screen);
 }
 MonsterManager.prototype = Object.create(Manager.prototype);
 MonsterManager.prototype.constructor = MonsterManager;
-//This is the MonsterManager's main load method, eventually it will accept a list of monsters loaded by from the battle of battlesurmanager class to use, atm though it uses a default set of enemies
+//This is the MonsterManager's battleLoad method that accepts a battleID and then populates the assetList with the relevant monsters
 //This monster laoder will rename monsters if they have the same name(wolf 1 wolf 2 etc.)
-MonsterManager.prototype.load = function(battleID) {
+MonsterManager.prototype.battleLoad = function(battleID) {
   switch(battleID) {
     case -1:
     this.assetList.push(new Snake());
@@ -166,7 +164,6 @@ MonsterManager.prototype.load = function(battleID) {
   let k = 1;
   let i = 0;
   for(i = 0; i<this.assetList.length;i++){
-    this.assetList[i].setSurManager(this.surManager);
     this.assetList[i].setPartyPosition(i);
     let name = this.assetList[i].name;
     let match = false;
@@ -215,21 +212,30 @@ LogManager.prototype.draw = function(ctx) {
 }
 
 //This is the constructor function for the EnvironmentManager class, this class is responsible for managing the background
-function EnvironmentManager() {
-  Manager.call(this);
+function EnvironmentManager(screen) {
+  Manager.call(this, screen);
 }
 EnvironmentManager.prototype = Object.create(Manager.prototype);
 EnvironmentManager.prototype.constructor = EnvironmentManager;
-EnvironmentManager.prototype.load = function(battleID) {
-  if (battleID>=0 && battleID < 7) {
-    this.backgroundImageSource = require('../assets/myGrasslandBattleScene.png');
-  }
-  else if(battleID >= 7 && battleID < 15) {
-    this.backgroundImageSource = require('../assets/myBeachBattleScene.png');
+EnvironmentManager.prototype.load = function(gameState) {
+  if(gameState == "battle") {
+
+    let battleID = this.screen.game.battleID;
+
+    if (battleID>=0 && battleID < 7) {
+      this.backgroundImageSource = require('../assets/myGrasslandBattleScene.png');
+    }
+    else if(battleID >= 7 && battleID < 15) {
+      this.backgroundImageSource = require('../assets/myBeachBattleScene.png');
+    }
+    else {
+      this.backgroundImageSource = "../assets/mySecretRoom.png";
+    }
   }
   else {
-    this.backgroundImageSource = "../assets/mySecretRoom.png";
+    this.backgroundImageSource = "../assets/myMenuBackground.png";
   }
+
 
   this.backgroundImage = new Image();
   this.backgroundImage.src = this.backgroundImageSource;
@@ -241,21 +247,54 @@ EnvironmentManager.prototype.draw = function(ctx) {
   ctx.drawImage(this.backgroundImage, 0, 0);
 }
 
-function MenuEnvironmentManager() {
+function MenuManager(screen) {
+  Manager.call(this, screen);
+}
+MenuManager.prototype = Object.create(Manager.prototype);
+MenuManager.prototype.constructor = MenuManager;
+//Load is going to overridden by the specific type of MenuManager
+MenuManager.prototype.load = function() {
 
 }
-MenuEnvironmentManager.prototype = Object.create(Manager.prototype);
-MenuEnvironmentManager.prototype.constructor = MenuEnvironmentManager;
-MenuEnvironmentManager.prototype.load = function() {
-  this.backgroundImage = new Image();
-  this.backgroundImage.src = "../assets/myBattleEndBackground.png";
-}
-MenuEnvironmentManager.prototype.update = function(gameTime, elapsedTime) {
-
-}
-MenuEnvironmentManager.prototype.draw = function(ctx) {
-  if(this.backgroundImage != null) {
-    ctx.drawImage(this.backgroundImage, 0, 0);
+MenuManager.prototype.update = function(gameTime, elapsedTime) {
+  if(this.screen.state == "waiting for input") {
+    for(let i = 0 ; i < this.assetList.length ; i++) {
+      this.assetList[i].update(gameTime, elapsedTime);
+    }
+    this.cursorHoverCheck();
   }
 }
-export {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuEnvironmentManager}
+MenuManager.prototype.cursorHoverCheck = function() {
+  let cursorHover = false;
+  for(let i = 0 ; i < this.assetList.length ; i++) {
+    this.assetList[i].hoverCheck();
+    if (this.assetList[i].cursorHover) {
+      cursorHover = true;
+      break;
+    }
+  }
+  if(cursorHover) {
+    this.screen.enableHandPointer();
+  }
+  else {
+    this.screen.disableHandPointer();
+  }
+}
+//This huge method is goning to be cut down now :)
+MenuManager.prototype.handleClick = function(){
+  //heroSelectionMenu (i=0); ActionMenu(i=1); Special Move Menu (i=2); Item  Menu(i=3); MonsterTargetMenu (i=4); HeroTargetMenu(i=5); ConfirmTurn Button (i=6);
+  for(let i = 0 ; i < this.assetList.length ; i++) {
+
+    for(let j = 0 ; j < this.assetList[i].menuButtonList.length ; j++) {
+      if(this.assetList[i].menuButtonList[j].cursorHover) {
+        this.assetList[i].select(j);
+        this.select(i, j);
+      } // end of if(this.assetList[i].menuButtonList[j].cursorHover)
+    }// end of for(let j = 0 ; j< this.assetList[i].menuButtonList.length; j++)
+  }// end of for(let i =0 ; i< this.assetList.length; i++)
+}
+MenuManager.prototype.select = function(i, j) {
+
+}
+
+export {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuManager}

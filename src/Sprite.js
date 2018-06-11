@@ -97,7 +97,7 @@ Sprite.prototype.loadEffectSprite = function(name, position) {
   switch(name) {
     case "Poisoned":
     imgsrc = '../assets/myPoisonEffectSymbol.png';
-    console.log("Poison effect image loaded");
+
     break;
     case "Stunned":
     imgsrc = '../assets/myStunnedEffectSymbol.png';
@@ -130,7 +130,6 @@ BattleSprite.prototype.setPassivePosition = function() {
   else{
     this.position = {x:150, y:100 + this.owner.partyPosition*50};
   }
-  console.log("set at y: " + (100+this.owner.partyPosition*50));
 }
 
 function EffectSprite(position) {

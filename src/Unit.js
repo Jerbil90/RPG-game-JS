@@ -41,8 +41,8 @@ function Unit(name){
   this.initiativeSprite = null;
   this.battleSprite = null;
 }
-Unit.prototype.setSurManager = function(surManager) {
-  this.surManager = surManager;
+Unit.prototype.setCurrentScreen = function(screen) {
+  this.screen = screen;
 }
 Unit.prototype.isAfflictedWith = function(statusName) {
   for(let i = 0 ; i < this.statusEffectList.length ; i ++) {
@@ -356,7 +356,7 @@ HealthBar.prototype.calculateRemainingHPLength = function() {
 }
 HealthBar.prototype.calculatePotentialDamage = function() {
   let owner = this.owner;
-  let heroList = owner.surManager.heroManager.assetList;
+  let heroList = owner.screen.heroManager.assetList;
   let potentialDamage = 0;
   this.isPotentiallyFullySlain = false;
   this.isPotentiallyFullyHealed = false;
@@ -401,12 +401,14 @@ HealthBar.prototype.update = function(gameTime, elapsedTime) {
   this.maxHP = this.owner.maxHP;
   this.remainingHP = this.owner.remainingHP;
   this.calculateRemainingHPLength();
-  if(this.owner.surManager.battleState != null) {
-    if(this.owner.surManager.battleState == "waiting for input") {
-      this.calculatePotentialDamage();
-    }
-    else {
-      this.potentialDamageLength = 0;
+  if(this.owner.screen != null) {
+    if(this.owner.screen.state != null) {
+      if(this.owner.screen.state == "waiting for input") {
+        this.calculatePotentialDamage();
+      }
+      else {
+        this.potentialDamageLength = 0;
+      }
     }
   }
 }

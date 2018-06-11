@@ -1,7 +1,8 @@
 //MENU CLASS/////////////////////////
 
 //This is the constructor function for the Menu class, this class is the parent of all menus that the user will use throughout the game
-function Menu() {
+function Menu(screen) {
+  this.screen = screen;
   this.counter = 0;
   this.isVisible = true;
   this.isActive = true;
@@ -16,10 +17,7 @@ function Menu() {
   //this holds the menuButtons that will make up the basis for the user interface
   this.menuButtonList = [];
 }
-//This method is reposible for setting a reference to the surmanager, this allows the menu to talk to the managers to request lists of items/heros/enemies etc
-Menu.prototype.setSurManager = function(surManager) {
-  this.surManager = surManager;
-}
+
 //This method is for setting the position of the menu, it is used by the child menus for setting position based on what type of menu it is
 Menu.prototype.setPosition = function(x, y) {
   this.position.x = x;
@@ -33,21 +31,20 @@ Menu.prototype.setOptions = function(options) {
 //This method is called after a new options list is set, it is responsible for completing the menuButtonsList and giving them the proper location
 Menu.prototype.compileMenu = function(){
   this.menuButtonList = [];
-  let i = 0;
-  for(i = 0;i<this.optionList.length;i++) {
+  for(let i = 0 ; i < this.optionList.length ; i++) {
     let menuButton = new MenuButton(this.optionList[i]);
     menuButton.setPosition(this.position.x+5, this.position.y+5 + (25*i));
-    menuButton.setSurManager(this.surManager);
+    menuButton.setScreen(this.screen);
     this.menuButtonList.push(menuButton);
   }
 }
 Menu.prototype.select = function(i) {
-  if(this.target!=i) {
+  if(this.target != i) {
     this.target = i;
     this.targetAcquired = true;
     this.menuButtonList[i].isClicked = true;
-    for(let j = 0; j<this.menuButtonList.length;j++) {
-      if(i!=j) {
+    for(let j = 0 ; j < this.menuButtonList.length ; j++) {
+      if(i != j) {
         this.menuButtonList[j].isClicked = false;
       }
     }
@@ -61,8 +58,8 @@ Menu.prototype.select = function(i) {
 Menu.prototype.update = function(gameTime, elapsedTime) {
   this.verifyApplicability();
   if(this.isActive) {
-	  let i = 0;
-    for(i = 0 ; i < this.menuButtonList.length;i++) {
+    for(let i = 0 ; i < this.menuButtonList.length ; i++) {
+      this.menuButtonList[i].hoverCheck();
       this.menuButtonList[i].update(gameTime, elapsedTime);
     }
 
@@ -72,16 +69,14 @@ Menu.prototype.update = function(gameTime, elapsedTime) {
   }
 }
 Menu.prototype.verifyApplicability = function() {
-	let i = 0;
-  for(i = 0 ; i < this.menuButtonList.length;i++) {
+  for(let i = 0 ; i < this.menuButtonList.length ; i++) {
     this.menuButtonList[i].verifyApplicability();
   }
 }
 Menu.prototype.hoverCheck = function(){
   this.cursorHover = false;
   if(this.isActive) {
-	  let i = 0;
-    for(i = 0; i < this.menuButtonList.length; i++) {
+    for(let i = 0 ; i < this.menuButtonList.length ; i++) {
       this.menuButtonList[i].hoverCheck();
       if (this.menuButtonList[i].cursorHover){
         this.cursorHover = true;
@@ -92,8 +87,7 @@ Menu.prototype.hoverCheck = function(){
 Menu.prototype.clickCheck = function () {
   this.menuClicked = false;
   if(this.isActive) {
-	  let i = 0 ;
-    for(i = 0 ; i<this.menuButtonList.length; i++) {
+    for(let i = 0 ; i < this.menuButtonList.length ; i++) {
       if(this.menuButtonList[i].isClicked) {
         this.menuClicked = true;
       }
@@ -104,16 +98,14 @@ Menu.prototype.clickCheck = function () {
 Menu.prototype.resetMenu = function() {
   this.menuClicked = false;
   this.target = -1;
-  let i = 0;
-  for(i = 0 ; i<this.menuButtonList.length; i++) {
+  for(let i = 0 ; i < this.menuButtonList.length ; i++) {
     this.menuButtonList[i].isClicked = false;
     this.menuButtonList[i].cursorHover = false;
   }
 }
 //This method allows the menuManager to set the menu to be clicked on a particular target
 Menu.prototype.setSelection = function(target) {
-	let i = 0;
-  for(i = 0 ; i<this.menuButtonList.length; i++) {
+  for(let i = 0 ; i < this.menuButtonList.length ; i++) {
     if(this.menuButtonList[i].target == target) {
       this.menuButtonList[i].isClicked = true;
     }
@@ -125,8 +117,7 @@ Menu.prototype.setSelectionByIndex = function (i) {
   this.menuButtonList[i].isClicked = true;
 }
 Menu.prototype.setSelectionByString = function(label) {
-	let i = 0;
-  for(i = 0 ; i<this.menuButtonList.length; i++) {
+  for(let i = 0 ; i < this.menuButtonList.length ; i++) {
     if(this.menuButtonList[i].label == label) {
       this.menuButtonList[i].isClicked = true;
     }
@@ -137,30 +128,26 @@ Menu.prototype.draw = function(ctx) {
   if(this.isVisible) {
     ctx.fillStyle = this.menuColor;
     ctx.fillRect(this.position.x, this.position.y, 160, 240);
-	let i = 0;
-    for(i = 0 ; i<this.menuButtonList.length; i++) {
+    for(let i = 0 ; i < this.menuButtonList.length ; i++) {
       this.menuButtonList[i].draw(ctx);
     }
   }
 }
 
-function HeroSelectionMenu() {
-  Menu.call(this);
+//This class is a menu for choosing which hero to assign actions/targets for
+function HeroSelectionMenu(screen) {
+  Menu.call(this, screen);
+  this.setPosition(0, 240);
 }
 HeroSelectionMenu.prototype = Object.create(Menu.prototype);
 HeroSelectionMenu.prototype.constructor = HeroSelectionMenu;
-HeroSelectionMenu.prototype.load = function(HeroList) {
-  this.setOptions(HeroList);
+HeroSelectionMenu.prototype.load = function() {
+  this.setOptions(this.screen.heroManager.assetList);
 }
 
-function ActionMenu() {
-  Menu.call(this);
-}
-ActionMenu.prototype = Object.create(Menu.prototype);
-ActionMenu.prototype.constructor = ActionMenu;
-ActionMenu.prototype.load = function() {
-  this.isVisible = false;
-  this.isActive = false;
+//This class is a menu for choosing which action you want a hero to take in battle
+function ActionMenu(screen) {
+  Menu.call(this, screen);
   this.setPosition(160, 240);
   this.menuColor = "rgb(255, 231, 97)";
   let label1 = {name: "Attack", applicableTarget: true};
@@ -170,91 +157,103 @@ ActionMenu.prototype.load = function() {
   let buttonList = [label1, label2, label3, label4];
   this.setOptions(buttonList);
 }
+ActionMenu.prototype = Object.create(Menu.prototype);
+ActionMenu.prototype.constructor = ActionMenu;
+ActionMenu.prototype.load = function() {
+  this.isVisible = false;
+  this.isActive = false;
+}
 
-function SpecialMenu() {
-  Menu.call(this);
+//This class is a menu for choosing which specific special move to use in battle
+function SpecialMenu(screen) {
+  Menu.call(this, screen);
+  this.setPosition(160, 240);
 }
 SpecialMenu.prototype = Object.create(Menu.prototype);
 SpecialMenu.prototype.constructor = SpecialMenu
 SpecialMenu.prototype.load = function() {
   this.isActive = false;
   this.isVisible = false;
-  this.setPosition(160, 240);
 }
+//this method is a special override that lists a "back" button in addition to the specialMoves
 SpecialMenu.prototype.setOptions = function(options) {
-  let optionListPlus = [];
-  optionListPlus.push({name: "Back", applicableTarget: true});
-  let i = 0;
-  for(i = 0 ; i < options.length ; i++) {
-    optionListPlus.push(options[i]);
-  }
-  this.optionList = optionListPlus;
+  options.unshift({name: "Back", applicableTarget: true});
+  this.optionList = options;
   this.compileMenu();
 }
 
-function ItemMenu() {
-  Menu.call(this);
+//This class is a menu for choosing which specific item to use in battle
+function ItemMenu(screen) {
+  Menu.call(this, screen);
+  this.setPosition(160, 240);
 }
 ItemMenu.prototype = Object.create(Menu.prototype);
 ItemMenu.prototype.constructor = ItemMenu;
 ItemMenu.prototype.load = function () {
   this.isActive = false;
   this.isVisible = false;
-  this.setPosition(160, 240);
-  this.setOptions(this.surManager.battleItems);
+  this.setOptions(this.screen.battleItems);
 }
-ItemMenu.prototype.setOptions = function(options) {
+//this method lists a "back" button in addition to the other items
+ItemMenu.prototype.setOptions = function() {
+  var options = this.screen.battleItems;
   options.unshift({name: "Back", applicableTarget: true});
   this.optionList = options;
   this.compileMenu();
 }
+//this method checks to see if the items in this menu are avilable of if they are all used up / currently being used by someone else
 ItemMenu.prototype.checkRemainingItems = function(currentHero){
-	let i = 0;
-  for(i = 1 ; i < this.optionList.length ; i++) {
-    this.menuButtonList[i].target.checkAvailability(this.surManager.heroManager.assetList, currentHero);
+  for(let i = 1 ; i < this.optionList.length ; i++) {
+    this.menuButtonList[i].target.checkAvailability(this.screen.heroManager.assetList, currentHero);
   }
   this.verifyApplicability();
 }
 
-function MonsterTargetMenu() {
-  Menu.call(this);
+//This class is a menu for selecting a monster as a target
+function MonsterTargetMenu(screen) {
+  Menu.call(this, screen);
+  this.setPosition(320, 240);
 }
 MonsterTargetMenu.prototype = Object.create(Menu.prototype);
 MonsterTargetMenu.constructor = MonsterTargetMenu;
 MonsterTargetMenu.prototype.load = function() {
   this.isActive = false;
   this.isVisible = false;
-  this.setPosition(320, 240);
-  this.setOptions(this.surManager.monsterManager.assetList);
+  this.setOptions(this.screen.monsterManager.assetList);
 }
 
-function HeroTargetMenu() {
-  Menu.call(this);
+//this class is a menu for selecting on of the heroes as a target;
+function HeroTargetMenu(screen) {
+  Menu.call(this, screen);
+  this.setPosition(320, 240);
 }
 HeroTargetMenu.prototype = Object.create(Menu.prototype);
 HeroTargetMenu.prototype.constructor = HeroTargetMenu;
 HeroTargetMenu.prototype.load = function() {
   this.isActive = false;
   this.isVisible = false;
-  this.setPosition(320, 240);
-  this.setOptions(this.surManager.heroManager.assetList);
+  this.setOptions(this.screen.heroManager.assetList);
 }
 
-function TurnConfirmButton() {
-  Menu.call(this);
+//This class is a special button that appears when actions/targets are assigned and starts the combat when pressed
+function TurnConfirmButton(screen) {
+  Menu.call(this, screen);
   this.isVisible = false
   this.isActive = false;
-}
-TurnConfirmButton.prototype = Object.create(new Menu());
-TurnConfirmButton.prototype.constructor = TurnConfirmButton;
-TurnConfirmButton.prototype.load = function() {
   this.setPosition(480, 240);
   let label = [{name: "Confirm Turn", applicableTarget: true}];
   this.setOptions(label);
 }
+TurnConfirmButton.prototype = Object.create(new Menu());
+TurnConfirmButton.prototype.constructor = TurnConfirmButton;
+TurnConfirmButton.prototype.load = function() {
+  this.isVisible = false
+  this.isActive = false;
+}
 
-function BattleSelectMenu() {
-  Menu.call(this);
+//This class is a special developer menu that allows the commencement of another battle
+function BattleSelectMenu(screen) {
+  Menu.call(this, screen);
   this.isVisible = true;
   this.isActive = true;
 }
@@ -297,14 +296,14 @@ MenuButton.prototype.verifyApplicability = function() {
     this.isActive = false;
   }
 }
-MenuButton.prototype.setSurManager = function(surManager) {
-  this.surManager = surManager;
+MenuButton.prototype.setScreen = function(screen) {
+  this.screen = screen;
 }
 MenuButton.prototype.hoverCheck = function() {
   this.cursorHover = false;
   if(this.isActive){
-    let mousex = this.surManager.mousex;
-    let mousey = this.surManager.mousey;
+    let mousex = this.screen.mousex;
+    let mousey = this.screen.mousey;
     //check for collision and set cursorHover
     if(mousex>this.rectangle.x && mousex<this.rectangle.x+this.rectangle.l && mousey>this.rectangle.y && mousey<this.rectangle.y+this.rectangle.h) {
       this.cursorHover = true;
