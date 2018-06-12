@@ -7,7 +7,7 @@ import {Item, BattleItem, MinorHealthPotion, Antidote} from './Item';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 import {BattleScreen} from './BattleScreen';
-import {BattleEndScreen, ExperienceBar} from './BattleEndScreen';
+import {AftermathScreen, ExperienceBar} from './AftermathScreen';
 import {MainMenuScreen} from './MainMenuScreen';
 
 //Game class constructor, this is the main object that holds and manages the game
@@ -29,7 +29,7 @@ function Game() {
 //the loadGame method instantiates the various screens that the game will scwitch between
 Game.prototype.loadGame = function () {
   this.battleScreen = new BattleScreen(this);
-  //this.aftermathScreen = new AftermathScreen(this);
+  this.aftermathScreen = new AftermathScreen(this);
 };
 //This method is responsible for requesting the user's Heros from the server, atm it just provides default heros
 Game.prototype.loadUserData = function() {
@@ -50,7 +50,7 @@ Game.prototype.startBattle = function () {
 }
 Game.prototype.endBattle = function() {
   if(this.targetScreen != this.aftermathScreen) {
-    this.battleEndScreen.newEnd(battle);
+    this.aftermathScreen.newEnd();
     this.targetScreen = this.aftermathScreen;
     this.fade.startFade();
   }
@@ -63,7 +63,7 @@ Game.prototype.update = function() {
   this.gameTime = currentTime;
 
   this.battleScreen.update(this.gameTime, this.elapsedTime);
-  //this.aftermathScreen.update(this.gameTime, this.elapsedTime);
+  this.aftermathScreen.update(this.gameTime, this.elapsedTime);
   //this.mainMenuScreen.update(this.gameTime, this.elapsedTime);
 
   if(this.fade.fadeState == "none") {
@@ -71,9 +71,10 @@ Game.prototype.update = function() {
       if(this.battleScreen.state == "victory" || this.battleScreen.state == "defeat") {
         this.endBattle();
       }
-    }/*
+    }
     else if(this.currentScreen == this.aftermathScreen) {
       if(this.aftermathScreen.menuManager.isScreenOver) {
+        this.aftermathScreen.endScreen();
         if(this.aftermathScreen.menuManager.newID != 100) {
           this.startBattle(this.aftermathScreen.menuManager.newID)
           this.fade.startFade();
@@ -83,7 +84,7 @@ Game.prototype.update = function() {
         }
 
       }
-    }
+    }/*
     else if(this.currentScreen == this.mainMenuScreen) {
     }*/
   }
@@ -91,6 +92,7 @@ Game.prototype.update = function() {
     this.fade.update(this.gameTime, this.elapsedTime);
     if(this.fade.fadeState == "faded") {
       this.currentScreen = this.targetScreen;
+      this.currentScreen.load();
     }
     else if(this.fade.hasFadeEnded) {
       this.fade.hasFadeEnded = false;
@@ -214,10 +216,10 @@ $(document).ready(function() {
     var rect = canvas.getBoundingClientRect();
     let mousex = event.clientX - rect.left;
     let mousey = event.clientY - rect.top;
-    game.currentScreen.setMouseDetails(mousex, mousey);/*
+    game.currentScreen.setMouseDetails(mousex, mousey);
     if(game.aftermathScreen != null) {
-      game.battleEndScreen.surManager.setMouseDetails(mousex, mousey);
-    }
+      game.aftermathScreen.setMouseDetails(mousex, mousey);
+    }/*
     if(game.mainMenuScreen != null) {
       game.mainMenuScreen.surManager.setMouseDetails(mousex, mousey);
     }*/

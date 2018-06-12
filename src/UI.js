@@ -67,8 +67,8 @@ PoisonedDisplayIndicator.prototype.draw = function(ctx) {
 }
 
 
-function InitiativeDisplay(surManager) {
-  this.surManager = surManager;
+function InitiativeDisplay(screen) {
+  this.screen = screen;
   this.currentState = "passive";
   this.unitList = null;
   this.initiativeSpriteArray = null;
@@ -76,29 +76,27 @@ function InitiativeDisplay(surManager) {
   this.currentTurnOrder = [];
 }
 InitiativeDisplay.prototype.update = function(gameTime, elapsedTime) {
-  let i = 0;
   if(this.initiativeSpriteArray != null) {
-    for(i = 0 ; i < this.initiativeSpriteArray.length; i++) {
+    for(let i = 0 ; i < this.initiativeSpriteArray.length; i++) {
       if(this.initiativeSpriteArray[i] != null) {
         this.initiativeSpriteArray[i].update(gameTime, elapsedTime);
       }
-
     }
   }
   else {
     this.unitList = [];
-    for(i=0; i<this.surManager.heroManager.assetList.length; i++) {
-      if( this.surManager.heroManager.assetList[i].isAlive) {
-        this.unitList.push(this.surManager.heroManager.assetList[i]);
+    for(let i = 0 ; i < this.screen.heroManager.assetList.length ; i++) {
+      if( this.screen.heroManager.assetList[i].isAlive) {
+        this.unitList.push(this.screen.heroManager.assetList[i]);
       }
     }
-    for(i = 0 ; i<this.surManager.monsterManager.assetList.length ; i++) {
-      if(this.surManager.monsterManager.assetList[i].isAlive) {
-        this.unitList.push(this.surManager.monsterManager.assetList[i]);
+    for(let i = 0 ; i<this.screen.monsterManager.assetList.length ; i++) {
+      if(this.screen.monsterManager.assetList[i].isAlive) {
+        this.unitList.push(this.screen.monsterManager.assetList[i]);
       }
     }
     this.initiativeSpriteArray = [];
-    for(i=0;i<this.unitList.length;i++) {
+    for(let i = 0 ; i < this.unitList.length ; i++) {
       let initiativeSprite = new InitiativeSprite(this.unitList[i]);
       this.unitList[i].initiativeSprite = initiativeSprite;
       this.initiativeSpriteArray.push(initiativeSprite);
@@ -125,7 +123,7 @@ InitiativeDisplay.prototype.update = function(gameTime, elapsedTime) {
 	  break;
   }
 
-  for(i=0;i<this.unitList.length;i++) {
+  for(let i = 0 ; i < this.unitList.length ; i++) {
     if(!this.unitList[i].isAlive){
       this.initiativeSpriteArray[i] = null;
     }

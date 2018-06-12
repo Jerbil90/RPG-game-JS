@@ -25,19 +25,13 @@ BattleScreen.prototype.loadBattle = function () {
   this.battleID = this.game.battleID;
   this.load();
   this.state = "waiting for input";
+  this.combat = null;
   this.heroManager.setPassiveBattleSpritePosition();
   this.monsterManager.setPassiveBattleSpritePosition();
 };
 //in battle only the party heros are relevant
 BattleScreen.prototype.setUpHeroManager = function() {
-  var partyHeroes = [];
-  for(let i = 0 ; i < this.game.userHeroList.length ; i++) {
-    if(this.game.userHeroList[i].isInParty) {
-      this.game.userHeroList[i].setPartyPosition(i);
-      this.game.userHeroList[i].loadBattleSprite();
-      partyHeroes.push(this.game.userHeroList[i]);
-    }
-  }
+  var partyHeroes = this.getPartyHeros();
   this.heroManager.load(partyHeroes);
 }
 BattleScreen.prototype.setUpMonsterManager = function() {
@@ -467,6 +461,7 @@ BattleMenuManager.prototype.select = function(i, j){
         if(this.currentlySelectedSpecialOrItem.isUsedOnOpponent) {
           this.assetList[4].isVisible = true;
           this.assetList[4].isActive = true;
+          this.assetList[4].resetMenu();
           this.assetList[4].setSelection(this.currentlySelectedTarget);
         }
         else {

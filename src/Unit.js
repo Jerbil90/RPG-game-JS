@@ -3,7 +3,7 @@ import {SpecialMove, PowerStrike, WindSlash, BlockOpponent, GuardAlly} from './S
 import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite';
 import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
 import {StatusEffect, Guarded, Blocked, Poisoned, Stunned} from './StatusEffect';
-import {BattleEndScreen, ExperienceBar} from './BattleEndScreen';
+import {AftermathScreen, ExperienceBar} from './AftermathScreen';
 
 //This is the constructor function for the Unit class, this class is the parent for each unit (hero/monster) and contains the parent properties and methods required by each Unit such as load, draw, update
 function Unit(name){
@@ -106,7 +106,7 @@ Unit.prototype.deathCheck = function() {
   if(this.remainingHP<=0) {
     this.isAlive = false;
     this.applicableTarget = false;
-    this.initiativeSprite = null;
+    //this.initiativeSprite = null;
   }
   else {
     this.isAlive = true;
@@ -200,6 +200,7 @@ Unit.prototype.endBattle = function() {
   this.remainingHP = this.maxHP;
   this.statusEffectList = [];
   this.experienceBar = new ExperienceBar(this);
+
 }
 
 
@@ -269,7 +270,7 @@ Snake.prototype = Object.create(Monster.prototype);
 Snake.prototype.contructor = Snake;
 Snake.prototype.attack = function(target) {
   Unit.prototype.attack.call(this, target);
-  if(Math.random()>0.5) {
+  if(Math.random()>0) {
     target.statusEffectList.push(new Poisoned(target));
     console.log(target.name + " is now poisoned!");
   }
@@ -355,13 +356,12 @@ HealthBar.prototype.calculateRemainingHPLength = function() {
   }
 }
 HealthBar.prototype.calculatePotentialDamage = function() {
-  let owner = this.owner;
-  let heroList = owner.screen.heroManager.assetList;
-  let potentialDamage = 0;
+  var owner = this.owner;
+  var heroList = owner.screen.heroManager.assetList;
+  var potentialDamage = 0;
   this.isPotentiallyFullySlain = false;
   this.isPotentiallyFullyHealed = false;
-  let i = 0;
-  for(i = 0 ; i < heroList.length ; i++) {
+  for(let i = 0 ; i < heroList.length ; i++) {
     if(heroList[i].currentlySelectedTarget == owner) {
       switch(heroList[i].currentlySelectedAction) {
         case "Attack":
@@ -411,6 +411,7 @@ HealthBar.prototype.update = function(gameTime, elapsedTime) {
       }
     }
   }
+
 }
 HealthBar.prototype.draw = function(ctx) {
   //first draw the background rect

@@ -21,6 +21,22 @@ StatusEffect.prototype.draw = function(ctx) {
     this.statusEffectSprites[i].draw(ctx);
   }
 }
+StatusEffect.prototype.isThisLongestDurationEffect = function() {
+  var testResult = true;
+  for(let i = this.owner.statusEffectList.length - 1 ; i >= 0 ; i--) {
+    if (this.owner.statusEffectList[i].name == this.name && this.owner.statusEffectList[i] != this) {
+      if(this.owner.statusEffectList[i].duration == this.duration) {
+        this.owner.statusEffectList.splice(i, 1);
+        console.log("similar status discovered, removing...");
+      }
+      else if (this.owner.statusEffectList[i].duration > this.duration) {
+        testResult = false;
+        this.duration = 0;
+      }
+    }
+  }
+  return testResult;
+}
 
 function Guarded(owner, guardian) {
   StatusEffect.call(this, owner);
@@ -53,19 +69,24 @@ function Poisoned(owner) {
 Poisoned.prototype = Object.create(StatusEffect.prototype);
 Poisoned.prototype.constructor = Poisoned;
 Poisoned.prototype.update = function(gameTime, elapsedTime) {
-  StatusEffect.prototype.update.call(this, gameTime, elapsedTime);
-  for(let i = this.statusEffectSprites.length - 1; i >= 0 ; i--) {
-    if(this.statusEffectSprites[i].hasExpired) {
-      this.statusEffectSprites.splice(i, 1);
+  if(this.isThisLongestDurationEffect()) {
+    StatusEffect.prototype.update.call(this, gameTime, elapsedTime);
+    for(let i = this.statusEffectSprites.length - 1; i >= 0 ; i--) {
+      if(this.statusEffectSprites[i].hasExpired) {
+        this.statusEffectSprites.splice(i, 1);
+      }
+    }
+    if(this.latestEffectSpawnTime == null) {
+      this.latestEffectSpawnTime = gameTime;
+      this.spawnPoisonEffectSprite();
+    }
+    else if(gameTime > this.latestEffectSpawnTime + this.spawnInterval) {
+      this.latestEffectSpawnTime = gameTime;
+      this.spawnPoisonEffectSprite();
     }
   }
-  if(this.latestEffectSpawnTime == null) {
-    this.latestEffectSpawnTime = gameTime;
-    this.spawnPoisonEffectSprite();
-  }
-  else if(gameTime > this.latestEffectSpawnTime + this.spawnInterval) {
-    this.latestEffectSpawnTime = gameTime;
-    this.spawnPoisonEffectSprite();
+  else {
+    console.log("largerduration discovered");
   }
 }
 Poisoned.prototype.spawnPoisonEffectSprite = function() {

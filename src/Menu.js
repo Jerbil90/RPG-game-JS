@@ -108,6 +108,7 @@ Menu.prototype.setSelection = function(target) {
   for(let i = 0 ; i < this.menuButtonList.length ; i++) {
     if(this.menuButtonList[i].target == target) {
       this.menuButtonList[i].isClicked = true;
+      this.target = i;
     }
   }
   this.menuClicked = true;
@@ -115,11 +116,14 @@ Menu.prototype.setSelection = function(target) {
 //This method allows the menuManager to set the menu to be clickewd via index
 Menu.prototype.setSelectionByIndex = function (i) {
   this.menuButtonList[i].isClicked = true;
+  this.target = i;
 }
 Menu.prototype.setSelectionByString = function(label) {
   for(let i = 0 ; i < this.menuButtonList.length ; i++) {
     if(this.menuButtonList[i].label == label) {
       this.menuButtonList[i].isClicked = true;
+      this.meuClicked = true;
+      this.target = i;
     }
   }
 }
@@ -174,11 +178,16 @@ SpecialMenu.prototype.constructor = SpecialMenu
 SpecialMenu.prototype.load = function() {
   this.isActive = false;
   this.isVisible = false;
+
 }
-//this method is a special override that lists a "back" button in addition to the specialMoves
+//this method is a special override that lists a "back" button in addition to the specialMoves, a new list must bee compiled to avoid adding the option back to the actual move list
 SpecialMenu.prototype.setOptions = function(options) {
-  options.unshift({name: "Back", applicableTarget: true});
-  this.optionList = options;
+  let optionListPlus = [];
+  optionListPlus.push({name: "Back", applicableTarget: true});
+  for(let i = 0 ; i < options.length ; i++) {
+    optionListPlus.push(options[i]);
+  }
+  this.optionList = optionListPlus;
   this.compileMenu();
 }
 
@@ -197,9 +206,13 @@ ItemMenu.prototype.load = function () {
 //this method lists a "back" button in addition to the other items
 ItemMenu.prototype.setOptions = function() {
   var options = this.screen.battleItems;
-  options.unshift({name: "Back", applicableTarget: true});
-  this.optionList = options;
-  this.compileMenu();
+  let optionListPlus = [];
+  optionListPlus.push({name: "Back", applicableTarget: true});
+  for(let i = 0 ; i < options.length ; i++) {
+    optionListPlus.push(options[i]);
+  }
+  this.optionList = optionListPlus;
+this.compileMenu();
 }
 //this method checks to see if the items in this menu are avilable of if they are all used up / currently being used by someone else
 ItemMenu.prototype.checkRemainingItems = function(currentHero){

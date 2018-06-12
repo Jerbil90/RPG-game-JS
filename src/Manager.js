@@ -85,6 +85,7 @@ MonsterManager.prototype.constructor = MonsterManager;
 //This is the MonsterManager's battleLoad method that accepts a battleID and then populates the assetList with the relevant monsters
 //This monster laoder will rename monsters if they have the same name(wolf 1 wolf 2 etc.)
 MonsterManager.prototype.battleLoad = function(battleID) {
+  this.assetList = [];
   switch(battleID) {
     case -1:
     this.assetList.push(new Snake());
@@ -182,6 +183,9 @@ MonsterManager.prototype.battleLoad = function(battleID) {
     }
     match = false;
   }
+  for(let i = 0 ; i < this.assetList.length ; i++) {
+    this.assetList[i].setCurrentScreen(this.screen);
+  }
 }
 MonsterManager.prototype.newRound = function() {
 	let  i = 0;
@@ -217,7 +221,8 @@ function EnvironmentManager(screen) {
 }
 EnvironmentManager.prototype = Object.create(Manager.prototype);
 EnvironmentManager.prototype.constructor = EnvironmentManager;
-EnvironmentManager.prototype.load = function(gameState) {
+EnvironmentManager.prototype.load = function() {
+  var gameState = this.screen.game.state;
   if(gameState == "battle") {
 
     let battleID = this.screen.game.battleID;

@@ -11,8 +11,6 @@ function Screen(game){
   this.lastMouseY = 0;
   this.mousex = 0;
   this.mousey = 0;
-
-
 }
 Screen.prototype.enableHandPointer = function() {
   $("#gameArea").addClass("handPointer");
@@ -39,13 +37,13 @@ Screen.prototype.load = function() {
   this.setUpMonsterManager();
   this.setUpMenuManager();
 }
-//no all screens will have heros on them
+//not all screens will have heros on them
 Screen.prototype.setUpHeroManager = function() {
 
 }
-//All screens will need some dort of background
+//All screens will need some sort of background
 Screen.prototype.setUpEnvironmentManager = function() {
-  this.environmentManager.load(this.game.state);
+  this.environmentManager.load();
 }
 //not all screens will have monsters on them
 Screen.prototype.setUpMonsterManager = function() {
@@ -81,5 +79,16 @@ Screen.prototype.draw = function(ctx) {
     this.menuManager.draw(ctx);
   }
 }
+Screen.prototype.getPartyHeros = function () {
+  let partyHeroes = [];
+  for(let i = 0 ; i < this.game.userHeroList.length ; i++) {
+    if(this.game.userHeroList[i].isInParty) {
+      this.game.userHeroList[i].setPartyPosition(i);
+      this.game.userHeroList[i].loadBattleSprite();
+      partyHeroes.push(this.game.userHeroList[i]);
+    }
+  }
+  return partyHeroes;
+};
 
 export {Screen}

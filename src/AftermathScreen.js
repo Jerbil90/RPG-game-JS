@@ -1,55 +1,47 @@
 import {SurManager} from './main';
-import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuEnvironmentManager} from './Manager';
+import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuManager} from './Manager';
 import {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite} from './Sprite';
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from './Menu'
+import {Screen} from './Screen';
 
-function BattleEndScreen(battle) {
+function AftermathScreen(game) {
+  this.game = game;
+  this.heroManager = new HeroManager(this);
+  this.monsterManager = new MonsterManager(this);
+  this.menuManager = new AftermathMenuManager(this);
+  Screen.call(this, game);
   this.endScreenStartTime = null;
-  if(battle.battleSurManager.battleState == "victory") {
-    this.surManager = new BattleEndSurManager(battle.battleSurManager);
-  }
-  else {
-    this.surManager = new GameOverSurManager();
-  }
 }
-BattleEndScreen.prototype.draw = function(ctx) {
-  this.surManager.draw(ctx);
-
-}
-BattleEndScreen.prototype.update = function (gameTime, elapsedTime) {
-  this.surManager.update(gameTime, elapsedTime);
+AftermathScreen.prototype = Object.create(Screen.prototype);
+AftermathScreen.prototype.constructor = AftermathScreen;
+AftermathScreen.prototype.update = function (gameTime, elapsedTime) {
+  Screen.prototype.update.call(this, gameTime, elapsedTime);
   if(this.endScreenStartTime == null) {
     this.endScreenStartTime = gameTime;
   }
   else {
     if(gameTime > this.endScreenStartTime + 4000) {
-      this.surManager.menuManager.assetList[0].isActive = true;
-      this.surManager.menuManager.assetList[0].isVisible = true;
+      this.menuManager.assetList[0].isActive = true;
+      this.menuManager.assetList[0].isVisible = true;
     }
   }
 }
-
-function BattleEndSurManager(battleSurManager) {
-  SurManager.call(this);
-  this.heroManager = battleSurManager.heroManager;
+AftermathScreen.prototype.setUpHeroManager = function () {
+  this.heroManager = this.game.battleScreen.heroManager;
   this.heroManager.endBattle();
-  this.monsterManager = battleSurManager.monsterManager;
-  this.logManager = battleSurManager.logManager;
-  this.environmentManager = new MenuEnvironmentManager();
-  this.environmentManager.setSurManager(this);
-  this.environmentManager.load();
-  this.menuManager = new BattleEndMenuManager();
-  this.menuManager.setSurManager(this);
+};
+AftermathScreen.prototype.setUpMonsterManager = function () {
+  this.monsterManager = this.game.battleScreen.monsterManager;
+};
+AftermathScreen.prototype.setUpMenuManager = function() {
   this.menuManager.load();
 }
-BattleEndSurManager.prototype = Object.create(SurManager.prototype);
-BattleEndSurManager.prototype.constructor = BattleEndSurManager;
-BattleEndSurManager.prototype.update = function(gameTime, elapsedTime) {
-  SurManager.prototype.update.call(this, gameTime, elapsedTime);
-}
-BattleEndSurManager.prototype.draw = function(ctx) {
-  SurManager.prototype.draw.call(this, ctx);
-}
+AftermathScreen.prototype.newEnd = function () {
+  this.load();
+};
+AftermathScreen.prototype.endScreen = function () {
+  this.menuManager.reset();
+};
 
 function GameOverSurManager() {
   this.environmentManager = new MenuEnvironmentManager();
@@ -190,75 +182,63 @@ ExperienceBar.prototype.draw = function(ctx) {
   ctx.fillRect(this.position.x + 50 + Math.floor(200 * (this.oldXP/this.requiredXP)), this.position.y - 18, Math.floor(200 * (this.filledXP/this.requiredXP)), 50);
 }
 
-function BattleEndMenuManager() {
-  Manager.call(this);
+function AftermathMenuManager(screen) {
+  MenuManager.call(this, screen);
   this.isScreenOver = false;
-}
-BattleEndMenuManager.prototype = Object.create(Manager.prototype);
-BattleEndMenuManager.prototype.constructor = BattleEndMenuManager;
-BattleEndMenuManager.prototype.load = function() {
-  let battleSelectMenu = new BattleSelectMenu();
-  battleSelectMenu.setSurManager(this.surManager);
+  let battleSelectMenu = new BattleSelectMenu(screen);
   battleSelectMenu.setPosition(0, 240);
   battleSelectMenu.load();
   battleSelectMenu.isActive = false;
   battleSelectMenu.isVisible = false;
   this.assetList.push(battleSelectMenu);
 }
-BattleEndMenuManager.prototype.update = function(gameTime, elapsedTime) {
+AftermathMenuManager.prototype = Object.create(MenuManager.prototype);
+AftermathMenuManager.prototype.constructor = AftermathMenuManager;
+AftermathMenuManager.prototype.load = function() {
+  this.assetList[0].isVisible = true;
+  this.assetList[0].isActive = true;
+}
+AftermathMenuManager.prototype.update = function(gameTime, elapsedTime) {
   for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].update(gameTime, elapsedTime);
   }
   this.cursorHoverCheck();
 }
-BattleEndMenuManager.prototype.cursorHoverCheck = function() {
-  let cursorHover = false;
-  for(let i = 0; i<this.assetList.length; i++) {
-    this.assetList[i].hoverCheck();
-    if (this.assetList[i].cursorHover) {
-      cursorHover = true;
-      break;
-    }
-  }
-  if(cursorHover) {
-    this.surManager.enableHandPointer();
-  }
-  else {
-    this.surManager.disableHandPointer();
-  }
-}
-BattleEndMenuManager.prototype.handleClick = function() {
-  this.newID = -1;
-  for(let i = 0 ; i< this.assetList.length ; i++) {
 
-    for(let j = 0 ; j < this.assetList[i].menuButtonList.length ; j++) {
-      if(this.assetList[i].menuButtonList[j].cursorHover) {
-        this.assetList[i].select(j);
-        this.isScreenOver = true;
-        if(j==0) {
-          this.newID = Math.floor(Math.random()*2);
-        }
-        else if(j==1) {
-          this.newID = 2 + Math.floor(Math.random()*2);
-        }
-        else if(j==2) {
-          this.newID = 4 + Math.floor(Math.random()*3);
-        }
-        else if(j==3) {
-          this.newID = 7 + Math.floor(Math.random()*3);
-        }
-        else if(j==4) {
-          this.newID = 10 + Math.floor(Math.random()*3);
-        }
-        else if(j==5) {
-          this.newID = 13 + Math.floor(Math.random()*2);
-        }
-        else if(j==6) {
-          this.newID = 100;
-        }
-      }
+AftermathMenuManager.prototype.select = function(i, j) {
+  if(this.assetList[i].menuButtonList[j].cursorHover) {
+    this.assetList[i].select(j);
+    this.isScreenOver = true;
+    if(j==0) {
+      this.newID = Math.floor(Math.random()*2);
+    }
+    else if(j==1) {
+      this.newID = 2 + Math.floor(Math.random()*2);
+    }
+    else if(j==2) {
+      this.newID = 4 + Math.floor(Math.random()*3);
+    }
+    else if(j==3) {
+      this.newID = 7 + Math.floor(Math.random()*3);
+    }
+    else if(j==4) {
+      this.newID = 10 + Math.floor(Math.random()*3);
+    }
+    else if(j==5) {
+      this.newID = 13 + Math.floor(Math.random()*2);
+    }
+    else if(j==6) {
+      this.newID = 100;
     }
   }
 }
+AftermathMenuManager.prototype.reset = function () {
+  for(let i = 0 ; i < this.assetList.length ; i++) {
+    this.assetList[i].resetMenu();
+    this.isScreenOver = false;
+  }
+  this.assetList[0].isVisible = false;
+  this.assetList[0].isActive = false;
+};
 
-export {BattleEndScreen, ExperienceBar}
+export {AftermathScreen, ExperienceBar}

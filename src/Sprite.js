@@ -97,7 +97,6 @@ Sprite.prototype.loadEffectSprite = function(name, position) {
   switch(name) {
     case "Poisoned":
     imgsrc = '../assets/myPoisonEffectSymbol.png';
-
     break;
     case "Stunned":
     imgsrc = '../assets/myStunnedEffectSymbol.png';
