@@ -21,6 +21,7 @@ function BattleScreen(game) {
 }
 BattleScreen.prototype = Object.create(Screen.prototype);
 BattleScreen.prototype.constructor = BattleScreen;
+//This method is called whenever a new battle is loaded and readies the heromanager, monstermanager and the environmentmanager and activates the menumanager
 BattleScreen.prototype.loadBattle = function () {
   this.battleID = this.game.battleID;
   this.load();
@@ -34,12 +35,15 @@ BattleScreen.prototype.setUpHeroManager = function() {
   var partyHeroes = this.getPartyHeros();
   this.heroManager.load(partyHeroes);
 }
+//the monsters will depend on the battle ID they are loaded into the monstermanager here
 BattleScreen.prototype.setUpMonsterManager = function() {
   this.monsterManager.battleLoad(this.game.battleID);
 }
+//menuManager wll need to load in the new party heros and he selected battle items
 BattleScreen.prototype.setUpMenuManager = function() {
   this.menuManager.load();
 }
+//The battleScreen'supdate loop updates all managers, then checks the state and checks to see if the next state should be commenced
 BattleScreen.prototype.update = function(gameTime, elapsedTime) {
   Screen.prototype.update.call(this, gameTime, elapsedTime);
   this.initiativeDisplay.update(gameTime, elapsedTime);
@@ -63,8 +67,9 @@ BattleScreen.prototype.update = function(gameTime, elapsedTime) {
   }
 }
 
-function Combat(surManager) {
-  this.surManager = surManager;
+//The Combat class takes care of one round of combat, organising the turnOrder, calculating and administering the effects of battle and considering status aliments
+function Combat(screen) {
+  this.screen = screen;
   this.combatStartTime = null
   this.isCombatOver = false;
   this.isVictory = false;
@@ -73,17 +78,16 @@ function Combat(surManager) {
   this.currentTurn = 0;
   this.isCurrentTurnTargeted = false;
   this.isCurrentTurnAttacked = false;
-  let applicableHeros = [];
-  let i = 0;
-  for(i = 0 ; i < this.surManager.heroManager.assetList.length; i++) {
-    let currentHero = this.surManager.heroManager.assetList[i];
+  var applicableHeros = [];
+  for(let i = 0 ; i < this.screen.heroManager.assetList.length; i++) {
+    let currentHero = this.screen.heroManager.assetList[i];
     if(currentHero.isAlive) {
       applicableHeros.push(currentHero);
     }
   }
-  let applicableMonsters = [];
-  for(i = 0 ; i < this.surManager.monsterManager.assetList.length; i++) {
-    let currentMonster = this.surManager.monsterManager.assetList[i];
+  var applicableMonsters = [];
+  for(let i = 0 ; i < this.screen.monsterManager.assetList.length; i++) {
+    let currentMonster = this.screen.monsterManager.assetList[i];
     if(currentMonster.isAlive) {
       applicableMonsters.push(currentMonster);
     }
@@ -93,31 +97,29 @@ function Combat(surManager) {
 }
 Combat.prototype.victoryCheck = function() {
   this.isVictory = true;
-  let i = 0;
-  for(i = 0 ; i < this.surManager.monsterManager.assetList.length ; i++) {
-    if(this.surManager.monsterManager.assetList[i].isAlive) {
+  for(let i = 0 ; i < this.screen.monsterManager.assetList.length ; i++) {
+    if(this.screen.monsterManager.assetList[i].isAlive) {
       this.isVictory = false;
     }
   }
   if(!this.isCombatOver) {
     if(this.isVictory) {
       this.isCombatOver = true;
-      this.surManager.battleState = "victory";
+      this.screen.state = "victory";
     }
   }
 }
 Combat.prototype.defeatCheck = function() {
   this.isDefeat = true;
-  let i  = 0;
-  for(i = 0 ; i < this.surManager.heroManager.assetList.length ; i++) {
-    if(this.surManager.heroManager.assetList[i].isAlive) {
+  for(let i = 0 ; i < this.screen.heroManager.assetList.length ; i++) {
+    if(this.screen.heroManager.assetList[i].isAlive) {
       this.isDefeat = false;
     }
   }
   if(!this.isCombatOver) {
     if(this.isDefeat) {
       this.isCombatOver = true;
-      this.surManager.battleState = "defeat";
+      this.screen.state = "defeat";
     }
   }
 }
@@ -125,7 +127,7 @@ Combat.prototype.update = function(gameTime, elapsedTime) {
   if (this.combatStartTime == null) {
     this.combatStartTime = gameTime;
     this.arbTime = gameTime;
-    this.surManager.disableHandPointer();
+    this.screen.disableHandPointer();
     console.log("combat started@ combatstarttime: " + this.combatStartTime);
     this.setMonsterActions();
     this.setTurnOrder();
@@ -240,6 +242,7 @@ Combat.prototype.blockCheck = function(i) {
     }
   }
 }
+//this method checks if the current Unit's target is not guarded
 Combat.prototype.guardCheck = function(i) {
   if(this.turnOrder[i].currentlySelectedTarget.isAfflictedWith("Guarded")) {
     let guardedBy = [];
@@ -258,6 +261,7 @@ Combat.prototype.guardCheck = function(i) {
     }
   }
 }
+//this method is for checing the unit's target n the unit's turn, it takes into consideration things like if the current target is slain, or guarded
 Combat.prototype.checkTarget = function() {
   let isUsedOnDead = false;
   if(this.turnOrder[this.currentTurn].currentlySelectedSpecialOrItem != null) {
@@ -307,8 +311,7 @@ Combat.prototype.checkTarget = function() {
   }
 }
 Combat.prototype.setMonsterActions = function() {
-	let i = 0;
-  for(i = 0 ; i < this.applicableMonsters.length ; i++) {
+  for(let i = 0 ; i < this.applicableMonsters.length ; i++) {
     let currentMonster = this.applicableMonsters[i];
     currentMonster.isActionSelected = true;
     currentMonster.currentlySelectedAction = "Attack";
@@ -317,8 +320,8 @@ Combat.prototype.setMonsterActions = function() {
 }
 Combat.prototype.setTurnOrder = function(){
   this.turnOrder = [];
-  let maxSpeed = 0;
-  let i = 0;
+  var maxSpeed = 0;
+  var i = 0;
   for (i = 0 ; i < this.applicableMonsters.length ; i++) {
     if(this.applicableMonsters[i].combatStats.speed > maxSpeed) {
       maxSpeed = this.applicableMonsters[i].baseStats.speed;
@@ -330,7 +333,7 @@ Combat.prototype.setTurnOrder = function(){
     }
   }
 
-  let allAssigned = false;
+  var allAssigned = false;
 
   while (!allAssigned) {
     if(Math.random()>0.5) {
@@ -364,12 +367,11 @@ Combat.prototype.setTurnOrder = function(){
   }
 }
 Combat.prototype.resetUnits = function() {
-  let i = 0;
-  for(i = 0 ; i < this.surManager.heroManager.assetList.length ; i++) {
-    this.surManager.heroManager.assetList[i].combatReset();
+  for(let i = 0 ; i < this.screen.heroManager.assetList.length ; i++) {
+    this.screen.heroManager.assetList[i].combatReset();
   }
-  for(i = 0 ; i < this.surManager.monsterManager.assetList.length ; i++) {
-    this.surManager.monsterManager.assetList[i].combatReset();
+  for(let i = 0 ; i < this.screen.monsterManager.assetList.length ; i++) {
+    this.screen.monsterManager.assetList[i].combatReset();
   }
 }
 

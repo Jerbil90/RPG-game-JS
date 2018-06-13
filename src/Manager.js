@@ -54,6 +54,7 @@ HeroManager.prototype.newRound = function() {
   }
 }
 HeroManager.prototype.setPassiveBattleSpritePosition = function() {
+  console.log("position set");
   for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].battleSprite.setPassivePosition();
   }

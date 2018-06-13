@@ -76,7 +76,8 @@ Game.prototype.update = function() {
       if(this.aftermathScreen.menuManager.isScreenOver) {
         this.aftermathScreen.endScreen();
         if(this.aftermathScreen.menuManager.newID != 100) {
-          this.startBattle(this.aftermathScreen.menuManager.newID)
+          this.battleID = this.aftermathScreen.menuManager.newID;
+          this.startBattle();
           this.fade.startFade();
         }
         else{
