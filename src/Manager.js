@@ -91,8 +91,8 @@ MonsterManager.prototype.battleLoad = function(battleID) {
   this.assetList = [];
   switch(battleID) {
     case -1:
-    this.assetList.push(new Snake());
-    this.assetList.push(new Snake());
+    this.assetList.push(new MrSnips());
+    //this.assetList.push(new Snake());
     break;
     case 0:
     this.assetList.push(new Snake());
@@ -226,11 +226,10 @@ EnvironmentManager.prototype = Object.create(Manager.prototype);
 EnvironmentManager.prototype.constructor = EnvironmentManager;
 EnvironmentManager.prototype.load = function() {
   var gameState = this.screen.game.targetState;
-  console.log("loading environment... " + gameState + "\tid: " + this.screen.game.battleID)
   if(gameState == "battle") {
     let battleID = this.screen.game.battleID;
 
-    if (battleID>=0 && battleID < 7) {
+    if (battleID >= 0 && battleID < 7) {
       this.backgroundImageSource = require('../assets/myGrasslandBattleScene.png');
     }
     else if(battleID >= 7 && battleID < 15) {
@@ -243,7 +242,6 @@ EnvironmentManager.prototype.load = function() {
   else {
     this.backgroundImageSource = "../assets/myMenuBackground.png";
   }
-
 
   this.backgroundImage = new Image();
   this.backgroundImage.src = this.backgroundImageSource;

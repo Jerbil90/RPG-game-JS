@@ -100,6 +100,7 @@ Sprite.prototype.loadEffectSprite = function(name, position) {
     break;
     case "Stunned":
     imgsrc = '../assets/myStunnedEffectSymbol.png';
+    console.log("stunned image loaded");
     break;
   }
   this.image.src = imgsrc;
@@ -135,6 +136,7 @@ BattleSprite.prototype.setPassivePosition = function() {
 function EffectSprite(position) {
   Sprite.call(this);
   this.effectStartTime = null;
+  console.log("effectSprite");
   this.setPosition(position.x, position.y);
 }
 EffectSprite.prototype = Object.create(Sprite.prototype);
@@ -164,10 +166,50 @@ PoisonEffectSprite.prototype.update = function(gameTime, elapsedTime) {
   }
 }
 
-function StunnedEffectSprite() {
-
+function StunnedEffectSprite(position) {
+  EffectSprite.call(this, position);
+  this.centre = {x: position.x + 16, y: position.y};
+  this.partList = [];
+  for(let i = 0 ; i < 3 ; i++) {
+    this.partList.push(new StunnedEffectSpritePart(this.centre, i));
+  }
 }
-StunnedEffectSprite.prototype = Object.create(EffectSprite);
+StunnedEffectSprite.prototype = Object.create(EffectSprite.prototype);
 StunnedEffectSprite.prototype.constructor = StunnedEffectSprite;
+StunnedEffectSprite.prototype.update = function(gameTime, elapsedTime) {
+  for(let i = 0 ; i < this.partList.length ; i++) {
+    this.partList[i].update(gameTime, elapsedTime);
+  }
+}
+StunnedEffectSprite.prototype.draw = function(ctx) {
+  for(let i = 0 ; i < this.partList.length ; i++) {
+    this.partList[i].draw(ctx);
+    console.log("drawing part");
+    console.log(this.partList[i].image);
+  }
+}
+
+function StunnedEffectSpritePart(centre, i) {
+  Sprite.call(this);
+  this.centre = centre;
+  this.radiusx = 10;
+  this.radiusy = 5;
+  this.period = 3000;
+  this.effectStartTime = null;
+  this.index = i;
+}
+StunnedEffectSpritePart.prototype = Object.create(Sprite.prototype);
+StunnedEffectSpritePart.prototype.constructor = StunnedEffectSpritePart
+StunnedEffectSpritePart.prototype.update = function(gameTime, elapsedTime) {
+  if(this.effectStartTime == null) {
+    this.effectStartTime = gameTime;
+    this.effectStartTime -= (this.period/3) * this.index;
+    this.loadEffectSprite("Stunned", this.position);
+  }
+  else {
+    Sprite.prototype.update.call(this, gameTime, elapsedTime);
+    this.setPosition(this.radiusx * Math.cos(2*Math.PI*(gameTime-this.effectStartTime)/this.period), this.radiusy * Math.sin(2*Math.PI*(gameTime-this.effectStartTime)/this.period));
+  }
+}
 
 export {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite}

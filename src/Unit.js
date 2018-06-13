@@ -272,7 +272,7 @@ Snake.prototype = Object.create(Monster.prototype);
 Snake.prototype.contructor = Snake;
 Snake.prototype.attack = function(target) {
   Unit.prototype.attack.call(this, target);
-  if(Math.random()>0.5) {
+  if(Math.random()>0) {
     target.statusEffectList.push(new Poisoned(target));
     console.log(target.name + " is now poisoned!");
   }
