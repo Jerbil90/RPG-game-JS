@@ -104,6 +104,7 @@ Sprite.prototype.loadEffectSprite = function(name, position) {
     break;
   }
   this.image.src = imgsrc;
+  console.log(this.image);
   this.setPosition(position.x, position.y);
 }
 
@@ -184,8 +185,7 @@ StunnedEffectSprite.prototype.update = function(gameTime, elapsedTime) {
 StunnedEffectSprite.prototype.draw = function(ctx) {
   for(let i = 0 ; i < this.partList.length ; i++) {
     this.partList[i].draw(ctx);
-    console.log("drawing part");
-    console.log(this.partList[i].image);
+    ctx.drawImage(this.partList[0].image, this.centre.x, this.centre.y);
   }
 }
 
@@ -197,6 +197,8 @@ function StunnedEffectSpritePart(centre, i) {
   this.period = 3000;
   this.effectStartTime = null;
   this.index = i;
+  this.loadEffectSprite("Stunned", this.position);
+  console.log(this.image);
 }
 StunnedEffectSpritePart.prototype = Object.create(Sprite.prototype);
 StunnedEffectSpritePart.prototype.constructor = StunnedEffectSpritePart
@@ -204,12 +206,15 @@ StunnedEffectSpritePart.prototype.update = function(gameTime, elapsedTime) {
   if(this.effectStartTime == null) {
     this.effectStartTime = gameTime;
     this.effectStartTime -= (this.period/3) * this.index;
-    this.loadEffectSprite("Stunned", this.position);
   }
   else {
     Sprite.prototype.update.call(this, gameTime, elapsedTime);
     this.setPosition(this.radiusx * Math.cos(2*Math.PI*(gameTime-this.effectStartTime)/this.period), this.radiusy * Math.sin(2*Math.PI*(gameTime-this.effectStartTime)/this.period));
   }
+}
+StunnedEffectSprite.prototype.draw = function(ctx) {
+  console.log(this.image);
+  ctx.drawImage(this.image, this.position.x, this.position.y);
 }
 
 export {Sprite, InitiativeSprite, BattleSprite, PoisonEffectSprite, StunnedEffectSprite}
