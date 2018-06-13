@@ -46,10 +46,12 @@ Game.prototype.loadUserData = function() {
 //This method is responsible for creating an instance of a Battle
 Game.prototype.startBattle = function () {
   this.targetScreen = this.battleScreen;
+  this.targetState = "battle";
   this.battleScreen.loadBattle();
 }
 Game.prototype.endBattle = function() {
   if(this.targetScreen != this.aftermathScreen) {
+    this.targetState = "aftermath";
     this.aftermathScreen.newEnd();
     this.targetScreen = this.aftermathScreen;
     this.fade.startFade();
@@ -57,22 +59,25 @@ Game.prototype.endBattle = function() {
 }
 //This is the game's main Update function it is responsible for determining gameTime and elapsedTime before calling the update functions of the appropriate managers
 Game.prototype.update = function() {
-  let currentDate = new Date();
-  let currentTime = currentDate.getTime();
+  var currentDate = new Date();
+  var currentTime = currentDate.getTime();
   this.elapsedTime = currentTime - this.gameTime;
   this.gameTime = currentTime;
-
-  this.battleScreen.update(this.gameTime, this.elapsedTime);
-  this.aftermathScreen.update(this.gameTime, this.elapsedTime);
+  if(this.state == "battle"){
+    this.battleScreen.update(this.gameTime, this.elapsedTime);
+  }
+  if(this.state == "aftermath") {
+    this.aftermathScreen.update(this.gameTime, this.elapsedTime);
+  }
   //this.mainMenuScreen.update(this.gameTime, this.elapsedTime);
 
   if(this.fade.fadeState == "none") {
-    if(this.currentScreen == this.battleScreen) {
+    if(this.state == "battle") {
       if(this.battleScreen.state == "victory" || this.battleScreen.state == "defeat") {
         this.endBattle();
       }
     }
-    else if(this.currentScreen == this.aftermathScreen) {
+    else if(this.state == "aftermath") {
       if(this.aftermathScreen.menuManager.isScreenOver) {
         this.aftermathScreen.endScreen();
         if(this.aftermathScreen.menuManager.newID != 100) {
@@ -93,7 +98,7 @@ Game.prototype.update = function() {
     this.fade.update(this.gameTime, this.elapsedTime);
     if(this.fade.fadeState == "faded") {
       this.currentScreen = this.targetScreen;
-      this.currentScreen.load();
+      this.state = this.targetState;
     }
     else if(this.fade.hasFadeEnded) {
       this.fade.hasFadeEnded = false;

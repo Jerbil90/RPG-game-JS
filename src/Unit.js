@@ -198,6 +198,8 @@ Unit.prototype.endBattle = function() {
   this.battleSprite = null;
   this.healthBar = null;
   this.remainingHP = this.maxHP;
+  this.isAlive = true;
+  this.isApplicableTarget = true;
   this.statusEffectList = [];
   this.experienceBar = new ExperienceBar(this);
 
@@ -270,7 +272,7 @@ Snake.prototype = Object.create(Monster.prototype);
 Snake.prototype.contructor = Snake;
 Snake.prototype.attack = function(target) {
   Unit.prototype.attack.call(this, target);
-  if(Math.random()>0) {
+  if(Math.random()>0.5) {
     target.statusEffectList.push(new Poisoned(target));
     console.log(target.name + " is now poisoned!");
   }

@@ -33,6 +33,10 @@ StatusEffect.prototype.isThisLongestDurationEffect = function() {
         testResult = false;
         this.duration = 0;
       }
+      else if(this.owner.statusEffectList[i].duration < this.duration) {
+        console.log("shorter duration statuseffect detected, removing");
+        this.owner.statusEffectList.splice(i, 1);
+      }
     }
   }
   return testResult;

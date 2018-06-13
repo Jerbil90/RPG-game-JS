@@ -37,6 +37,9 @@ HeroManager.prototype.load = function(heroes) {
   this.assetList = heroes;
   for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].setCurrentScreen(this.screen);
+    this.assetList[i].setPartyPosition(i);
+    this.assetList[i].battleSprite.setPassivePosition();
+    this.assetList[i].applicableTarget = true;
   }
 }
 //This method is called on the battleScreen and resets all the heros ready for a new turn
@@ -54,7 +57,6 @@ HeroManager.prototype.newRound = function() {
   }
 }
 HeroManager.prototype.setPassiveBattleSpritePosition = function() {
-  console.log("position set");
   for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].battleSprite.setPassivePosition();
   }
@@ -163,15 +165,14 @@ MonsterManager.prototype.battleLoad = function(battleID) {
 
 
   //this code numbers similarly named enemies
-  let k = 1;
-  let i = 0;
-  for(i = 0; i<this.assetList.length;i++){
+  var k = 1;
+  for(let i = 0 ; i < this.assetList.length ; i++){
     this.assetList[i].setPartyPosition(i);
+    this.assetList[i].battleSprite.setPassivePosition();
     let name = this.assetList[i].name;
     let match = false;
-	let j = 0;
-    for(j = 0 ; j<this.assetList.length;j++) {
-      if (i!=j) {
+    for(let j = 0 ; j < this.assetList.length ; j++) {
+      if (i != j) {
         if(name == this.assetList[j].name) {
           k++;
           match = true;
@@ -188,15 +189,16 @@ MonsterManager.prototype.battleLoad = function(battleID) {
     this.assetList[i].setCurrentScreen(this.screen);
   }
 }
+//this method is called in BattleScreen after combat and prepares the monsters for a new round of combat
 MonsterManager.prototype.newRound = function() {
-	let  i = 0;
-  for(i = 0 ; i < this.assetList.length ; i++) {
+  for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].combatReset();
   }
 }
+//This method is called at the start of a battle to set the poitions of the monsters when they are passive
 MonsterManager.prototype.setPassiveBattleSpritePosition = function() {
-  let i = 0 ;
-  for(i=0;i<this.assetList.length ; i++) {
+  console.log("monsterPassivePOsitionSet");
+  for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].battleSprite.setPassivePosition();
   }
 }
@@ -223,9 +225,9 @@ function EnvironmentManager(screen) {
 EnvironmentManager.prototype = Object.create(Manager.prototype);
 EnvironmentManager.prototype.constructor = EnvironmentManager;
 EnvironmentManager.prototype.load = function() {
-  var gameState = this.screen.game.state;
+  var gameState = this.screen.game.targetState;
+  console.log("loading environment... " + gameState + "\tid: " + this.screen.game.battleID)
   if(gameState == "battle") {
-
     let battleID = this.screen.game.battleID;
 
     if (battleID>=0 && battleID < 7) {

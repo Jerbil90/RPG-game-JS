@@ -118,12 +118,13 @@ function BattleSprite(owner) {
   Sprite.call(this);
   this.owner = owner;
   this.loadBattleSprite();
-  this.setPassivePosition();
+  //this.setPassivePosition();
 }
 BattleSprite.prototype = Object.create(Sprite.prototype);
 BattleSprite.prototype.constructor = BattleSprite;
 BattleSprite.prototype.setPassivePosition = function() {
   if(this.owner.role == "monster") {
+    console.log(this.owner.name + " has had their sprite set!");
     this.position = {x:450, y:100 + this.owner.partyPosition*50};
   }
   else{

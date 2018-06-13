@@ -27,8 +27,9 @@ BattleScreen.prototype.loadBattle = function () {
   this.load();
   this.state = "waiting for input";
   this.combat = null;
-  this.heroManager.setPassiveBattleSpritePosition();
-  this.monsterManager.setPassiveBattleSpritePosition();
+  this.initiativeDisplay.initiativeSpriteArray = null;
+  //this.heroManager.setPassiveBattleSpritePosition();
+  //this.monsterManager.setPassiveBattleSpritePosition();
 };
 //in battle only the party heros are relevant
 BattleScreen.prototype.setUpHeroManager = function() {
@@ -399,7 +400,12 @@ BattleMenuManager.prototype.load = function() {
     this.assetList[i].load();
   }
 }
-
+//This method is the overwrite for handleClick, it checks to see if the screen is in an appropriate state before calling te parent method
+BattleMenuManager.prototype.handleClick = function () {
+  if(this.screen.state == "waiting for input") {
+    MenuManager.prototype.handleClick.call(this);
+  }
+};
 //This huge method is still pretty huge:/
 BattleMenuManager.prototype.select = function(i, j){
   //heroSelectionMenu (i=0); ActionMenu(i=1); Special Move Menu (i=2); Item  Menu(i=3); MonsterTargetMenu (i=4); HeroTargetMenu(i=5); ConfirmTurn Button (i=6);
