@@ -92,7 +92,6 @@ Sprite.prototype.setOwner = function(owner) {
 }
 Sprite.prototype.loadEffectSprite = function(name, position) {
   this.image = new Image();
-  position
   var imgsrc = "";
   switch(name) {
     case "Poisoned":
@@ -100,12 +99,11 @@ Sprite.prototype.loadEffectSprite = function(name, position) {
     break;
     case "Stunned":
     imgsrc = '../assets/myStunnedEffectSymbol.png';
-    console.log("stunned image loaded");
     break;
   }
   this.image.src = imgsrc;
-  console.log(this.image);
   this.setPosition(position.x, position.y);
+  console.log("centre set at: " + position.x + ", " + position.y);
 }
 
 function InitiativeSprite(owner) {
@@ -126,7 +124,6 @@ BattleSprite.prototype = Object.create(Sprite.prototype);
 BattleSprite.prototype.constructor = BattleSprite;
 BattleSprite.prototype.setPassivePosition = function() {
   if(this.owner.role == "monster") {
-    console.log(this.owner.name + " has had their sprite set!");
     this.position = {x:450, y:100 + this.owner.partyPosition*50};
   }
   else{
@@ -137,7 +134,6 @@ BattleSprite.prototype.setPassivePosition = function() {
 function EffectSprite(position) {
   Sprite.call(this);
   this.effectStartTime = null;
-  console.log("effectSprite");
   this.setPosition(position.x, position.y);
 }
 EffectSprite.prototype = Object.create(Sprite.prototype);
@@ -185,7 +181,6 @@ StunnedEffectSprite.prototype.update = function(gameTime, elapsedTime) {
 StunnedEffectSprite.prototype.draw = function(ctx) {
   for(let i = 0 ; i < this.partList.length ; i++) {
     this.partList[i].draw(ctx);
-    ctx.drawImage(this.partList[0].image, this.centre.x, this.centre.y);
   }
 }
 
@@ -197,8 +192,8 @@ function StunnedEffectSpritePart(centre, i) {
   this.period = 3000;
   this.effectStartTime = null;
   this.index = i;
-  this.loadEffectSprite("Stunned", this.position);
-  console.log(this.image);
+  this.loadEffectSprite("Stunned", centre);
+  //console.log(this.image);
 }
 StunnedEffectSpritePart.prototype = Object.create(Sprite.prototype);
 StunnedEffectSpritePart.prototype.constructor = StunnedEffectSpritePart
@@ -209,11 +204,10 @@ StunnedEffectSpritePart.prototype.update = function(gameTime, elapsedTime) {
   }
   else {
     Sprite.prototype.update.call(this, gameTime, elapsedTime);
-    this.setPosition(this.radiusx * Math.cos(2*Math.PI*(gameTime-this.effectStartTime)/this.period), this.radiusy * Math.sin(2*Math.PI*(gameTime-this.effectStartTime)/this.period));
+    this.setPosition(this.centre.x + this.radiusx * Math.cos(2*Math.PI*(gameTime-this.effectStartTime)/this.period), this.centre.y + this.radiusy * Math.sin(2*Math.PI*(gameTime-this.effectStartTime)/this.period));
   }
 }
-StunnedEffectSprite.prototype.draw = function(ctx) {
-  console.log(this.image);
+StunnedEffectSpritePart.prototype.draw = function(ctx) {
   ctx.drawImage(this.image, this.position.x, this.position.y);
 }
 
