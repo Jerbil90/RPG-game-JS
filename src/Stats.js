@@ -9,7 +9,7 @@ function Stats(owner) {
   this.spirit = 0;
   this.will = 0;
   this.speed = 0;
-  this.load(owner.role);
+  this.load();
 }
 Stats.prototype.empty = function() {
   this.strength = 0;
@@ -31,22 +31,23 @@ Stats.prototype.combineStats = function(stats1, stats2) {
   this.will = stats1.will + stats2.will;
   this.speed = stats1.speed + stats2.speed;
 }
-Stats.prototype.load = function(role) {
+Stats.prototype.load = function() {
+  var role = this.owner.role;
   switch(role) {
     case "fighter":
-    this.loadFighter(this.owner.currentLV);
+    this.loadFighter();
       break;
     case "knight":
-    this.loadKnight(this.owner.currentLV);
+    this.loadKnight();
       break;
     case "monster":
-      this.loadMonster(this.owner.name);
+      this.loadMonster();
       break;
     case "equipment":
-      this.loadEquipment(this.owner.name);
+      this.loadEquipment();
       break;
     case "special":
-      this.loadSpecial(this.owner.name);
+      this.loadSpecial();
       break;
     case "item":
       this.strength = 0;
@@ -74,7 +75,8 @@ Stats.prototype.load = function(role) {
       break;
   }
 }
-Stats.prototype.loadFighter = function(level) {
+Stats.prototype.loadFighter = function() {
+  var level = this.owner.currentLV;
   switch(level) {
     case 1:
     this.strength = 8;
@@ -83,7 +85,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 4;
     this.speed = 4;
     break;
     case 2:
@@ -93,7 +95,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 4;
     this.speed = 5;
     break;
     case 3:
@@ -103,7 +105,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 5;
     this.speed = 6;
     break;
     case 4:
@@ -113,7 +115,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 6;
     this.speed = 8;
     break;
     case 5:
@@ -123,7 +125,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 7;
     this.speed = 9;
     break;
     case 6:
@@ -133,7 +135,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 8;
     this.speed = 10;
     break;
     case 7:
@@ -143,7 +145,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 9;
     this.speed = 12;
     break;
     case 8:
@@ -153,7 +155,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 10;
     this.speed = 13;
     break;
     case 9:
@@ -163,7 +165,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 12;
     this.speed = 15;
     break;
     case 10:
@@ -173,7 +175,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 14;
     this.speed = 17;
     break;
     case 11:
@@ -183,7 +185,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 15;
     this.speed = 20;
     break;
     case 12:
@@ -193,7 +195,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 16;
     this.speed = 24;
     break;
     case 13:
@@ -203,7 +205,7 @@ Stats.prototype.loadFighter = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 20;
     this.speed = 28;
     break;
     case 14:
@@ -228,7 +230,8 @@ Stats.prototype.loadFighter = function(level) {
     break;
   }
 }
-Stats.prototype.loadKnight = function(level) {
+Stats.prototype.loadKnight = function() {
+  var level = this.owner.currentLV;
   switch(level) {
     case 1:
     this.strength = 6;
@@ -237,7 +240,7 @@ Stats.prototype.loadKnight = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 2;
     this.speed = 3;
     break;
     case 2:
@@ -247,7 +250,7 @@ Stats.prototype.loadKnight = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 3;
     this.speed = 4;
     break;
     case 3:
@@ -257,7 +260,7 @@ Stats.prototype.loadKnight = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 4;
     this.speed = 6;
     break;
     case 4:
@@ -267,7 +270,7 @@ Stats.prototype.loadKnight = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 5;
     this.speed = 7;
     break;
     case 5:
@@ -277,7 +280,7 @@ Stats.prototype.loadKnight = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 6;
     this.speed = 8;
     break;
     case 6:
@@ -287,7 +290,7 @@ Stats.prototype.loadKnight = function(level) {
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
-    this.will = 0;
+    this.will = 8;
     this.speed = 4;
     break;
     case 7:
@@ -382,7 +385,8 @@ Stats.prototype.loadKnight = function(level) {
     break;
   }
 }
-Stats.prototype.loadMonster = function(monster) {
+Stats.prototype.loadMonster = function() {
+  var monster = this.owner.name;
   switch(monster) {
     case "Wolf":
       this.strength = 8;
@@ -406,7 +410,7 @@ Stats.prototype.loadMonster = function(monster) {
       break;
       case "Highwayman":
       this.strength = 12;
-      this.toughness = 8;
+      this.toughness = 5;
       this.vigor = 4;
       this.dexterity = 0;
       this.cunning = 0;
@@ -416,7 +420,7 @@ Stats.prototype.loadMonster = function(monster) {
       break;
       case "Mr Snips":
       this.strength = 12;
-      this.toughness = 10;
+      this.toughness = 4;
       this.vigor = 5;
       this.dexterity = 0;
       this.cunning = 0;
@@ -426,7 +430,7 @@ Stats.prototype.loadMonster = function(monster) {
       break;
       case "Zombie Sailor":
       this.strength = 12;
-      this.toughness = 10;
+      this.toughness = 5;
       this.vigor = 5;
       this.dexterity = 0;
       this.cunning = 0;
@@ -436,7 +440,7 @@ Stats.prototype.loadMonster = function(monster) {
       break;
       case "Zombie Pirate":
       this.strength = 15;
-      this.toughness = 11;
+      this.toughness = 6;
       this.vigor = 7;
       this.dexterity = 0;
       this.cunning = 0;
@@ -449,7 +453,32 @@ Stats.prototype.loadMonster = function(monster) {
       break;
   }
 }
-Stats.loadEquipment = function(name) {
+Stats.prototype.loadEquipment = function() {
+  var type = this.owner.type;
+  switch(type) {
+    case "emptyEquipment":
+    this.strength = 0;
+    this.toughness = 0;
+    this.vigor = 0;
+    this.dexterity = 0;
+    this.cunning = 0;
+    this.spirit = 0;
+    this.will = 0;
+    this.speed = 0;
+    break;
+    case "sword":
+    this.loadSword();
+    break;
+    case "lightArmour":
+    this.loadLightArmour();
+    break;
+    default:
+      console.log("loadEquipment error, invalid type");
+      break;
+  }
+}
+Stats.prototype.loadSword = function () {
+  var name = this.owner.name;
   switch(name) {
       case "Iron Sword":
         this.strength = 2;
@@ -472,11 +501,20 @@ Stats.loadEquipment = function(name) {
         this.speed = 0;
       break;
     default:
-      console.log("loadEquipment error, invalid name");
+      console.log("loadSword error, invalid name");
       break;
+    }
+}
+Stats.prototype.loadLightArmor = function() {
+  var name = this.owner.name;
+  switch(name) {
+    default:
+      console.log("error in loadLightArmour, invalid name")
+    break;
   }
 }
-Stats.prototype.loadSpecial = function(name) {
+Stats.prototype.loadSpecial = function() {
+  var name = this.owner.name;
   switch(name) {
     case "Power Strike":
       this.strength = 3;

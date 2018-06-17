@@ -6,6 +6,8 @@ function Screen(game){
   this.environmentManager = new EnvironmentManager(this);
   //this.load();
   this.isActive = false;
+  this.isScreenOver = false;
+  this.screenStartTime = null;
   this.state = "none";
   this.lastMouseX = 0;
   this.lastMouseY = 0;
@@ -55,6 +57,10 @@ Screen.prototype.setUpMenuManager = function () {
 };
 //this method updates the environmentManager and any other managers that are there
 Screen.prototype.update = function(gameTime, elapsedTime) {
+  if(this.screenStartTime == null && this.isActive) {
+    this.screenStartTime = gameTime;
+  }
+
   this.environmentManager.update(gameTime, elapsedTime);
   if (this.heroManager != null) {
     this.heroManager.update(gameTime, elapsedTime);
@@ -80,7 +86,7 @@ Screen.prototype.draw = function(ctx) {
   }
 }
 Screen.prototype.getPartyHeros = function () {
-  let partyHeroes = [];
+  var partyHeroes = [];
   for(let i = 0 ; i < this.game.userHeroList.length ; i++) {
     if(this.game.userHeroList[i].isInParty) {
       this.game.userHeroList[i].setPartyPosition(i);

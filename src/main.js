@@ -20,7 +20,7 @@ function Game() {
   this.state = "none";
   this.targetScreen = null;
   this.currentScreen = null;
-  this.battleID = -1;
+  this.battleID = 0;
   this.battleScreen = null;
   this.battleEndScreen = null;
   this.mainMenuScreen = null;
@@ -30,6 +30,7 @@ function Game() {
 Game.prototype.loadGame = function () {
   this.battleScreen = new BattleScreen(this);
   this.aftermathScreen = new AftermathScreen(this);
+  this.mainMenuScreen = new MainMenuScreen(this);
 };
 //This method is responsible for requesting the user's Heros from the server, atm it just provides default heros
 Game.prototype.loadUserData = function() {
@@ -48,6 +49,7 @@ Game.prototype.startBattle = function () {
   this.targetScreen = this.battleScreen;
   this.targetState = "battle";
   this.battleScreen.loadBattle();
+  this.battleScreen.isActive = true;
 }
 Game.prototype.endBattle = function() {
   if(this.targetScreen != this.aftermathScreen) {
@@ -57,6 +59,19 @@ Game.prototype.endBattle = function() {
     this.fade.startFade();
   }
 }
+Game.prototype.openMainMenu = function () {
+  this.targetScreen = this.mainMenuScreen;
+  this.targetState = "mainMenu";
+  this.mainMenuScreen.load();
+  this.mainMenuScreen.isActive = true;
+  this.mainMenuScreen.state = "loading";
+  this.fade.startFade();
+};
+Game.prototype.closeMainMenu = function () {
+  console.log("Menu Closed!");
+  this.targetScreen = "none";
+
+};
 //This is the game's main Update function it is responsible for determining gameTime and elapsedTime before calling the update functions of the appropriate managers
 Game.prototype.update = function() {
   var currentDate = new Date();
@@ -69,7 +84,9 @@ Game.prototype.update = function() {
   if(this.state == "aftermath") {
     this.aftermathScreen.update(this.gameTime, this.elapsedTime);
   }
-  //this.mainMenuScreen.update(this.gameTime, this.elapsedTime);
+  if(this.state == "mainMenu") {
+    this.mainMenuScreen.update(this.gameTime, this.elapsedTime);
+  }
 
   if(this.fade.fadeState == "none") {
     if(this.state == "battle") {
@@ -90,9 +107,15 @@ Game.prototype.update = function() {
         }
 
       }
-    }/*
+    }
     else if(this.currentScreen == this.mainMenuScreen) {
-    }*/
+      if(this.mainMenuScreen.state == "exiting") {
+        this.mainMenuScreen.state = "inActive";
+        this.mainMenuScreen.isActive = false;
+        this.closeMainMenu();
+        console.log("closing main menu")
+      }
+    }
   }
   else {
     this.fade.update(this.gameTime, this.elapsedTime);
@@ -105,12 +128,6 @@ Game.prototype.update = function() {
     }
   }
 }
-Game.prototype.openMainMenu = function() {
-  this.mainMenuScreen = new MainMenuScreen(this.battleEndScreen);
-  this.targetState = "mainMenuScreen";
-  this.fade.startFade();
-}
-
 //This is the game's main draw function
 Game.prototype.draw = function(ctx) {
   this.currentScreen.draw(ctx);
@@ -191,24 +208,20 @@ Inventory.prototype.fetchBattleItems = function() {
   }
   return battleItems;
 }
+Inventory.prototype.fetchEquipment = function() {
+  var equipment = [];
+  for(let  i = 0 ; i < this.itemList.length ; i ++) {
+    if(this.itemList[i].isEquipment && this.itemList[i].quantity > 0) {
+      equipment.push(this.itemList[i]);
+    }
+  }
+  return equipment;
+}
 
 //This class is responsible for managing the game while in the manorExploration phase
 function ManorExplore() {
   this.heroList = [];
 }
-
-
-
-//This is the surManager's constructor function, the surManager holds and manages all the other managers
-function SurManager() {
-  this.heroManager = null;
-  this.monsterManager = null;
-  this.logManager = null;
-  this.environmentManager = null;
-  //this.menuManager = null;
-
-}
-
 
 $(document).ready(function() {
   var game = new Game();
@@ -225,10 +238,10 @@ $(document).ready(function() {
     game.currentScreen.setMouseDetails(mousex, mousey);
     if(game.aftermathScreen != null) {
       game.aftermathScreen.setMouseDetails(mousex, mousey);
-    }/*
+    }
     if(game.mainMenuScreen != null) {
-      game.mainMenuScreen.surManager.setMouseDetails(mousex, mousey);
-    }*/
+      game.mainMenuScreen.setMouseDetails(mousex, mousey);
+    }
   });
   canvas.addEventListener("click", function(event) {
     if(game.currentScreen.menuManager != null) {
@@ -247,6 +260,3 @@ $(document).ready(function() {
   }, 16.67);
 
 });
-
-
-export {SurManager}

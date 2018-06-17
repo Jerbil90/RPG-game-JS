@@ -42,18 +42,18 @@ AftermathScreen.prototype.newEnd = function () {
 AftermathScreen.prototype.endScreen = function () {
   this.menuManager.reset();
 };
-
+/*
 function GameOverSurManager() {
   this.environmentManager = new MenuEnvironmentManager();
   this.environmentManager.setSurManager(this);
   this.environmentManager.load();
 }
-GameOverSurManager.prototype = Object.create(SurManager.prototype);
+GameOverSurManager.prototype = Object.create();
 GameOverSurManager.prototype.constructor = GameOverSurManager;
 GameOverSurManager.prototype.draw = function(ctx) {
   this.environmentManager.draw(ctx);
   ctx.fillText("Game Over", 200, 200);
-}
+}*/
 
 
 

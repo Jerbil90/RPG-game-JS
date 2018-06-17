@@ -8,6 +8,7 @@ function SpecialMove() {
   this.isUsedOnOpponent = true;
   this.specialOrItemStats = null;
   this.isUsedOnDead = false;
+  this.pointCost = 0;
 }
 SpecialMove.prototype.loadStats = function() {
   this.specialOrItemStats = new Stats(this);
@@ -22,6 +23,7 @@ SpecialMove.prototype.useMove = function(owner, target) {
 function PowerStrike() {
   SpecialMove.call(this);
   this.name = "Power Strike";
+  this.cost = 5;
   this.loadStats();
 }
 PowerStrike.prototype = Object.create(SpecialMove.prototype);
@@ -30,6 +32,7 @@ PowerStrike.prototype.constructor = PowerStrike;
 function WindSlash() {
   SpecialMove.call(this);
   this.name = "Wind Slash";
+  this.cost = 3;
   this.loadStats();
 }
 WindSlash.prototype = Object.create(SpecialMove.prototype);
@@ -37,6 +40,7 @@ WindSlash.prototype.constructor = WindSlash;
 function BlockOpponent() {
   SpecialMove.call(this);
   this.name = "Block Opponent";
+  this.cost = 4;
   this.loadStats();
 }
 BlockOpponent.prototype = Object.create(SpecialMove.prototype);
@@ -49,6 +53,7 @@ BlockOpponent.prototype.useMove = function(owner, target) {
 function GuardAlly() {
   SpecialMove.call(this);
   this.name = "Guard Ally";
+  this.cost = 8;
   this.isUsedOnOpponent = false;
   this.loadStats();
 }

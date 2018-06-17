@@ -157,6 +157,7 @@ Combat.prototype.update = function(gameTime, elapsedTime) {
                 break;
               case "Special":
                 this.turnOrder[this.currentTurn].currentlySelectedSpecialOrItem.useMove(this.turnOrder[this.currentTurn], this.turnOrder[this.currentTurn].currentlySelectedTarget);
+                this.turnOrder[this.currentTurn].remainingSP -= this.turnOrder[this.currentTurn].currentlySelectedSpecialOrItem.cost;
                 break;
               case "Item":
 this.turnOrder[this.currentTurn].currentlySelectedSpecialOrItem.effect(this.turnOrder[this.currentTurn].currentlySelectedTarget)

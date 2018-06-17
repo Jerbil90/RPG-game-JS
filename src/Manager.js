@@ -35,9 +35,11 @@ HeroManager.prototype.constructor = HeroManager;
 //This is the HeroManager's main load method, it is responsible for assigning the given heroes to the manager's assetList
 HeroManager.prototype.load = function(heroes) {
   this.assetList = heroes;
+  console.log("loading heroes");
   for(let i = 0 ; i < this.assetList.length ; i++) {
     this.assetList[i].setCurrentScreen(this.screen);
     this.assetList[i].setPartyPosition(i);
+    this.assetList[i].setMaxHP();
     this.assetList[i].battleSprite.setPassivePosition();
     this.assetList[i].applicableTarget = true;
   }
@@ -96,7 +98,7 @@ MonsterManager.prototype.battleLoad = function(battleID) {
     break;
     case 0:
     this.assetList.push(new Snake());
-    this.assetList.push(new Snake());
+    //this.assetList.push(new Snake());
     break;
     case 1:
     this.assetList.push(new Wolf());
@@ -301,6 +303,13 @@ MenuManager.prototype.handleClick = function(){
 }
 MenuManager.prototype.select = function(i, j) {
 
+}
+MenuManager.prototype.resetAll = function() {
+  if(this.assetList != null) {
+    for(let i = 0 ; i < this.assetList.length ; i++) {
+      this.assetList[i].resetMenu();
+    }
+  }
 }
 
 export {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuManager}

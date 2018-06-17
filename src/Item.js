@@ -3,10 +3,14 @@ import {DamageDisplay, PoisonedDisplayIndicator, InitiativeDisplay} from './UI';
 
 function Item() {
   this.isBattleItem = false;
+  this.isEquipment = false;
   this.applicableTarget = false;
   this.name = "unnamedItem";
   this.quantity = 0;
   this.isUsedOnOpponent = false;
+}
+Item.prototype.acquire = function() {
+  this.quantity += 1;
 }
 Item.prototype.consume = function() {
   this.quantity -= 1;
@@ -15,6 +19,36 @@ Item.prototype.checkAvailability = function(heroList, currentHero) {
 
 }
 
+function Equipment(name) {
+  Item.call(this);
+  this.isEquipment = true;
+  this.name = name;
+  this.role = "equipment";
+  this.type = "untyped";
+  this.load();
+}
+Equipment.prototype = Object.create(Item.prototype);
+Equipment.prototype.constructor = Equipment;
+//This method sets the equipment type and instigates the stats, whch are both based on the name property
+Equipment.prototype.load = function() {
+  switch(this.name){
+    case "none":
+    this.type = "emptyEquipment";
+    this.stats = new Stats(this);
+    break;
+    case "Iron Sword":
+      this.type = "sword";
+      this.stats = new Stats(this);
+      break;
+      case "Steel Sword":
+      this.type = "sword";
+      this.stats = new Stats(this);
+      break;
+    default:
+      console.log("equipment load error, invalid name");
+      break;
+  }
+}
 function BattleItem() {
   Item.call(this);
   this.name = "unnamedBattleItem";
@@ -130,4 +164,4 @@ Antidote.prototype.targetCheck = function(target){
 }
 
 
-export {Item, BattleItem, MinorHealthPotion, Antidote};
+export {Item, BattleItem, MinorHealthPotion, Antidote, Equipment};
