@@ -469,8 +469,35 @@ Stats.prototype.loadEquipment = function() {
     case "sword":
     this.loadSword();
     break;
-    case "lightArmour":
-    this.loadLightArmour();
+    case "lightBodyArmour":
+    this.loadLightBodyArmour();
+    break;
+    case "heavyBodyArmour":
+    this.loadHeavyBodyArmour();
+    break;
+    case "lightHelm":
+    this.loadLightHelm();
+    break;
+    case "heavyHelm":
+    this.loadHeavyHelm();
+    break;
+    case "lightHandArmour":
+    this.loadLightHandArmour();
+    break;
+    case "heavyHandArmour":
+    this.loadHeavyHandArmour();
+    break;
+    case "lightFootArmour":
+    this.loadLightFootArmour();
+    break;
+    case "heavyFootArmour":
+    this.loadHeavyFootArmour();
+    break;
+    case "greatSword":
+    this.loadGreatSword();
+    break;
+    case "shield":
+    this.loadShield();
     break;
     default:
       console.log("loadEquipment error, invalid type");
@@ -505,14 +532,96 @@ Stats.prototype.loadSword = function () {
       break;
     }
 }
-Stats.prototype.loadLightArmor = function() {
+Stats.prototype.loadGreatSword = function() {
   var name = this.owner.name;
   switch(name) {
     default:
-      console.log("error in loadLightArmour, invalid name")
+      console.log("error in loadGreatSword, invalid name")
     break;
   }
 }
+Stats.prototype.loadShield = function() {
+  var name = this.owner.name;
+  switch(name) {
+    case "Battered Shield":
+    this.toughness = 1;
+    break;
+    default:
+      console.log("error in loadShield, invalid name");
+    break;
+  }
+}
+Stats.prototype.loadLightBodyArmour = function() {
+  var name = this.owner.name;
+  switch(name) {
+    case"Leather Body Armour":
+    this.vigor = 1;
+    break;
+    default:
+      console.log("error in loadLightBodyArmour, invalid name")
+    break;
+  }
+}
+Stats.prototype.loadHeavyBodyArmour = function() {
+  var name = this.owner.name;
+  switch(name) {
+    case"Smelly Scale Mail":
+    this.vigor = 1;
+    this.toughness = 1;
+    default:
+      console.log("error in loadHeavyBodyArmour, invalid name")
+    break;
+  }
+}
+Stats.prototype.loadLightHandArmour = function() {
+  var name = this.owner.name;
+  switch(name) {
+    default:
+      console.log("error in loadLightHandArmour, invalid name")
+    break;
+  }
+}
+Stats.prototype.loadHeavyHandArmour = function() {
+  var name = this.owner.name;
+  switch(name) {
+    default:
+      console.log("error in loadHeavyHandArmour, invalid name")
+    break;
+  }
+}
+Stats.prototype.loadLightFootArmour = function() {
+  var name = this.owner.name;
+  switch(name) {
+    default:
+      console.log("error in loadLightFootArmour, invalid name")
+    break;
+  }
+}
+Stats.prototype.loadHeavyFootArmour = function() {
+  var name = this.owner.name;
+  switch(name) {
+    default:
+      console.log("error in LoadHeavyFootArmour, invalid name")
+    break;
+  }
+}
+Stats.prototype.loadLightHelm = function() {
+  var name = this.owner.name;
+  switch(name) {
+    default:
+      console.log("error in loadLightHelm, invalid name")
+    break;
+  }
+}
+Stats.prototype.loadHeavyHelm = function() {
+  var name = this.owner.name;
+  switch(name) {
+    default:
+      console.log("error in loadHeavyHelm, invalid name")
+    break;
+  }
+}
+
 Stats.prototype.loadSpecial = function() {
   var name = this.owner.name;
   switch(name) {

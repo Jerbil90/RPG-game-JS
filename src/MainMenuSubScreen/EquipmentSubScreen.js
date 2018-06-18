@@ -80,9 +80,12 @@ EquipmentSubScreenMenuManager.prototype.select = function(i, j) {
     console.log("New Hero selected, assigning...");
     this.assetList[1].isActive = true;
     this.assetList[1].isVisible = true;
+    this.assetList[2].isVisible = false;
+    this.assetList[2].isActive = false;
     this.assetList[1].resetMenu();
     this.assetList[1].setOptions(this.screen.heroManager.assetList[j].equipment);
     this.currentlySelectedHeroIndex = j;
+    this.currentlySelectedEquippedIndex = -1;
     this.setEquippedList();
   }
   else if(i == 0 && this.currentlySelectedHeroIndex == j) {
@@ -93,6 +96,7 @@ EquipmentSubScreenMenuManager.prototype.select = function(i, j) {
     this.assetList[2].isVisible = false;
     this.assetList[2].isActive = false;
     this.currentlySelectedHeroIndex = -1;
+    this.currentlySelectedEquippedIndex = -1;
   }
   else if(i == 1 && this.currentlySelectedEquippedIndex != j) {
     console.log("New Equipped Slot selected, assigning...");
@@ -104,7 +108,7 @@ EquipmentSubScreenMenuManager.prototype.select = function(i, j) {
   else if(i == 1 && this.currentlySelectedEquippedIndex == j) {
     console.log("Same Equipped Slot Selected, unassigning");
     this.assetList[2].isActive = false;
-    this.assetList[2].isVisble = false;
+    this.assetList[2].isVisible = false;
     this.currentlySelectedEquippedIndex = -1;
 
   }
@@ -114,6 +118,9 @@ EquipmentSubScreenMenuManager.prototype.select = function(i, j) {
     this.assetList[2].isVisible = false;
     this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment.splice(this.currentlySelectedEquippedIndex, 1, this.assetList[i].menuButtonList[j].target);
     this.setEquippedList();
+    this.currentlySelectedEquippedIndex = -1;
+    this.assetList[1].resetMenu();
+    this.assetList[2].resetMenu();
   }
   else if(i == 3) {
     this.screen.isScreenOver = true;
@@ -169,14 +176,14 @@ EquipmentSubScreenMenuManager.prototype.setValidEquipmentList = function () {
     break;
     case 6:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
-      if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].accessory1EquipCheck(this.screen.itemList[i])) {
+      if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].accessoryEquipCheck(this.screen.itemList[i])) {
         equipmentList.push(this.screen.itemList[i]);
       }
     }
     break;
     case 7:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
-      if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].accessory2EquipCheck(this.screen.itemList[i])) {
+      if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].accessoryEquipCheck(this.screen.itemList[i])) {
         equipmentList.push(this.screen.itemList[i]);
       }
     }

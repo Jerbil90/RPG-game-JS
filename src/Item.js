@@ -45,6 +45,18 @@ Equipment.prototype.load = function() {
       this.type = "sword";
       this.stats = new Stats(this);
       break;
+      case "Leather Body Armour":
+      this.type = "lightBodyArmour";
+      this.stats = new Stats(this);
+      break;
+      case "Smelly Scale Mail":
+      this.type = "heavyBodyArmour";
+      this.stats = new Stats(this);
+      break;
+      case "Battered Shield":
+      this.type = "shield";
+      this.stats = new Stats(this);
+      break;
     default:
       console.log("equipment load error, invalid name");
       break;

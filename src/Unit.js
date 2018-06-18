@@ -71,10 +71,7 @@ Unit.prototype.handArmourEquipCheck = function (equipment) {
 Unit.prototype.footArmourEquipCheck = function (equipment) {
   return true;
 };
-Unit.prototype.accessory1EquipCheck = function (equipment) {
-  return true;
-};
-Unit.prototype.accessory2EquipCheck = function (equipment) {
+Unit.prototype.accessoryEquipCheck = function (equipment) {
   return true;
 };
 Unit.prototype.isAfflictedWith = function(statusName) {
@@ -296,6 +293,62 @@ function Fighter(name){
 }
 Fighter.prototype = Object.create(Hero.prototype);
 Fighter.prototype.constructor = Fighter;
+Fighter.prototype.mainHandEquipCheck = function (equipment) {
+  if(equipment.type == "sword" || equipment.type == "greatSword") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Fighter.prototype.offHandEquipCheck = function (equipment) {
+  if(equipment.type == null) {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Fighter.prototype.headArmourEquipCheck = function (equipment) {
+  if(equipment.type == "lightHelm") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Fighter.prototype.bodyArmourEquipCheck = function (equipment) {
+  if(equipment.type == "lightBodyArmour") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Fighter.prototype.handArmourEquipCheck = function (equipment) {
+  if(equipment.type == "lightHandArmour") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Fighter.prototype.footArmourEquipCheck = function (equipment) {
+  if(equipment.type == "lightFootArmour") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Fighter.prototype.accessoryEquipCheck = function (equipment) {
+  if(equipment.type == "accessory") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
 
 function Knight(name){
   Hero.call(this, name, "knight");
@@ -306,7 +359,62 @@ function Knight(name){
 }
 Knight.prototype = Object.create(Hero.prototype);
 Knight.prototype.constructor = Knight;
-
+Knight.prototype.mainHandEquipCheck = function (equipment) {
+  if(equipment.type == "sword") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Knight.prototype.offHandEquipCheck = function (equipment) {
+  if(equipment.type == "shield") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Knight.prototype.headArmourEquipCheck = function (equipment) {
+  if(equipment.type == "lightHelm" || equipment.type == "heavyHelm") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Knight.prototype.bodyArmourEquipCheck = function (equipment) {
+  if(equipment.type == "lightBodyArmour" || equipment.type == "heavyBodyArmour") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Knight.prototype.handArmourEquipCheck = function (equipment) {
+  if(equipment.type == "lightHandArmour" || equipment.type == "heavyHandArmour") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Knight.prototype.footArmourEquipCheck = function (equipment) {
+  if(equipment.type == "lightFootArmour" || equipment.type == "heavyFootArmour") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
+Knight.prototype.accessoryEquipCheck = function (equipment) {
+  if(equipment.type == "accessory") {
+    return true;
+  }
+  else {
+    return false;
+  }
+};
 //This is the constructor function for the Monster class, this class is responsible for describing the enemy monsters that the player will encounter throughout the game
 function Monster(name) {
   Unit.call(this, name);

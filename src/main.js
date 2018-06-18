@@ -206,6 +206,15 @@ Inventory.prototype.load = function(){
   var steelSword = new Equipment("Steel Sword");
   steelSword.quantity = 1;
   this.itemList.push(steelSword);
+  var scalemail = new Equipment("Smelly Scale Mail");
+  scalemail.quantity = 1;
+  this.itemList.push(scalemail);
+  var shield = new Equipment("Battered Shield");
+  shield.quantity = 1;
+  this.itemList.push(shield);
+  var leatherBodyArmour = new Equipment("Leather Body Armour");
+  leatherBodyArmour.quantity = 1;
+  this.itemList.push(leatherBodyArmour);
 }
 Inventory.prototype.fetchBattleItems = function() {
   var battleItems = [];
