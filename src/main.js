@@ -69,7 +69,9 @@ Game.prototype.openMainMenu = function () {
 };
 Game.prototype.closeMainMenu = function () {
   console.log("Menu Closed!");
-  this.targetScreen = "none";
+
+  this.startBattle();
+  this.fade.startFade();
 
 };
 //This is the game's main Update function it is responsible for determining gameTime and elapsedTime before calling the update functions of the appropriate managers
@@ -108,7 +110,7 @@ Game.prototype.update = function() {
 
       }
     }
-    else if(this.currentScreen == this.mainMenuScreen) {
+    else if(this.state == "mainMenu") {
       if(this.mainMenuScreen.state == "exiting") {
         this.mainMenuScreen.state = "inActive";
         this.mainMenuScreen.isActive = false;

@@ -44,6 +44,7 @@ function EquipmentSubScreenMenuManager(screen) {
   var equipmentMenu = new Menu(this.screen);
   equipmentMenu.setPosition(450, 100);
   this.assetList.push(equipmentMenu);
+  this.assetList.push(new MainMenuButton(this.screen));
   this.currentValidEquipment = [];
   this.currentlySelectedHeroIndex = -1;
   this.currentlySelectedEquippedIndex = -1;
@@ -59,7 +60,8 @@ EquipmentSubScreenMenuManager.prototype.load = function() {
   this.assetList[1].isVisible = false;
   this.assetList[2].isActive = false;
   this.assetList[2].isVisible = false;
-  console.log("Hero choice menu activeated and visible...");
+  this.assetList[3].isVisible = true;
+  this.assetList[3].isActive = true;
   console.log(this.assetList[0]);
 }
 EquipmentSubScreenMenuManager.prototype.update = function(gameTime, elapsedTime) {
@@ -112,6 +114,9 @@ EquipmentSubScreenMenuManager.prototype.select = function(i, j) {
     this.assetList[2].isVisible = false;
     this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment.splice(this.currentlySelectedEquippedIndex, 1, this.assetList[i].menuButtonList[j].target);
     this.setEquippedList();
+  }
+  else if(i == 3) {
+    this.screen.isScreenOver = true;
   }
 }
 EquipmentSubScreenMenuManager.prototype.setEquippedList = function() {
@@ -211,5 +216,13 @@ EquippedMenu.prototype.draw = function(ctx) {
     }
   }
 }
+
+function MainMenuButton(screen) {
+  Menu.call(this, screen);
+  this.setPosition(0, 390);
+  this.setOptions([{applicableTarget: true, name: "Main Menu"}]);
+}
+MainMenuButton.prototype = Object.create(Menu.prototype);
+MainMenuButton.prototype.constructor = MainMenuButton;
 
 export {EquipmentSubScreen}
