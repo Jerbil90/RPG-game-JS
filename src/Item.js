@@ -25,6 +25,7 @@ function Equipment(name) {
   this.name = name;
   this.role = "equipment";
   this.type = "untyped";
+  this.applicableTarget = true;
   this.load();
 }
 Equipment.prototype = Object.create(Item.prototype);

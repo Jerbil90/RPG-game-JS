@@ -79,6 +79,7 @@ MainMenuScreen.prototype.update = function(gameTime, elapsedTime) {
     break;
     case 3:
     this.subScreenList[3].update(gameTime, elapsedTime);
+    //console.log("updating equipment subScreen");
     if(this.subScreenList[3].isScreenOver) {
       this.subScreenList[3].isScreenOver = false;
       this.currentSubScreenIndex = -1;

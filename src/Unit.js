@@ -71,10 +71,10 @@ Unit.prototype.handArmourEquipCheck = function (equipment) {
 Unit.prototype.footArmourEquipCheck = function (equipment) {
   return true;
 };
-Unit.prototype.leftHandEquipCheck = function (equipment) {
+Unit.prototype.accessory1EquipCheck = function (equipment) {
   return true;
 };
-Unit.prototype.leftHandEquipCheck = function (equipment) {
+Unit.prototype.accessory2EquipCheck = function (equipment) {
   return true;
 };
 Unit.prototype.isAfflictedWith = function(statusName) {

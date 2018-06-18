@@ -198,6 +198,12 @@ Inventory.prototype.load = function(){
   let antidote = new Antidote();
   antidote.quantity = 1;
   this.itemList.push(antidote);
+  var ironSword = new Equipment("Iron Sword");
+  ironSword.quantity = 1;
+  this.itemList.push(ironSword);
+  var steelSword = new Equipment("Steel Sword");
+  steelSword.quantity = 1;
+  this.itemList.push(steelSword);
 }
 Inventory.prototype.fetchBattleItems = function() {
   var battleItems = [];
