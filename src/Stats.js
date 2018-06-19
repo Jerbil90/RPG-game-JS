@@ -79,9 +79,9 @@ Stats.prototype.loadFighter = function() {
   var level = this.owner.currentLV;
   switch(level) {
     case 1:
-    this.strength = 8;
-    this.toughness = 3;
-    this.vigor = 4;
+    this.strength = 6;
+    this.toughness = 2;
+    this.vigor = 3;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -89,9 +89,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 4;
     break;
     case 2:
-    this.strength = 9;
-    this.toughness = 4;
-    this.vigor = 5;
+    this.strength = 7;
+    this.toughness = 3;
+    this.vigor = 4;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -99,9 +99,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 5;
     break;
     case 3:
-    this.strength = 11;
-    this.toughness = 5;
-    this.vigor = 6;
+    this.strength = 9;
+    this.toughness = 4;
+    this.vigor = 5;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -109,9 +109,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 6;
     break;
     case 4:
-    this.strength =  12;
-    this.toughness = 7;
-    this.vigor = 7;
+    this.strength =  10;
+    this.toughness = 5;
+    this.vigor = 6;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -119,9 +119,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 8;
     break;
     case 5:
-    this.strength = 13;
-    this.toughness = 9;
-    this.vigor = 9;
+    this.strength = 11;
+    this.toughness = 6;
+    this.vigor = 7;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -129,9 +129,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 9;
     break;
     case 6:
-    this.strength = 15;
-    this.toughness = 11;
-    this.vigor = 11;
+    this.strength = 13;
+    this.toughness = 8;
+    this.vigor = 9;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -139,9 +139,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 10;
     break;
     case 7:
-    this.strength = 18;
-    this.toughness = 13;
-    this.vigor = 12;
+    this.strength = 15;
+    this.toughness = 10;
+    this.vigor = 10;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -149,9 +149,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 12;
     break;
     case 8:
-    this.strength = 20;
-    this.toughness = 16;
-    this.vigor = 15;
+    this.strength = 17;
+    this.toughness = 12;
+    this.vigor = 12;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -159,9 +159,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 13;
     break;
     case 9:
-    this.strength = 23;
-    this.toughness = 19;
-    this.vigor = 17;
+    this.strength = 19;
+    this.toughness = 14;
+    this.vigor = 14;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -169,9 +169,9 @@ Stats.prototype.loadFighter = function() {
     this.speed = 15;
     break;
     case 10:
-    this.strength = 26;
-    this.toughness = 22;
-    this.vigor = 20;
+    this.strength = 21;
+    this.toughness = 15;
+    this.vigor = 16;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -234,9 +234,9 @@ Stats.prototype.loadKnight = function() {
   var level = this.owner.currentLV;
   switch(level) {
     case 1:
-    this.strength = 6;
-    this.toughness = 4;
-    this.vigor = 5;
+    this.strength = 4;
+    this.toughness = 3;
+    this.vigor = 4;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -244,9 +244,9 @@ Stats.prototype.loadKnight = function() {
     this.speed = 3;
     break;
     case 2:
-    this.strength = 8;
-    this.toughness = 5;
-    this.vigor = 6;
+    this.strength = 6;
+    this.toughness = 4;
+    this.vigor = 5;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -254,7 +254,7 @@ Stats.prototype.loadKnight = function() {
     this.speed = 4;
     break;
     case 3:
-    this.strength = 10;
+    this.strength = 7;
     this.toughness = 5;
     this.vigor = 6;
     this.dexterity = 0;
@@ -264,9 +264,9 @@ Stats.prototype.loadKnight = function() {
     this.speed = 6;
     break;
     case 4:
-    this.strength = 12;
-    this.toughness = 7;
-    this.vigor = 8;
+    this.strength = 8;
+    this.toughness = 6;
+    this.vigor = 7;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -274,9 +274,9 @@ Stats.prototype.loadKnight = function() {
     this.speed = 7;
     break;
     case 5:
-    this.strength = 14;
-    this.toughness = 9;
-    this.vigor = 10;
+    this.strength = 9;
+    this.toughness = 7;
+    this.vigor = 8;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;
@@ -284,9 +284,9 @@ Stats.prototype.loadKnight = function() {
     this.speed = 8;
     break;
     case 6:
-    this.strength = 8;
-    this.toughness = 3;
-    this.vigor = 4;
+    this.strength = 10;
+    this.toughness = 8;
+    this.vigor = 8;
     this.dexterity = 0;
     this.cunning = 0;
     this.spirit = 0;

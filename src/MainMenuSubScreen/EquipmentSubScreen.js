@@ -1,7 +1,7 @@
 import {Screen} from '../Screen'
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager, MenuManager} from '../Manager'
 import {Menu, HeroSelectionMenu, ActionMenu, SpecialMenu, ItemMenu, MonsterTargetMenu, HeroTargetMenu, TurnConfirmButton, BattleSelectMenu} from '../Menu';
-
+import {Item, BattleItem, MinorHealthPotion, Antidote, Equipment} from '../Item'
 
 function EquipmentSubScreen(game) {
   this.name = "equipmentScreen";
@@ -41,7 +41,7 @@ function EquipmentSubScreenMenuManager(screen) {
   var equippedMenu = new EquippedMenu(this.screen);
   this.assetList.push(equippedMenu);
   //equippedMenu.setOptions(this.screen.heroManager.assetList[0].equipment);
-  var equipmentMenu = new Menu(this.screen);
+  var equipmentMenu = new EquipmentMenu(this.screen);
   equipmentMenu.setPosition(450, 100);
   this.assetList.push(equipmentMenu);
   this.assetList.push(new MainMenuButton(this.screen));
@@ -240,6 +240,23 @@ EquippedMenu.prototype.draw = function(ctx) {
       this.menuButtonList[i].draw(ctx);
     }
   }
+}
+
+//This is the menu that the player choses which item to equip
+function EquipmentMenu(screen) {
+  Menu.call(this, screen);
+}
+EquipmentMenu.prototype = Object.create(Menu.prototype);
+EquipmentMenu.prototype.constructor = EquipmentMenu;
+//in addition to the pieces of equipment the player can chose none to remove a piece of equipment
+EquipmentMenu.prototype.setOptions = function(options) {
+  var optionListPlus = [];
+  optionListPlus.push(new Equipment("none"));
+  for(let i = 0 ; i < options.length ; i++) {
+    optionListPlus.push(options[i]);
+  }
+  this.optionList = optionListPlus;
+  this.compileMenu();
 }
 
 function MainMenuButton(screen) {
