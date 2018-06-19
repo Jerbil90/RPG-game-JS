@@ -134,57 +134,75 @@ EquipmentSubScreenMenuManager.prototype.setValidEquipmentList = function () {
   switch(this.currentlySelectedEquippedIndex){
     case 0:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
+      //if the character is capable of equiping this item in the currentlySelectedEquipped slot
       if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].mainHandEquipCheck(this.screen.itemList[i])) {
-        equipmentList.push(this.screen.itemList[i]);
+        //if the player has enough pieces of the given equipment considering how many other heores are currently useing it
+        if(this.screen.game.inventory.isEquipmentAvaliable(this.screen.itemList[i], this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment[this.currentlySelectedEquippedIndex])) {
+          equipmentList.push(this.screen.itemList[i]);
+        }
       }
     }
     break;
     case 1:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
       if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].offHandEquipCheck(this.screen.itemList[i])) {
-        equipmentList.push(this.screen.itemList[i]);
+        if(this.screen.game.inventory.isEquipmentAvaliable(this.screen.itemList[i], this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment[this.currentlySelectedEquippedIndex])) {
+          equipmentList.push(this.screen.itemList[i]);
+        }
       }
     }
     break;
     case 2:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
       if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].headArmourEquipCheck(this.screen.itemList[i])) {
-        equipmentList.push(this.screen.itemList[i]);
+        if(this.screen.game.inventory.isEquipmentAvaliable(this.screen.itemList[i], this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment[this.currentlySelectedEquippedIndex])) {
+          equipmentList.push(this.screen.itemList[i]);
+        }
       }
     }
     break;
     case 3:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
       if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].bodyArmourEquipCheck(this.screen.itemList[i])) {
-        equipmentList.push(this.screen.itemList[i]);
+        if(this.screen.game.inventory.isEquipmentAvaliable(this.screen.itemList[i], this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment[this.currentlySelectedEquippedIndex])) {
+          equipmentList.push(this.screen.itemList[i]);
+        }
       }
     }
     break;
     case 4:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
       if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].handArmourEquipCheck(this.screen.itemList[i])) {
-        equipmentList.push(this.screen.itemList[i]);
+        if(this.screen.game.inventory.isEquipmentAvaliable(this.screen.itemList[i], this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment[this.currentlySelectedEquippedIndex])) {
+          equipmentList.push(this.screen.itemList[i]);
+        }
       }
     }
     break;
     case 5:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
       if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].footArmourEquipCheck(this.screen.itemList[i])) {
-        equipmentList.push(this.screen.itemList[i]);
+        if(this.screen.game.inventory.isEquipmentAvaliable(this.screen.itemList[i], this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment[this.currentlySelectedEquippedIndex])) {
+          equipmentList.push(this.screen.itemList[i]);
+        }
       }
     }
     break;
     case 6:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
       if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].accessoryEquipCheck(this.screen.itemList[i])) {
-        equipmentList.push(this.screen.itemList[i]);
+        if(this.screen.game.inventory.isEquipmentAvaliable(this.screen.itemList[i], this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment[this.currentlySelectedEquippedIndex])) {
+          equipmentList.push(this.screen.itemList[i]);
+        }
       }
     }
     break;
     case 7:
     for(let i = 0 ; i < this.screen.itemList.length ; i++) {
       if(this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].accessoryEquipCheck(this.screen.itemList[i])) {
-        equipmentList.push(this.screen.itemList[i]);
+        if(this.screen.game.inventory.isEquipmentAvaliable(this.screen.itemList[i], this.screen.heroManager.assetList[this.currentlySelectedHeroIndex].equipment[this.currentlySelectedEquippedIndex])) {
+          equipmentList.push(this.screen.itemList[i]);
+        }
       }
     }
     break;

@@ -40,7 +40,7 @@ Game.prototype.loadUserData = function() {
   let knight = new Knight("sammy");
   this.userHeroList.push(knight);
 
-  this.inventory = new Inventory();
+  this.inventory = new Inventory(this);
   this.inventory.load();
   this.userItemList = this.inventory.itemList;
 }
@@ -189,7 +189,8 @@ Fade.prototype.startFade = function() {
   this.fadeState = "startingFade";
 }
 
-function Inventory() {
+function Inventory(game) {
+  this.game = game;
   this.itemList = [];
 }
 Inventory.prototype.load = function(){
@@ -233,6 +234,31 @@ Inventory.prototype.fetchEquipment = function() {
     }
   }
   return equipment;
+}
+//This method is called by the EquipmentSubScreen's MenuManager to check if the current piece of equipment is available to equip or if all the possed pieces of this type is currently equipped on other heroes
+//currentHerosCurrentEquipment is the slot that it is currently checking against, as such this piece of equipment should be ignored, as the character should be able to set it again if they wish
+Inventory.prototype.isEquipmentAvaliable = function(equipment, currentHerosCurrentEquipment) {
+  var usageCount = 0;
+  for(let i = 0 ; i < this.game.userHeroList.length ; i++) {
+    for(let j = 0 ; j < this.game.userHeroList[i].equipment.length ; j++) {
+      //Do a check to ignore the curently selected hero in the equipment screen to check if it is their current heros current equip slot that is being checked for
+
+      if(this.game.userHeroList[i].equipment[j] == equipment) {
+        usageCount++;
+      }
+    }
+  }
+  console.log("Equipment: " + equipment.name + "\tusageCount: " + usageCount + "\tquantity: " + equipment.quantity);
+  if(equipment == currentHerosCurrentEquipment) {
+    usageCount--;
+    console.log("currently equipped!")
+  }
+  if(usageCount >= equipment.quantity) {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
 
 //This class is responsible for managing the game while in the manorExploration phase
