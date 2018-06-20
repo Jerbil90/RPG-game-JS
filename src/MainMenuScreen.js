@@ -95,8 +95,11 @@ MainMenuScreen.prototype.update = function(gameTime, elapsedTime) {
   }
 
   if(this.menuManager.isScreenOver) {
+    console.log("setting state to exiting");
+    this.menuManager.isScreenOver = false;
     this.state = "exiting"
     this.isActive = false;
+    this.currentSubScreenIndex = -1;
   }
 }
 MainMenuScreen.prototype.draw = function(ctx) {
@@ -112,16 +115,16 @@ MainMenuScreen.prototype.draw = function(ctx) {
 function MainMenuManager(screen) {
   MenuManager.call(this, screen);
   this.isScreenOver = false;
+  var mainMenu = new MainMenu(this.screen);
+  this.assetList.push(mainMenu);
 }
 MainMenuManager.prototype = Object.create(MenuManager.prototype);
 MainMenuManager.prototype.constructor = MainMenuManager;
 MainMenuManager.prototype.load = function() {
-  var mainMenu = new MainMenu(this.screen);
-  mainMenu.setPosition(30, 30);
-  mainMenu.load();
-  mainMenu.isActive = true;
-  mainMenu.isVisible = true;
-  this.assetList.push(mainMenu);
+  this.assetList[0].load();
+  this.assetList[0].isActive = true;
+  this.assetList[0].isVisible = true;
+  this.assetList[0].resetMenu();
 }
 MainMenuManager.prototype.select = function(i, j) {
   if(j==0) {
@@ -162,12 +165,9 @@ MainMenuManager.prototype.handleClick = function() {
 function MainMenu(screen) {
   this.screen = screen;
   Menu.call(this, screen);
+  this.setPosition(30, 30);
   this.isActive = true;
   this.isVisible = true;
-}
-MainMenu.prototype = Object.create(Menu.prototype);
-MainMenu.prototype.constructor = MainMenu;
-MainMenu.prototype.load = function() {
   let label1 = {name: "Stats", applicableTarget: true};
   let label2 = {name: "Inventory", applicableTarget: true};
   let label5 = {name: "Battle Items", applicableTarget: true};
@@ -176,6 +176,11 @@ MainMenu.prototype.load = function() {
   let label6 = {name: "Exit", applicableTarget: true};
   let buttonList = [label1, label2, label3, label4, label5, label6];
   this.setOptions(buttonList);
+}
+MainMenu.prototype = Object.create(Menu.prototype);
+MainMenu.prototype.constructor = MainMenu;
+MainMenu.prototype.load = function() {
+
 }
 
 export {MainMenuScreen}

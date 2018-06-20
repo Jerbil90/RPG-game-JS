@@ -68,18 +68,17 @@ Game.prototype.endBattle = function() {
   }
 }
 Game.prototype.openMainMenu = function () {
+  console.log("opening main menu screen");
   this.targetScreen = this.mainMenuScreen;
   this.targetState = "mainMenu";
   this.mainMenuScreen.load();
   this.mainMenuScreen.isActive = true;
+  this.mainMenuScreen.isScreenOver = false;
   this.mainMenuScreen.state = "loading";
   this.fade.startFade();
 };
 Game.prototype.closeMainMenu = function () {
-  console.log("Menu Closed!");
-
   this.loadExplore();
-
 };
 Game.prototype.loadExplore = function() {
   this.exploreScreen.load();
@@ -116,15 +115,9 @@ Game.prototype.update = function() {
     else if(this.state == "aftermath") {
       if(this.aftermathScreen.menuManager.isScreenOver) {
         this.aftermathScreen.endScreen();
-        if(this.aftermathScreen.menuManager.newID != 100) {
-          this.battleID = this.aftermathScreen.menuManager.newID;
-          this.startBattle();
-          this.fade.startFade();
-        }
-        else{
-          this.openMainMenu();
-        }
-
+        this.battleID = this.aftermathScreen.menuManager.newID;
+        this.startBattle();
+        this.fade.startFade();
       }
     }
     else if(this.state == "mainMenu") {
@@ -132,7 +125,6 @@ Game.prototype.update = function() {
         this.mainMenuScreen.state = "inActive";
         this.mainMenuScreen.isActive = false;
         this.closeMainMenu();
-        console.log("closing main menu")
       }
     }
   }
@@ -288,7 +280,6 @@ $(document).ready(function() {
   game.loadUserData();
   game.loadGame();
   game.loadExplore();
-  console.log("explore loaded");
   game.state = "explore";
   game.currentScreen = game.exploreScreen;
   var canvas = document.getElementById('gameArea');

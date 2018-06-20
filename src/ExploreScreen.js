@@ -27,20 +27,53 @@ Player.prototype.update = function(gameTime, elapsedTime) {
   var velocity = {x: 0, y: 0};
   var inputArray = this.screen.game.input.inputArray;
   var potentialPosition = {x: 0, y: 0};
+  var orientationArray = [];
+  for(let  i = 0 ; i < 4 ; i++) {
+    orientationArray.push(false);
+  }
   for(let i = 0 ; i < inputArray.length ; i++) {
     if(inputArray[i] == "ArrowUp") {
       velocity.y -= this.speed * elapsedTime/1000;
+      orientationArray[0] = true;
     }
     if(inputArray[i] == "ArrowDown") {
       velocity.y += this.speed * elapsedTime/1000;
+      orientationArray[1] = true;
     }
     if(inputArray[i] == "ArrowLeft") {
       velocity.x -= this.speed * elapsedTime/1000;
+      orientationArray[2] = true;
     }
     if(inputArray[i] == "ArrowRight") {
       velocity.x += this.speed * elapsedTime/1000;
+      orientationArray[3] = true;
     }
   }
+  //if not going up and not going down, if they are going from side to side then change the vertical orientation to 0;
+  if(!orientationArray[0] && !orientationArray[1]) {
+    if(orientationArray[2] || orientationArray[3]) {
+      this.orientation.y = 0;
+    }
+  }
+  //if not going from side to side, and is going up or down then set horizontal orientation to 0;
+  else if (!orientationArray[2] && !orientationArray[3]) {
+    if(orientationArray[0] || orientationArray[1]) {
+      this.orientation.x = 0;
+    }
+  }
+  if(orientationArray[0]) {
+    this.orientation.y = -1;
+  }
+  if(orientationArray[1]) {
+    this.orientation.y = 1;
+  }
+  if(orientationArray[2]) {
+    this.orientation.x = -1;
+  }
+  if(orientationArray[3]) {
+    this.orientation.x = 1;
+  }
+
   potentialPosition.x = this.position.x + velocity.x;
   potentialPosition.y = this.position.y + velocity.y;
   if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
@@ -128,7 +161,6 @@ ExploreScreenEnvironmentManager.prototype.loadMap = function() {
       }
     }
   }
-  console.log("mapLoaded");
 }
 ExploreScreenEnvironmentManager.prototype.draw = function(ctx) {
   for (let i = 0 ; i < this.map.length ; i++) {
@@ -183,7 +215,6 @@ ExploreScreenEnvironmentManager.prototype.checkPotentialPosition = function(pote
   //First get the tile the origin is in
   var x = Math.floor(potentialPosition.x/mapTileLength);
   var y = Math.floor(potentialPosition.y/mapTileLength);
-  console.log(x);
   collidingMapTiles.push(this.map[x][y]);
   //Next check if they over lap the adjecenttiles
   if(potentialPosition.x%mapTileLength != 0) {
