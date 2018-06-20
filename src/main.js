@@ -9,6 +9,8 @@ import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} fr
 import {BattleScreen} from './BattleScreen';
 import {AftermathScreen, ExperienceBar} from './AftermathScreen';
 import {MainMenuScreen} from './MainMenuScreen';
+import {ExploreScreen} from './ExploreScreen';
+import {Input} from './Input';
 
 //Game class constructor, this is the main object that holds and manages the game
 function Game() {
@@ -20,6 +22,7 @@ function Game() {
   this.state = "none";
   this.targetScreen = null;
   this.currentScreen = null;
+  this.worldExploreID = 0;
   this.battleID = 0;
   this.battleScreen = null;
   this.battleEndScreen = null;
@@ -31,6 +34,8 @@ Game.prototype.loadGame = function () {
   this.battleScreen = new BattleScreen(this);
   this.aftermathScreen = new AftermathScreen(this);
   this.mainMenuScreen = new MainMenuScreen(this);
+  this.exploreScreen = new ExploreScreen(this);
+  this.input = new Input(this);
 };
 //This method is responsible for requesting the user's Heros from the server, atm it just provides default heros
 Game.prototype.loadUserData = function() {
@@ -39,6 +44,9 @@ Game.prototype.loadUserData = function() {
   this.userHeroList.push(fighter);
   let knight = new Knight("sammy");
   this.userHeroList.push(knight);
+
+  this.playerArea = 0;
+  this.playerPosition = {x: 50, y: 50};
 
   this.inventory = new Inventory(this);
   this.inventory.load();
@@ -70,10 +78,16 @@ Game.prototype.openMainMenu = function () {
 Game.prototype.closeMainMenu = function () {
   console.log("Menu Closed!");
 
-  this.startBattle();
-  this.fade.startFade();
+  this.loadExplore();
 
 };
+Game.prototype.loadExplore = function() {
+  this.exploreScreen.load();
+  this.targetState = "explore";
+  this.targetScreen = this.exploreScreen;
+  this.targetScreen.isActive = true;
+  this.fade.startFade();
+}
 //This is the game's main Update function it is responsible for determining gameTime and elapsedTime before calling the update functions of the appropriate managers
 Game.prototype.update = function() {
   var currentDate = new Date();
@@ -88,6 +102,9 @@ Game.prototype.update = function() {
   }
   if(this.state == "mainMenu") {
     this.mainMenuScreen.update(this.gameTime, this.elapsedTime);
+  }
+  if(this.state == "explore") {
+    this.exploreScreen.update(this.gameTime, this.elapsedTime);
   }
 
   if(this.fade.fadeState == "none") {
@@ -270,9 +287,10 @@ $(document).ready(function() {
   var game = new Game();
   game.loadUserData();
   game.loadGame();
-  game.state = "battle";
-  game.currentScreen = game.battleScreen;
-  game.startBattle();
+  game.loadExplore();
+  console.log("explore loaded");
+  game.state = "explore";
+  game.currentScreen = game.exploreScreen;
   var canvas = document.getElementById('gameArea');
   canvas.addEventListener("mousemove", function(event) {
     var rect = canvas.getBoundingClientRect();
@@ -291,7 +309,12 @@ $(document).ready(function() {
       game.currentScreen.menuManager.handleClick();
     }
   });
-
+  document.addEventListener('keydown', function(event) {
+    game.input.handleKeyDown(event);
+  });
+  document.addEventListener('keyup', function(event) {
+    game.input.handleKeyUp(event);
+  });
   var intervalFunction = setInterval(function() {
     game.update();
 

@@ -3,8 +3,8 @@ import $ from 'jquery';
 //The screen class is responsible for updating and drawing all the managers, and will be given special tasks when succeded by their children
 function Screen(game){
   this.game = game;
-  this.environmentManager = new EnvironmentManager(this);
   //this.load();
+  this.instantiateEnvironmentManager();
   this.isActive = false;
   this.isScreenOver = false;
   this.screenStartTime = null;
@@ -13,6 +13,9 @@ function Screen(game){
   this.lastMouseY = 0;
   this.mousex = 0;
   this.mousey = 0;
+}
+Screen.prototype.instantiateEnvironmentManager = function() {
+  this.environmentManager = new EnvironmentManager(this);
 }
 Screen.prototype.enableHandPointer = function() {
   $("#gameArea").addClass("handPointer");
