@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import {Screen} from './Screen';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
 
@@ -6,6 +7,7 @@ function ExploreScreen(game) {
   this.elapsedTime = 0;
   this.player = new Player(this);
   this.dialogueBox = new DialogueBox(this);
+  this.chestManager = new ChestManager(this);
   this.state = "explore";
   this.battleProgress = 0;
 }
@@ -14,6 +16,7 @@ ExploreScreen.prototype.constructor = ExploreScreen;
 ExploreScreen.prototype.load = function() {
   Screen.prototype.load.call(this);
   this.state = "explore";
+  this.chestManager.load();
 }
 ExploreScreen.prototype.instantiateEnvironmentManager = function() {
   this.environmentManager = new ExploreScreenEnvironmentManager(this);
@@ -31,6 +34,7 @@ ExploreScreen.prototype.update = function(gameTime, elapsedTime) {
   Screen.prototype.update.call(this, gameTime, elapsedTime);
   this.player.update(gameTime, elapsedTime);
   this.dialogueBox.update(gameTime, elapsedTime);
+  this.chestManager.update(gameTime, elapsedTime);
   if(this.battleProgress >= 2000) {
     this.loadRandomBattle();
   }
@@ -38,6 +42,7 @@ ExploreScreen.prototype.update = function(gameTime, elapsedTime) {
 ExploreScreen.prototype.draw = function(ctx) {
   Screen.prototype.draw.call(this, ctx);
   this.dialogueBox.draw(ctx);
+  this.chestManager.draw(ctx);
 }
 
 function Player(screen) {
@@ -133,12 +138,12 @@ Player.prototype.interact = function() {
     var self = this;
     for(let i = 0 ; i < this.focus.length * this.focus.length ; i++) {
       let pixel = {x: self.focus.x + i%self.focus.length, y: self.focus.y + Math.floor(i/16)};
-      for(let j = 0 ; j < this.screen.environmentManager.chestPositions.length ; j++) {
-        if(!this.screen.environmentManager.isChestOpened[j]) {
-          let chestPos = this.screen.environmentManager.chestPositions[j];
-          if(pixel.x > chestPos.x * 16 && pixel.x < chestPos.x * 16 + 16 && pixel.y > chestPos.y * 16 && pixel.y < chestPos.y * 16 + 16) {
-            target = j;
-            console.log("chest detected in focus");
+      for(let j = 0 ; j < this.screen.chestManager.assetList.length ; j++) {
+        if(!this.screen.chestManager.assetList[j].isOpened) {
+          let chestPos = this.screen.chestManager.assetList[j].position;
+          if(pixel.x > chestPos.x && pixel.x < chestPos.x + 16 && pixel.y > chestPos.y && pixel.y < chestPos.y + 16) {
+            target = this.screen.chestManager.assetList[j];
+            console.log("target detected in focus");
             break;
           }
         }
@@ -148,7 +153,7 @@ Player.prototype.interact = function() {
       }
     }
     if (target != null) {
-      this.screen.environmentManager.openChest(target);
+      target.interact();
     }
   }
   else if(this.screen.state == "inDialogue") {
@@ -173,7 +178,6 @@ ExploreScreenEnvironmentManager.prototype = Object.create(EnvironmentManager.pro
 ExploreScreenEnvironmentManager.prototype.constructor = ExploreScreenEnvironmentManager;
 ExploreScreenEnvironmentManager.prototype.load = function() {
   this.loadMap();
-  this.loadChests();
 }
 ExploreScreenEnvironmentManager.prototype.loadMap = function() {
   this.map = [];
@@ -189,10 +193,6 @@ ExploreScreenEnvironmentManager.prototype.loadMap = function() {
       }
       else {
         this.map[i].push(0);
-      }
-      if(i == 29 && j == 25) {
-        this.map[i].pop();
-        this.map[i].push(2);
       }
     }
   }
@@ -227,21 +227,6 @@ ExploreScreenEnvironmentManager.prototype.draw = function(ctx) {
   ctx.fillStyle = "rgba(100, 0, 100, 0.25)";
   ctx.fillRect(this.screen.player.focus.x, this.screen.player.focus.y, this.screen.player.focus.length, this.screen.player.focus.length);
 }
-//this method is responsible for populating the chests arrays
-ExploreScreenEnvironmentManager.prototype.loadChests = function() {
-  this.chestContents = [];
-  this.isChestOpened = [];
-  this.chestPositions = [];
-  var contents = ["Steel Sword"];
-  this.chestContents.push(contents);
-  this.isChestOpened.push(false);
-  var pos = {x: 29, y: 25};
-  this.chestPositions.push(pos);
-}
-ExploreScreenEnvironmentManager.prototype.openChest = function(index) {
-  this.isChestOpened[index] = true;
-  this.screen.dialogueBox.openDialogueBox("Chest has been opened");
-}
 ExploreScreenEnvironmentManager.prototype.checkPotentialPosition = function(potentialPosition) {
   var unitSize = {x: 16, y:16};
   var mapTileLength = 16;
@@ -264,11 +249,93 @@ ExploreScreenEnvironmentManager.prototype.checkPotentialPosition = function(pote
 
   var isValidPosition = true;
   for(let i = 0 ; i < collidingMapTiles.length ; i++) {
-    if(collidingMapTiles[i] == 1) {
+    if(collidingMapTiles[i] != 0) {
       isValidPosition = false;
     }
   }
   return isValidPosition;
+}
+
+function ChestManager(screen) {
+  Manager.call(this, screen);
+}
+ChestManager.prototype = Object.create(Manager.prototype);
+ChestManager.prototype.constructor = ChestManager;
+ChestManager.prototype.load = function() {
+  //console.log("loading chests in chest manager");
+  let chest = new Chest(this.screen);
+  chest.setPosition(16*29, 16*25);
+  let contents = [];
+  contents.push("Steel Sword");
+  /*
+  for(let j = 2 ; j < line.length ; j++) {
+    contents.push(line[j]);
+  }
+  */
+  chest.setContents(contents);
+  this.assetList.push(chest);
+  /*
+  //read chest info from file and fille the chest list accordingly
+  var csvDirectory = "../chest/chests" + this.screen.game.playerArea + ".csv";
+  $.get(csvDirectory, function(data) {
+    console.log("file read");
+    this.chests = []
+    var allText = data;
+    var allTextLines = data.split(/\r\n|\n/);
+    for(let i = 0 ; i < allTextLines.length ; i++) {
+      let line = allTextLines.split(/,/);
+      let chest = new Chest(this.screen);
+      chest.setPosition(16*line[0], 16*line[1]);
+      let contents = [];
+      for(let j = 2 ; j < line.length ; j++) {
+        contents.push(line[j]);
+      }
+      chest.setContents(contents);
+      this.chests.push(chest);
+    }
+  });
+  */
+}
+
+function Chest(screen) {
+  this.screen = screen;
+  this.isOpened = false;
+}
+Chest.prototype.setPosition = function(a, b) {
+  this.position = {x: a, y: b};
+}
+Chest.prototype.setContents = function(contents) {
+  this.contents = contents;
+}
+Chest.prototype.update = function(gameTime, elapsedTime) {
+
+}
+Chest.prototype.draw = function(ctx) {
+  if(this.isOpened) {
+    ctx.fillStyle = "rgb(200, 50, 150)";
+  }
+  else {
+    ctx.fillStyle = "rgb(120, 15, 120)";
+  }
+  ctx.fillRect(this.position.x, this.position.y, 16, 16);
+}
+//This method is called when the player interacts with the chest, it sets the chest to open and bestows its contents upon the user's inventory and opens a dialogueBox
+Chest.prototype.openChest = function() {
+  this.isOpened = true;
+  var message = "Found a";
+  for(let  i = 0 ; i < this.contents.length ; i++) {
+    for(let j = 0 ; j < this.screen.game.inventory.itemList.length ; j++) {
+      if(this.contents[i] == this.screen.game.inventory.itemList[j].name) {
+        this.screen.game.inventory.itemList[j].quantity++;
+      }
+    }
+    message += " " + this.contents[i];
+  }
+  message += "!";
+  this.screen.dialogueBox.openDialogueBox(message);
+}
+Chest.prototype.interact = function() {
+  this.openChest();
 }
 
 function DialogueBox(screen) {
