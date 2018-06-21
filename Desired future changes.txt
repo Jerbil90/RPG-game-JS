@@ -1,0 +1,35 @@
+--- Inventory subscreen
+-sorting
+-display detailed info
+
+---Equipment subScreen
+- see quantity
+- see stats info
+
+---Stats subScreen
+- chose a hero and see detailed Stats
+
+---Party SubScreen
+- choose, from available heroes, who is in party
+- choose party leader
+
+---SpecialMoveSubScreen
+- see detailed information on special moves of each hero
+- see when next special move is unlocked
+
+--Battle Items
+-choose which items to take into battle;
+
+---exploreScreen
+- npcManager
+- chestManager
+- chestCollisions
+- random battles actually random
+- changing Map locations
+
+--- battle Screen
+- add activeTurn/targeting indicators;
+- redo Hero select menu to show HP and SP insdead of maving them cluttering the battle Sprites
+
+--- Misc
+import TimeFantasy assets and implement animations

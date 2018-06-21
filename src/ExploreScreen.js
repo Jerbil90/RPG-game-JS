@@ -7,21 +7,33 @@ function ExploreScreen(game) {
   this.player = new Player(this);
   this.dialogueBox = new DialogueBox(this);
   this.state = "explore";
+  this.battleProgress = 0;
 }
+ExploreScreen.prototype = Object.create(Screen.prototype);
+ExploreScreen.prototype.constructor = ExploreScreen;
 ExploreScreen.prototype.load = function() {
   Screen.prototype.load.call(this);
   this.state = "explore";
 }
-ExploreScreen.prototype = Object.create(Screen.prototype);
-ExploreScreen.prototype.constructor = ExploreScreen;
 ExploreScreen.prototype.instantiateEnvironmentManager = function() {
   this.environmentManager = new ExploreScreenEnvironmentManager(this);
+}
+ExploreScreen.prototype.loadRandomBattle = function() {
+  this.battleProgress = 0;
+  this.isScreenOver = true;
+  this.isActive = false;
+  this.state = "inactive";
+  this.game.battleID = 0;
+  this.game.startBattle();
 }
 ExploreScreen.prototype.update = function(gameTime, elapsedTime) {
   this.elapsedTime = elapsedTime;
   Screen.prototype.update.call(this, gameTime, elapsedTime);
   this.player.update(gameTime, elapsedTime);
   this.dialogueBox.update(gameTime, elapsedTime);
+  if(this.battleProgress >= 2000) {
+    this.loadRandomBattle();
+  }
 }
 ExploreScreen.prototype.draw = function(ctx) {
   Screen.prototype.draw.call(this, ctx);
@@ -41,6 +53,7 @@ Player.prototype.update = function(gameTime, elapsedTime) {
     var inputArray = this.screen.game.input.inputArray;
     var potentialPosition = {x: 0, y: 0};
     var orientationArray = [];
+    var isMoving = false;
     for(let  i = 0 ; i < 4 ; i++) {
       orientationArray.push(false);
     }
@@ -61,6 +74,9 @@ Player.prototype.update = function(gameTime, elapsedTime) {
         velocity.x += this.speed * elapsedTime/1000;
         orientationArray[3] = true;
       }
+    }
+    if(velocity.x != 0 || velocity.y != 0) {
+      this.screen.battleProgress += elapsedTime;
     }
     //if not going up and not going down, if they are going from side to side then change the vertical orientation to 0;
     if(!orientationArray[0] && !orientationArray[1]) {
@@ -225,7 +241,6 @@ ExploreScreenEnvironmentManager.prototype.loadChests = function() {
 ExploreScreenEnvironmentManager.prototype.openChest = function(index) {
   this.isChestOpened[index] = true;
   this.screen.dialogueBox.openDialogueBox("Chest has been opened");
-  console.log("Chest Opened!");
 }
 ExploreScreenEnvironmentManager.prototype.checkPotentialPosition = function(potentialPosition) {
   var unitSize = {x: 16, y:16};

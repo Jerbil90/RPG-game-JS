@@ -66,6 +66,7 @@ Game.prototype.startBattle = function () {
   this.targetState = "battle";
   this.battleScreen.loadBattle();
   this.battleScreen.isActive = true;
+  this.fade.startFade();
 }
 Game.prototype.endBattle = function() {
   if(this.targetScreen != this.aftermathScreen) {
@@ -123,9 +124,7 @@ Game.prototype.update = function() {
     else if(this.state == "aftermath") {
       if(this.aftermathScreen.menuManager.isScreenOver) {
         this.aftermathScreen.endScreen();
-        this.battleID = this.aftermathScreen.menuManager.newID;
-        this.startBattle();
-        this.fade.startFade();
+        this.loadExplore();
       }
     }
     else if(this.state == "mainMenu") {
@@ -174,7 +173,7 @@ Fade.prototype.update = function(gameTime, elapsedTime) {
       this.fadeState = "faded";
       this.alpha = 1;
     }
-          this.alpha = ((gameTime-this.stateStartTime)/this.fadeTime);
+    this.alpha = ((gameTime-this.stateStartTime)/this.fadeTime);
     break;
     case "faded":
     if(gameTime > this.stateStartTime + this.fadeTime) {
