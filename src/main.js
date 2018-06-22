@@ -221,7 +221,7 @@ Inventory.prototype.load = function(){
   ironSword.quantity = 1;
   this.itemList.push(ironSword);
   var steelSword = new Equipment("Steel Sword");
-  steelSword.quantity = 1;
+  steelSword.quantity = 0;
   this.itemList.push(steelSword);
   var scalemail = new Equipment("Smelly Scale Mail");
   scalemail.quantity = 1;

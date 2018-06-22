@@ -18,7 +18,6 @@ Input.prototype.handleKeyDown = function(event) {
       this.inputArray.push(event.code);
     }
     if(event.code == "ArrowUp") {
-      console.log("up");
       this.inputArray.push(event.code);
     }
     if(event.code == "ArrowLeft") {

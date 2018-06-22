@@ -21,8 +21,7 @@
 -choose which items to take into battle;
 
 ---exploreScreen
-- npcManager
-- chestManager
+- nPC collisions
 - chestCollisions
 - random battles actually random
 - changing Map locations
@@ -33,3 +32,5 @@
 
 --- Misc
 import TimeFantasy assets and implement animations
+managers able to load data from csv
+- able to load personalised save data
