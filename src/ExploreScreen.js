@@ -5,6 +5,9 @@ import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} fr
 function ExploreScreen(game) {
   Screen.call(this, game);
   this.elapsedTime = 0;
+  this.worldID = this.game.worldID;
+  this.worldAreaID = this.game.worldAreaID;
+  this.worldLength = 2;
   this.player = new Player(this);
   this.dialogueBox = new DialogueBox(this);
   this.chestManager = new ChestManager(this);
@@ -15,6 +18,8 @@ function ExploreScreen(game) {
 ExploreScreen.prototype = Object.create(Screen.prototype);
 ExploreScreen.prototype.constructor = ExploreScreen;
 ExploreScreen.prototype.load = function() {
+  this.worldID = this.game.worldID;
+  this.worldAreaID = this.game.worldAreaID;
   Screen.prototype.load.call(this);
   this.state = "explore";
   this.chestManager.load();
@@ -134,7 +139,9 @@ Player.prototype.update = function(gameTime, elapsedTime) {
       }
     }
     this.focus = {x: this.position.x + (this.orientation.x * 16), y: this.position.y + (this.orientation.y * 16), length: 16};
+    this.areaTransitionCheck();
   }
+
 }
 //This method is called by input and will check the player's focus for anything interactable, if something is found it takes the appropriate action
 Player.prototype.interact = function() {
@@ -179,6 +186,25 @@ Player.prototype.draw = function(ctx) {
   ctx.fillStyle = "rgba(100, 0, 100, 0.25)";
   ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
 }
+//This method is responsible for checking if the player has gone off the edge of the screen or into an area transition and loads the appropriate new area
+Player.prototype.areaTransitionCheck = function() {
+  var self = this;
+  var playerCentre = {x: self.position.x + 8, y: self.position.y + 8};
+  if(this.screen.worldAreaID == 0){
+    if(playerCentre.x > 630) {
+      this.screen.game.worldAreaID = 1;
+      this.position.x = 25;
+      this.screen.game.loadExplore();
+    }
+  }
+  else if(this.screen.worldAreaID == 1) {
+    if(playerCentre.x < 9) {
+      this.screen.game.worldAreaID = 0;
+      this.position.x = 615;
+      this.screen.game.loadExplore();
+    }
+  }
+}
 
 function ExploreScreenEnvironmentManager(screen) {
   EnvironmentManager.call(this, screen);
@@ -204,13 +230,37 @@ ExploreScreenEnvironmentManager.prototype.loadMap = function() {
     let emptyArray = [];
     this.map.push(emptyArray);
   }
-  for(let i = 0 ; i < 40 ; i++) {
-    for(let j = 0 ; j < 30 ; j++) {
-      if(i == 0 || i == 39 || j == 0 || j == 29){
-        this.map[i].push(1);
+  if(this.screen.worldAreaID == 0) {
+    for(let i = 0 ; i < 40 ; i++) {
+      for(let j = 0 ; j < 30 ; j++) {
+        if(i == 0 || i == 39 || j == 0 || j == 29){
+          this.map[i].push(1);
+        }
+        else {
+          this.map[i].push(0);
+        }
+
+        if((i == 39 && j > 10) && (i == 39 && j < 15)) {
+          this.map[i].pop();
+          this.map[i].push(0);
+        }
       }
-      else {
-        this.map[i].push(0);
+    }
+  }
+  else if(this.screen.worldAreaID == 1) {
+    for(let i = 0 ; i < 40 ; i++) {
+      for(let j = 0 ; j < 30 ; j++) {
+        if(i == 0 || i == 39 || j == 0 || j == 29){
+          this.map[i].push(1);
+        }
+        else {
+          this.map[i].push(0);
+        }
+
+        if((i == 0 && j > 10) && (i == 0 && j < 15)) {
+          this.map[i].pop();
+          this.map[i].push(0);
+        }
       }
     }
   }
@@ -232,7 +282,7 @@ ExploreScreenEnvironmentManager.prototype.draw = function(ctx) {
         }
         else {
           ctx.fillStyle = "rgb(50, 125, 125)";
-//          ctx.fillStyle = "rgb(125, 50, 125)";
+          //ctx.fillStyle = "rgb(125, 50, 125)";
 
         }
         ctx.fillRect(16*i, 16*j, 16, 16);
