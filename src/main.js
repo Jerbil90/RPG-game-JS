@@ -11,6 +11,8 @@ import {AftermathScreen, ExperienceBar} from './AftermathScreen';
 import {MainMenuScreen} from './MainMenuScreen';
 import {ExploreScreen} from './ExploreScreen';
 import {Input} from './Input';
+import {SaveDataManager} from'./SaveDataManager';
+import {AreaStateManager} from './AreaStateManager';
 
 //Game class constructor, this is the main object that holds and manages the game
 function Game() {
@@ -37,6 +39,9 @@ Game.prototype.loadGame = function () {
   this.mainMenuScreen = new MainMenuScreen(this);
   this.exploreScreen = new ExploreScreen(this);
   this.input = new Input(this);
+  this.saveDataManager = new SaveDataManager(this);
+  this.areaStateManager = new AreaStateManager(this);
+  this.areaStateManager.newGame();
 };
 //This method is responsible for requesting the user's Heros from the server, atm it just provides default heros
 Game.prototype.loadUserData = function() {
@@ -49,13 +54,6 @@ Game.prototype.loadUserData = function() {
   this.playerArea = 0;
   this.playerPosition = {x: 50, y: 50};
 
-  this.playerWorldStateArray = [];
-
-  //for each worldArea,an array of boolean values should be loaded to determine the state the player left eh world in
-  //ie which chests are unloacked, switches are flipped, special characters spoken to, or bosses defeated
-  for(let  i = 0 ; i < 1 ; i++){
-
-  }
 
   this.inventory = new Inventory(this);
   this.inventory.load();

@@ -222,6 +222,7 @@ ExploreScreenEnvironmentManager.prototype = Object.create(EnvironmentManager.pro
 ExploreScreenEnvironmentManager.prototype.constructor = ExploreScreenEnvironmentManager;
 ExploreScreenEnvironmentManager.prototype.load = function() {
   this.loadMap();
+  this.loadMapAlt();
 }
 ExploreScreenEnvironmentManager.prototype.loadMap = function() {
   this.map = [];
@@ -265,6 +266,14 @@ ExploreScreenEnvironmentManager.prototype.loadMap = function() {
     }
   }
 }
+
+ExploreScreenEnvironmentManager.prototype.loadMapAlt = function () {
+  //var testObject = require("./testObject.json");
+  //console.log(testObject.type);
+  var map = require("./maps/openingPlains.json");
+  this.screen.mapObject = map;
+  console.log(map.layers[0].data);
+};
 ExploreScreenEnvironmentManager.prototype.draw = function(ctx) {
   for (let i = 0 ; i < this.map.length ; i++) {
     for(let j = 0 ; j < this.map[0].length ; j++) {
@@ -327,9 +336,14 @@ NPCManager.prototype.constructor = NPCManager;
 //Thismethod populates the assetList with the appropriate NPCs
 NPCManager.prototype.load = function() {
   this.assetList = [];
-  var nPC = new NPC(this.screen);
-  nPC.setPosition(16*16, 10*16);
-  this.assetList.push(nPC);
+  var npcList = this.screen.mapObject.layers[2].objects;
+  for(let i = 0 ;i < npcList.length ; i++) {
+    var nPC = new NPC(this.screen);
+    nPC.setPosition(npcList[i].x, npcList[i].y);
+    nPC.setMessage(npcList[i].properties.dialogue);
+    console.log(npcList[i].name);
+    this.assetList.push(nPC);
+  }
 }
 NPCManager.prototype.update = function(gameTime, elapsedTime) {
   if (this.screen.state == "explore") {
@@ -428,6 +442,9 @@ NPC.prototype.draw = function(ctx) {
 NPC.prototype.interact = function() {
   this.screen.dialogueBox.openDialogueBox(this.nPCDialogue);
 }
+NPC.prototype.setMessage = function(message) {
+  this.nPCDialogue = message;
+}
 
 function ChestManager(screen) {
   Manager.call(this, screen);
@@ -435,41 +452,22 @@ function ChestManager(screen) {
 ChestManager.prototype = Object.create(Manager.prototype);
 ChestManager.prototype.constructor = ChestManager;
 ChestManager.prototype.load = function() {
-  //console.log("loading chests in chest manager");
-  let chest = new Chest(this.screen);
-  chest.setPosition(16*29, 16*25);
-  let contents = [];
+  for(let i = 0 ; i < this.screen.mapObject.layers[1].objects.length ; i++) {
+    let chest  = new Chest(this.screen);
+    let chestObject = this.screen.mapObject.layers[1].objects[i];
+    chest.setPosition(chestObject.x, chestObject.y);
+    let contents = [];
+    let contentsString = chestObject.properties.contents
+    contents = contentsString.split(',');
+    chest.setContents(contents);
+    chest.setID(chestObject.id);
 
-  contents.push("Steel Sword");
-  contents.push("Steel Sword");
-  /*
-  for(let j = 2 ; j < line.length ; j++) {
-    contents.push(line[j]);
-  }
-  */
-  chest.setContents(contents);
-  this.assetList.push(chest);
-  /*
-  //read chest info from file and fille the chest list accordingly
-  var csvDirectory = "../chest/chests" + this.screen.game.playerArea + ".csv";
-  $.get(csvDirectory, function(data) {
-    console.log("file read");
-    this.chests = []
-    var allText = data;
-    var allTextLines = data.split(/\r\n|\n/);
-    for(let i = 0 ; i < allTextLines.length ; i++) {
-      let line = allTextLines.split(/,/);
-      let chest = new Chest(this.screen);
-      chest.setPosition(16*line[0], 16*line[1]);
-      let contents = [];
-      for(let j = 2 ; j < line.length ; j++) {
-        contents.push(line[j]);
-      }
-      chest.setContents(contents);
-      this.chests.push(chest);
+    //perform a check to see if this chest has already been opened;
+    if(!this.screen.game.areaStateManager.checkChest(chestObject.id)) {
+      chest.isOpened = true;
     }
-  });
-  */
+    this.assetList.push(chest);
+  }
 }
 
 function Chest(screen) {
@@ -497,6 +495,7 @@ Chest.prototype.draw = function(ctx) {
 //This method is called when the player interacts with the chest, it sets the chest to open and bestows its contents upon the user's inventory and opens a dialogueBox
 Chest.prototype.openChest = function() {
   this.isOpened = true;
+  this.screen.game.areaStateManager.openChest(this.id);
   var message = "Found a";
   for(let  i = 0 ; i < this.contents.length ; i++) {
     for(let j = 0 ; j < this.screen.game.inventory.itemList.length ; j++) {
@@ -511,6 +510,9 @@ Chest.prototype.openChest = function() {
 }
 Chest.prototype.interact = function() {
   this.openChest();
+}
+Chest.prototype.setID = function(id) {
+  this.id = id;
 }
 
 function DialogueBox(screen) {
