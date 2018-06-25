@@ -24,7 +24,7 @@ function Game() {
   this.state = "none";
   this.targetScreen = null;
   this.currentScreen = null;
-  this.worldAreaID = 1;
+  this.worldAreaID = 0;
   this.worldID = 0;
   this.battleID = 0;
   this.battleScreen = null;

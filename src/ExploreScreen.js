@@ -191,7 +191,8 @@ Player.prototype.areaTransitionCheck = function() {
   var self = this;
   var playerCentre = {x: self.position.x + 8, y: self.position.y + 8};
   if(this.screen.worldAreaID == 0){
-    if(playerCentre.x > 630) {
+    if(playerCentre.x > 600) {
+      console.log("yeah");
       this.screen.game.worldAreaID = 1;
       this.position.x = 25;
       this.screen.game.loadExplore();
@@ -221,63 +222,41 @@ function ExploreScreenEnvironmentManager(screen) {
 ExploreScreenEnvironmentManager.prototype = Object.create(EnvironmentManager.prototype);
 ExploreScreenEnvironmentManager.prototype.constructor = ExploreScreenEnvironmentManager;
 ExploreScreenEnvironmentManager.prototype.load = function() {
+  this.loadMapObject();
   this.loadMap();
-  this.loadMapAlt();
 }
 ExploreScreenEnvironmentManager.prototype.loadMap = function() {
   this.map = [];
-  //first push empty arrays to this.map
-  for(let i = 0 ; i < 40 ; i++) {
-    let emptyArray = [];
-    this.map.push(emptyArray);
-  }
-  if(this.screen.worldAreaID == 0) {
-    for(let i = 0 ; i < 40 ; i++) {
-      for(let j = 0 ; j < 30 ; j++) {
-        if(i == 0 || i == 39 || j == 0 || j == 29){
-          this.map[i].push(1);
-        }
-        else {
-          this.map[i].push(0);
-        }
+  var mapObject = this.screen.mapObject.layers[0];
 
-        if((i == 39 && j > 10) && (i == 39 && j < 15)) {
-          this.map[i].pop();
-          this.map[i].push(0);
-        }
-      }
-    }
-  }
-  else if(this.screen.worldAreaID == 1) {
-    for(let i = 0 ; i < 40 ; i++) {
-      for(let j = 0 ; j < 30 ; j++) {
-        if(i == 0 || i == 39 || j == 0 || j == 29){
-          this.map[i].push(1);
-        }
-        else {
-          this.map[i].push(0);
-        }
 
-        if((i == 0 && j > 10) && (i == 0 && j < 15)) {
-          this.map[i].pop();
-          this.map[i].push(0);
-        }
-      }
+  for(let i = 0 ; i < mapObject.width ; i++) {
+    let column = [];
+    for(let j = 0 ; j < mapObject.height ; j++) {
+      column.push(mapObject.data[i + mapObject.width * j]);
     }
+    this.map.push(column);
+
   }
+
 }
 
-ExploreScreenEnvironmentManager.prototype.loadMapAlt = function () {
+ExploreScreenEnvironmentManager.prototype.loadMapObject = function () {
   //var testObject = require("./testObject.json");
   //console.log(testObject.type);
-  var map = require("./maps/openingPlains.json");
-  this.screen.mapObject = map;
-  console.log(map.layers[0].data);
+  if(this.screen.game.worldAreaID == 0) {
+    var map = require("./maps/openingPlains.json");
+    this.screen.mapObject = map;
+  }
+  else if(this.screen.game.worldAreaID == 1) {
+    var map = require("./maps/middlePlains.json");
+    this.screen.mapObject = map;
+  }
 };
 ExploreScreenEnvironmentManager.prototype.draw = function(ctx) {
   for (let i = 0 ; i < this.map.length ; i++) {
     for(let j = 0 ; j < this.map[0].length ; j++) {
-      if(this.map[i][j] == 0) {
+      if(this.map[i][j] == 3) {
         ctx.fillStyle = "rgb(0, 250, 0)";
         ctx.fillRect(16*i, 16*j, 16, 16);
       }
@@ -321,7 +300,7 @@ ExploreScreenEnvironmentManager.prototype.checkPotentialPosition = function(pote
 
   var isValidPosition = true;
   for(let i = 0 ; i < collidingMapTiles.length ; i++) {
-    if(collidingMapTiles[i] != 0) {
+    if(collidingMapTiles[i] != 3) {
       isValidPosition = false;
     }
   }
@@ -436,8 +415,10 @@ NPC.prototype.startRandomMovement = function() {
 NPC.prototype.draw = function(ctx) {
   ctx.fillStyle = "rgb(250, 200, 100)";
   ctx.fillRect(this.position.x, this.position.y, 16, 16);
-  ctx.fillStyle = "rgba(250, 200, 100, 0.2)";
-  ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
+  if(this.focus != null) {
+    ctx.fillStyle = "rgba(250, 200, 100, 0.2)";
+    ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
+  }
 }
 NPC.prototype.interact = function() {
   this.screen.dialogueBox.openDialogueBox(this.nPCDialogue);
