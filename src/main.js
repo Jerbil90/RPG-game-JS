@@ -92,7 +92,8 @@ Game.prototype.loadExplore = function() {
   this.exploreScreen.load();
   this.targetState = "explore";
   this.targetScreen = this.exploreScreen;
-  this.targetScreen.isActive = true;
+  this.targetScreen.state = "loading";
+  this.exploreScreen.isActive = false;
   this.fade.startFade();
 }
 //This is the game's main Update function it is responsible for determining gameTime and elapsedTime before calling the update functions of the appropriate managers
@@ -111,7 +112,14 @@ Game.prototype.update = function() {
     this.mainMenuScreen.update(this.gameTime, this.elapsedTime);
   }
   if(this.state == "explore") {
-    this.exploreScreen.update(this.gameTime, this.elapsedTime);
+    if(this.exploreScreen.isActive) {
+      this.exploreScreen.update(this.gameTime, this.elapsedTime);
+      console.log("updating");
+    }
+    else if(this.fade.fadeState == "none") {
+      this.exploreScreen.isActive = true;
+      this.exploreScreen.state = "explore";
+    }
   }
 
   if(this.fade.fadeState == "none") {

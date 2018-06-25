@@ -43,7 +43,7 @@ ExploreScreen.prototype.update = function(gameTime, elapsedTime) {
   this.dialogueBox.update(gameTime, elapsedTime);
   this.chestManager.update(gameTime, elapsedTime);
   this.nPCManager.update(gameTime, elapsedTime);
-  if(this.battleProgress >= 2000) {
+  if(this.battleProgress >= 10000) {
     this.loadRandomBattle();
   }
 }
@@ -183,25 +183,27 @@ Player.prototype.draw = function(ctx) {
   //draw the player position
   ctx.fillStyle = "rgb(0, 0, 250)";
   ctx.fillRect(this.position.x, this.position.y, 16, 16);
-  ctx.fillStyle = "rgba(100, 0, 100, 0.25)";
-  ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
+  if(this.focus != null) {
+    ctx.fillStyle = "rgba(100, 0, 100, 0.25)";
+    ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
+  }
 }
 //This method is responsible for checking if the player has gone off the edge of the screen or into an area transition and loads the appropriate new area
 Player.prototype.areaTransitionCheck = function() {
   var self = this;
   var playerCentre = {x: self.position.x + 8, y: self.position.y + 8};
   if(this.screen.worldAreaID == 0){
-    if(playerCentre.x > 600) {
+    if(playerCentre.x > 620) {
       console.log("yeah");
       this.screen.game.worldAreaID = 1;
-      this.position.x = 25;
+      this.position.x = 30;
       this.screen.game.loadExplore();
     }
   }
   else if(this.screen.worldAreaID == 1) {
-    if(playerCentre.x < 9) {
+    if(playerCentre.x < 15) {
       this.screen.game.worldAreaID = 0;
-      this.position.x = 615;
+      this.position.x = 610;
       this.screen.game.loadExplore();
     }
   }
@@ -433,6 +435,7 @@ function ChestManager(screen) {
 ChestManager.prototype = Object.create(Manager.prototype);
 ChestManager.prototype.constructor = ChestManager;
 ChestManager.prototype.load = function() {
+  this.assetList = [];
   for(let i = 0 ; i < this.screen.mapObject.layers[1].objects.length ; i++) {
     let chest  = new Chest(this.screen);
     let chestObject = this.screen.mapObject.layers[1].objects[i];
