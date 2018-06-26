@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import {Screen} from './Screen';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
+import {NPCManager, ChestManager} from './EnvironmentalObject';
 
 function ExploreScreen(game) {
   Screen.call(this, game);
@@ -155,7 +156,6 @@ Player.prototype.interact = function() {
           let chestPos = this.screen.chestManager.assetList[j].position;
           if(pixel.x > chestPos.x && pixel.x < chestPos.x + 16 && pixel.y > chestPos.y && pixel.y < chestPos.y + 16) {
             target = this.screen.chestManager.assetList[j];
-            console.log("target detected in focus");
             break;
           }
         }
@@ -324,203 +324,59 @@ ExploreScreenEnvironmentManager.prototype.checkPotentialPosition = function(pote
   }
 
   var isValidPosition = true;
+  //first check to see if the solid map tiles are potentially colliding with it
   for(let i = 0 ; i < collidingMapTiles.length ; i++) {
     if(collidingMapTiles[i] != 3) {
       isValidPosition = false;
     }
   }
+
+  //Next check if there are any environmental objects(chests, NPCs) to collide with;
+  //First NPCs
+  for(let i = 0 ; i < this.screen.nPCManager.assetList.length ; i++) {
+    let nPC = this.screen.nPCManager.assetList[i];
+    //First check the player's top left corner
+    if (potentialPosition.x < nPC.position.x + nPC.length && potentialPosition.x > nPC.position.x && potentialPosition.y < nPC.position.y + nPC.height && potentialPosition.y > nPC.position.y) {
+      isValidPosition = false;
+    }
+    //Next check the player's top right corner
+    if (potentialPosition.x + unitSize.x < nPC.position.x + unitSize.x + nPC.length && potentialPosition.x > nPC.position.x && potentialPosition.y < nPC.position.y + nPC.height && potentialPosition.y > nPC.position.y) {
+      isValidPosition = false;
+    }
+    //Then check the player's bottom right corner
+    if (potentialPosition.x + unitSize.x < nPC.position.x + nPC.length && potentialPosition.x + unitSize.x > nPC.position.x && potentialPosition.y + unitSize.y < nPC.position.y + nPC.height && potentialPosition.y + unitSize.y > nPC.position.y) {
+      isValidPosition = false;
+    }
+    //Finally check the player's bottom left corner
+    if (potentialPosition.x < nPC.position.x + nPC.length && potentialPosition.x > nPC.position.x && potentialPosition.y + unitSize.y < nPC.position.y + nPC.height && potentialPosition.y + unitSize.y > nPC.position.y) {
+      isValidPosition = false;
+    }
+  }
+  //Next chestStatusList
+  for(let i = 0 ; i < this.screen.chestManager.assetList.length ; i++) {
+    let chest = this.screen.chestManager.assetList[i];
+    //First check the player's top left corner
+    if (potentialPosition.x < chest.position.x + chest.length && potentialPosition.x > chest.position.x && potentialPosition.y < chest.position.y + chest.height && potentialPosition.y > chest.position.y) {
+      isValidPosition = false;
+    }
+    //Next check the player's top right corner
+    if (potentialPosition.x + unitSize.x < chest.position.x + unitSize.x + chest.length && potentialPosition.x > chest.position.x && potentialPosition.y < chest.position.y + chest.height && potentialPosition.y > chest.position.y) {
+      isValidPosition = false;
+    }
+    //Then check the player's bottom right corner
+    if (potentialPosition.x + unitSize.x < chest.position.x + chest.length && potentialPosition.x + unitSize.x > chest.position.x && potentialPosition.y + unitSize.y < chest.position.y + chest.height && potentialPosition.y + unitSize.y > chest.position.y) {
+      isValidPosition = false;
+    }
+    //Finally check the player's bottom left corner
+    if (potentialPosition.x < chest.position.x + chest.length && potentialPosition.x > chest.position.x && potentialPosition.y + unitSize.y < chest.position.y + chest.height && potentialPosition.y + unitSize.y > chest.position.y) {
+      isValidPosition = false;
+    }
+  }
+
   return isValidPosition;
 }
 
-function NPCManager(screen) {
-  Manager.call(this, screen);
-}
-NPCManager.prototype = Object.create(Manager.prototype);
-NPCManager.prototype.constructor = NPCManager;
-//Thismethod populates the assetList with the appropriate NPCs
-NPCManager.prototype.load = function() {
-  this.assetList = [];
-  var npcList = this.screen.mapObject.layers[2].objects;
-  for(let i = 0 ;i < npcList.length ; i++) {
-    var nPC = new NPC(this.screen);
-    nPC.setPosition(npcList[i].x, npcList[i].y);
-    nPC.setMessage(npcList[i].properties.dialogue);
-    console.log(npcList[i].name);
-    this.assetList.push(nPC);
-  }
-}
-NPCManager.prototype.update = function(gameTime, elapsedTime) {
-  if (this.screen.state == "explore") {
-    Manager.prototype.update.call(this, gameTime, elapsedTime);
-  }
-}
 
-function NPC(screen) {
-  this.screen = screen;
-  this.position = {x: 0, y: 0};
-  this.focus = null;
-  this.idleTime = null;
-  this.lastMovementTime = null;
-  this.orientation = {x: 0, y: 1};
-  this.movementDuration = null;
-  this.speed = 50;
-  this.nPCDialogue = "Do you know the way?";
-}
-NPC.prototype.setPosition = function(a, b) {
-  this.position = {x: a, y: b};
-}
-NPC.prototype.update = function(gameTime, elapsedTime) {
-  if(this.lastMovementTime == null) {
-    this.lastMovementTime = gameTime;
-    this.idleTime = 2000 + Math.random()*3000;
-  }
-  else {
-    if(gameTime >= this.lastMovementTime + this.idleTime) {
-      this.startRandomMovement();
-      this.lastMovementTime = gameTime;
-    }
-    if(this.movementDuration != null) {
-      if(gameTime >= this.lastMovementTime + this.movementDuration) {
-        this.movementDuration = null;
-      }
-      else {
-        let self = this;
-        let velocity = {x: self.orientation.x * self.speed*elapsedTime/1000, y: self.orientation.y * self.speed*elapsedTime/1000};
-        let potentialPosition = {x: 0, y: 0};
-        potentialPosition.x = this.position.x + velocity.x;
-        potentialPosition.y = this.position.y + velocity.y;
-        if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
-          this.position.x = potentialPosition.x;
-          this.position.y = potentialPosition.y;
-        }
-        //else check if they canmove in the x OR the y direction
-        else {
-          potentialPosition.y -= velocity.y;
-          if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
-            this.position.x = potentialPosition.x;
-          }
-          else {
-            potentialPosition.y += velocity.y;
-            potentialPosition.x -= velocity.x;
-            if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
-              this.position.y = potentialPosition.y;
-            }
-          }
-        }
-      }
-    }
-  }
-  this.focus = {x: this.position.x + (this.orientation.x * 16), y: this.position.y + (this.orientation.y * 16), length: 16};
-}
-NPC.prototype.startRandomMovement = function() {
-  var result = Math.floor(Math.random() * 4);
-  this.movementDuration = 1000 + Math.random() * 1000;
-  switch(result) {
-    case 0:
-      this.orientation.x = 1;
-      this.orientation.y = 0;
-    break;
-    case 1:
-    this.orientation.x = -1;
-    this.orientation.y = 0;
-    break;
-    case 2:
-    this.orientation.x = 0;
-    this.orientation.y = 1;
-    break;
-    case 3:
-    this.orientation.x = 0;
-    this.orientation.y = -1;
-    break;
-    default:
-    console.log("error in NPC.startRandomBattle, invalid result");
-    break;
-  }
-}
-NPC.prototype.draw = function(ctx) {
-  ctx.fillStyle = "rgb(250, 200, 100)";
-  ctx.fillRect(this.position.x, this.position.y, 16, 16);
-  if(this.focus != null) {
-    ctx.fillStyle = "rgba(250, 200, 100, 0.2)";
-    ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
-  }
-}
-NPC.prototype.interact = function() {
-  this.screen.dialogueBox.openDialogueBox(this.nPCDialogue);
-}
-NPC.prototype.setMessage = function(message) {
-  this.nPCDialogue = message;
-}
-
-function ChestManager(screen) {
-  Manager.call(this, screen);
-}
-ChestManager.prototype = Object.create(Manager.prototype);
-ChestManager.prototype.constructor = ChestManager;
-ChestManager.prototype.load = function() {
-  this.assetList = [];
-  for(let i = 0 ; i < this.screen.mapObject.layers[1].objects.length ; i++) {
-    let chest  = new Chest(this.screen);
-    let chestObject = this.screen.mapObject.layers[1].objects[i];
-    chest.setPosition(chestObject.x, chestObject.y);
-    let contents = [];
-    let contentsString = chestObject.properties.contents
-    contents = contentsString.split(',');
-    chest.setContents(contents);
-    chest.setID(chestObject.id);
-
-    //perform a check to see if this chest has already been opened;
-    if(!this.screen.game.areaStateManager.checkChest(chestObject.id)) {
-      chest.isOpened = true;
-    }
-    this.assetList.push(chest);
-  }
-}
-
-function Chest(screen) {
-  this.screen = screen;
-  this.isOpened = false;
-}
-Chest.prototype.setPosition = function(a, b) {
-  this.position = {x: a, y: b};
-}
-Chest.prototype.setContents = function(contents) {
-  this.contents = contents;
-}
-Chest.prototype.update = function(gameTime, elapsedTime) {
-
-}
-Chest.prototype.draw = function(ctx) {
-  if(this.isOpened) {
-    ctx.fillStyle = "rgb(200, 50, 150)";
-  }
-  else {
-    ctx.fillStyle = "rgb(120, 15, 120)";
-  }
-  ctx.fillRect(this.position.x, this.position.y, 16, 16);
-}
-//This method is called when the player interacts with the chest, it sets the chest to open and bestows its contents upon the user's inventory and opens a dialogueBox
-Chest.prototype.openChest = function() {
-  this.isOpened = true;
-  this.screen.game.areaStateManager.openChest(this.id);
-  var message = "Found a";
-  for(let  i = 0 ; i < this.contents.length ; i++) {
-    for(let j = 0 ; j < this.screen.game.inventory.itemList.length ; j++) {
-      if(this.contents[i] == this.screen.game.inventory.itemList[j].name) {
-        this.screen.game.inventory.itemList[j].quantity++;
-      }
-    }
-    message += " " + this.contents[i];
-  }
-  message += "!";
-  this.screen.dialogueBox.openDialogueBox(message);
-}
-Chest.prototype.interact = function() {
-  this.openChest();
-}
-Chest.prototype.setID = function(id) {
-  this.id = id;
-}
 
 function DialogueBox(screen) {
   this.screen = screen;
