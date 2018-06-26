@@ -158,6 +158,19 @@ Game.prototype.draw = function(ctx) {
   this.currentScreen.draw(ctx);
   this.fade.draw(ctx);
 }
+Game.prototype.setArea = function (areaString) {
+  switch(areaString) {
+    case "openingPlains" :
+      this.worldAreaID = 0;
+    break;
+    case "middlePlains" :
+      this.worldAreaID = 1;
+    break;
+    default:
+      console.log("error in game.setArea, invalid areaString detected!");
+    break;
+  }
+}
 
 function Fade() {
   this.alpha = 0;

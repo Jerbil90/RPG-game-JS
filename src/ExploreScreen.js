@@ -188,10 +188,33 @@ Player.prototype.draw = function(ctx) {
     ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
   }
 }
-//This method is responsible for checking if the player has gone off the edge of the screen or into an area transition and loads the appropriate new area
+//This method is responsible for checking if the player hascollided with an area transition space and loads the appropriate new area
 Player.prototype.areaTransitionCheck = function() {
   var self = this;
+  var playerEdge = {x: self.position.x + 16, y: self.position.y + 16};
   var playerCentre = {x: self.position.x + 8, y: self.position.y + 8};
+  var currentTransitionAreas = this.screen.mapObject.layers[3].objects;
+
+  for(let  i = 0 ; i < currentTransitionAreas.length ; i++) {
+    let obj = currentTransitionAreas[i];
+    if(playerCentre.x > obj.x && playerCentre.y > obj.y && playerCentre.x < obj.x + obj.width && playerCentre.y < obj.y + obj.height) {
+      this.screen.game.setArea(obj.properties.destination);
+      this.position.x = obj.properties.destinationx;
+      this.position.y = obj.properties.destinationy;
+      this.screen.game.loadExplore();
+      console.log("areaTransition detected! placing player in " + obj.properties.destination + " at x = " + obj.properties.destinationx + "\t y = " + obj.properties.destinationy);
+      break;
+    }
+/*
+    if((playerEdge.x > currentTransitionAreas[i].x || this.position.x < currentTransitionAreas[i].x + currentTransitionAreas[i].width) && (playerEdge.y > currentTransitionAreas[i].y || this.position.y < currentTransitionAreas[i].y + currentTransitionAreas[i].height)) {
+      this.screen.game.setArea(currentTransitionAreas[i].properties.destination);
+      this.position.x = currentTransitionAreas[i].properties.destinationx;
+      this.position.y = currentTransitionAreas[i].properties.destinationy;
+      this.screen.game.loadExplore();
+      break;
+    }*/
+  }
+/*
   if(this.screen.worldAreaID == 0){
     if(playerCentre.x > 620) {
       console.log("yeah");
@@ -206,7 +229,7 @@ Player.prototype.areaTransitionCheck = function() {
       this.position.x = 610;
       this.screen.game.loadExplore();
     }
-  }
+  }*/
 }
 
 function ExploreScreenEnvironmentManager(screen) {
