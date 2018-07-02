@@ -21,16 +21,16 @@
 -choose which items to take into battle;
 
 ---exploreScreen
-- nPC collisions
-- chestCollisions
 - random battles actually random
-- changing Map locations
+- camera scaling
+
 
 --- battle Screen
 - add activeTurn/targeting indicators;
-- redo Hero select menu to show HP and SP insdead of maving them cluttering the battle Sprites
+- redo Hero select menu to show HP and SP instead of having them cluttering the battle Sprites
+- add tooltips for monster and hero stats,and special moves and items
 
 --- Misc
 import TimeFantasy assets and implement animations
-managers able to load data from csv
 - able to load personalised save data
+proper layout of menu screen and sub screens

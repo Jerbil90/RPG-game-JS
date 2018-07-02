@@ -24,7 +24,7 @@ function Game() {
   this.state = "none";
   this.targetScreen = null;
   this.currentScreen = null;
-  this.worldAreaID = 0;
+  this.worldAreaID = 2;
   this.worldID = 0;
   this.battleID = 0;
   this.battleScreen = null;
@@ -51,7 +51,7 @@ Game.prototype.loadUserData = function() {
   let knight = new Knight("sammy");
   this.userHeroList.push(knight);
 
-  this.playerArea = 0;
+  this.playerArea = 2;
   this.playerPosition = {x: 50, y: 50};
 
 
@@ -161,10 +161,13 @@ Game.prototype.draw = function(ctx) {
 Game.prototype.setArea = function (areaString) {
   switch(areaString) {
     case "openingPlains" :
-      this.worldAreaID = 0;
+      this.worldAreaID = 2;
     break;
     case "middlePlains" :
-      this.worldAreaID = 1;
+      this.worldAreaID = 2;
+    break;
+    case "largeField" :
+      this.worldAreaID = 2;
     break;
     default:
       console.log("error in game.setArea, invalid areaString detected!");

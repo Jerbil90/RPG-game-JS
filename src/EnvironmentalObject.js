@@ -5,6 +5,7 @@ function EnvironmentalObject(screen) {
   this.position = {x: 0, y: 0};
   this.height = 0;
   this.length = 0;
+  this.isCurrentlyBeingCheckedForCollisions = false;
 }
 EnvironmentalObject.prototype.setPosition = function (a, b) {
     this.position = {x: a, y: b};
@@ -80,6 +81,7 @@ NPC.prototype.update = function(gameTime, elapsedTime) {
         let potentialPosition = {x: 0, y: 0};
         potentialPosition.x = this.position.x + velocity.x;
         potentialPosition.y = this.position.y + velocity.y;
+        this.isCurrentlyBeingCheckedForCollisions = true;
         if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
           this.position.x = potentialPosition.x;
           this.position.y = potentialPosition.y;
@@ -101,6 +103,7 @@ NPC.prototype.update = function(gameTime, elapsedTime) {
       }
     }
   }
+  this.isCurrentlyBeingCheckedForCollisions = false;
   this.focus = {x: this.position.x + (this.orientation.x * 16), y: this.position.y + (this.orientation.y * 16), length: 16};
 }
 NPC.prototype.startRandomMovement = function() {
@@ -130,10 +133,12 @@ NPC.prototype.startRandomMovement = function() {
 }
 NPC.prototype.draw = function(ctx) {
   ctx.fillStyle = "rgb(250, 200, 100)";
-  ctx.fillRect(this.position.x, this.position.y, 16, 16);
+  var screenPos = this.screen.camera.getScreenPosition(this.position);
+  ctx.fillRect(screenPos.x, screenPos.y, 16, 16);
   if(this.focus != null) {
     ctx.fillStyle = "rgba(250, 200, 100, 0.2)";
-    ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
+    screenPos = this.screen.camera.getScreenPosition(worldPos);
+    ctx.fillRect(screenPos.x, screenPos.y, 16, 16);
   }
 }
 NPC.prototype.interact = function() {
@@ -193,7 +198,8 @@ Chest.prototype.draw = function(ctx) {
   else {
     ctx.fillStyle = "rgb(120, 15, 120)";
   }
-  ctx.fillRect(this.position.x, this.position.y, 16, 16);
+  var screenPos = this.screen.camera.getScreenPosition(this.position)
+  ctx.fillRect(screenPos.x, screenPos.y, 16, 16);
 }
 //This method is called when the player interacts with the chest, it sets the chest to open and bestows its contents upon the user's inventory and opens a dialogueBox
 Chest.prototype.openChest = function() {
@@ -220,4 +226,164 @@ Chest.prototype.setID = function(id) {
   this.id = id;
 }
 
-export {NPCManager, ChestManager}
+function Player(screen) {
+  this.screen = screen;
+  EnvironmentalObject.call(this, screen);
+  this.position = this.screen.game.playerPosition;
+  this.speed = 250;
+  this.orientation = {x: 0, y: 1};
+  this.focus = null;
+  this.setCollisionBoxSize(16, 16);
+}
+Player.prototype = Object.create(EnvironmentalObject.prototype);
+Player.prototype.constructor = Player;
+Player.prototype.update = function(gameTime, elapsedTime) {
+  if(this.screen.state == "explore") {
+    var velocity = {x: 0, y: 0};
+    var inputArray = this.screen.game.input.inputArray;
+    var potentialPosition = {x: 0, y: 0};
+    var orientationArray = [];
+    var isMoving = false;
+    for(let  i = 0 ; i < 4 ; i++) {
+      orientationArray.push(false);
+    }
+    for(let i = 0 ; i < inputArray.length ; i++) {
+      if(inputArray[i] == "ArrowUp") {
+        velocity.y -= this.speed * elapsedTime/1000;
+        orientationArray[0] = true;
+      }
+      if(inputArray[i] == "ArrowDown") {
+        velocity.y += this.speed * elapsedTime/1000;
+        orientationArray[1] = true;
+      }
+      if(inputArray[i] == "ArrowLeft") {
+        velocity.x -= this.speed * elapsedTime/1000;
+        orientationArray[2] = true;
+      }
+      if(inputArray[i] == "ArrowRight") {
+        velocity.x += this.speed * elapsedTime/1000;
+        orientationArray[3] = true;
+      }
+    }
+    if(velocity.x != 0 || velocity.y != 0) {
+      this.screen.battleProgress += elapsedTime;
+    }
+    //if not going up and not going down, if they are going from side to side then change the vertical orientation to 0;
+    if(!orientationArray[0] && !orientationArray[1]) {
+      if(orientationArray[2] || orientationArray[3]) {
+        this.orientation.y = 0;
+      }
+    }
+    //if not going from side to side, and is going up or down then set horizontal orientation to 0;
+    else if (!orientationArray[2] && !orientationArray[3]) {
+      if(orientationArray[0] || orientationArray[1]) {
+        this.orientation.x = 0;
+      }
+    }
+    if(orientationArray[0]) {
+      this.orientation.y = -1;
+    }
+    if(orientationArray[1]) {
+      this.orientation.y = 1;
+    }
+    if(orientationArray[2]) {
+      this.orientation.x = -1;
+    }
+    if(orientationArray[3]) {
+      this.orientation.x = 1;
+    }
+
+    potentialPosition.x = this.position.x + velocity.x;
+    potentialPosition.y = this.position.y + velocity.y;
+    this.isCurrentlyBeingCheckedForCollisions = true;
+    if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
+      this.position.x = potentialPosition.x;
+      this.position.y = potentialPosition.y;
+    }
+    //else check if they canmove in the x OR the y direction
+    else {
+      potentialPosition.y -= velocity.y;
+      if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
+        this.position.x = potentialPosition.x;
+      }
+      else {
+        potentialPosition.y += velocity.y;
+        potentialPosition.x -= velocity.x;
+        if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
+          this.position.y = potentialPosition.y;
+        }
+      }
+    }
+    this.isCurrentlyBeingCheckedForCollisions = false;
+    this.focus = {x: this.position.x + (this.orientation.x * 16), y: this.position.y + (this.orientation.y * 16), length: 16};
+    this.areaTransitionCheck();
+  }
+
+}
+//This method is called by input and will check the player's focus for anything interactable, if something is found it takes the appropriate action
+Player.prototype.interact = function() {
+  if(this.screen.state == "explore") {
+    var target = null;
+    var self = this;
+    for(let i = 0 ; i < this.focus.length * this.focus.length ; i++) {
+      let pixel = {x: self.focus.x + i%self.focus.length, y: self.focus.y + Math.floor(i/16)};
+      for(let j = 0 ; j < this.screen.chestManager.assetList.length ; j++) {
+        if(!this.screen.chestManager.assetList[j].isOpened) {
+          let chestPos = this.screen.chestManager.assetList[j].position;
+          if(pixel.x > chestPos.x && pixel.x < chestPos.x + 16 && pixel.y > chestPos.y && pixel.y < chestPos.y + 16) {
+            target = this.screen.chestManager.assetList[j];
+            break;
+          }
+        }
+      }
+      for(let j = 0 ; j < this.screen.nPCManager.assetList.length ; j++) {
+        let nPCPos = this.screen.nPCManager.assetList[j].position;
+        if(pixel.x > nPCPos.x && pixel.x < nPCPos.x + 16 && pixel.y > nPCPos.y && pixel.y < nPCPos.y + 16) {
+          target = this.screen.nPCManager.assetList[j];
+        }
+      }
+      if (target != null) {
+        break;
+      }
+    }
+    if (target != null) {
+      target.interact();
+    }
+  }
+  else if(this.screen.state == "inDialogue") {
+    this.screen.dialogueBox.advance();
+  }
+}
+Player.prototype.draw = function(ctx) {
+  //draw the player position
+  ctx.fillStyle = "rgb(0, 0, 250)";
+  var screenPos = this.screen.camera.getScreenPosition(this.position);
+  ctx.fillRect(screenPos.x, screenPos.y, 16, 16);
+  if(this.focus != null) {
+    ctx.fillStyle = "rgba(100, 0, 100, 0.25)";
+    screenPos = this.screen.camera.getScreenPosition(this.position);
+    ctx.fillRect(screenPos.x, screenPos.y, 16, 16);
+  }
+}
+//This method is responsible for checking if the player hascollided with an area transition space and loads the appropriate new area
+Player.prototype.areaTransitionCheck = function() {
+  var self = this;
+  var playerEdge = {x: self.position.x + 16, y: self.position.y + 16};
+  var playerCentre = {x: self.position.x + 8, y: self.position.y + 8};
+  var currentTransitionAreas = this.screen.mapObject.layers[3].objects;
+
+  for(let  i = 0 ; i < currentTransitionAreas.length ; i++) {
+    let obj = currentTransitionAreas[i];
+    if(playerCentre.x > obj.x && playerCentre.y > obj.y && playerCentre.x < obj.x + obj.width && playerCentre.y < obj.y + obj.height) {
+      this.screen.game.setArea(obj.properties.destination);
+      this.position.x = obj.properties.destinationx;
+      this.position.y = obj.properties.destinationy;
+      this.screen.game.loadExplore();
+      console.log("areaTransition detected! placing player in " + obj.properties.destination + " at x = " + obj.properties.destinationx + "\t y = " + obj.properties.destinationy);
+      break;
+    }
+  }
+}
+
+
+export {NPCManager, ChestManager, Player}

@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import {Screen} from './Screen';
 import {Manager, HeroManager, MonsterManager, LogManager, EnvironmentManager} from './Manager';
-import {NPCManager, ChestManager} from './EnvironmentalObject';
+import {NPCManager, ChestManager, Player} from './EnvironmentalObject';
 
 function ExploreScreen(game) {
   Screen.call(this, game);
@@ -15,6 +15,7 @@ function ExploreScreen(game) {
   this.nPCManager = new NPCManager(this);
   this.state = "explore";
   this.battleProgress = 0;
+  this.camera = new Camera(this);
 }
 ExploreScreen.prototype = Object.create(Screen.prototype);
 ExploreScreen.prototype.constructor = ExploreScreen;
@@ -44,6 +45,7 @@ ExploreScreen.prototype.update = function(gameTime, elapsedTime) {
   this.dialogueBox.update(gameTime, elapsedTime);
   this.chestManager.update(gameTime, elapsedTime);
   this.nPCManager.update(gameTime, elapsedTime);
+  this.camera.update(gameTime, elapsedTime);
   if(this.battleProgress >= 10000) {
     this.loadRandomBattle();
   }
@@ -54,182 +56,6 @@ ExploreScreen.prototype.draw = function(ctx) {
   this.nPCManager.draw(ctx);
   this.player.draw(ctx);
   this.dialogueBox.draw(ctx);
-}
-
-function Player(screen) {
-  this.screen = screen;
-  this.position = this.screen.game.playerPosition;
-  this.speed = 250;
-  this.orientation = {x: 0, y: 1};
-  this.focus = null;
-}
-Player.prototype.update = function(gameTime, elapsedTime) {
-  if(this.screen.state == "explore") {
-    var velocity = {x: 0, y: 0};
-    var inputArray = this.screen.game.input.inputArray;
-    var potentialPosition = {x: 0, y: 0};
-    var orientationArray = [];
-    var isMoving = false;
-    for(let  i = 0 ; i < 4 ; i++) {
-      orientationArray.push(false);
-    }
-    for(let i = 0 ; i < inputArray.length ; i++) {
-      if(inputArray[i] == "ArrowUp") {
-        velocity.y -= this.speed * elapsedTime/1000;
-        orientationArray[0] = true;
-      }
-      if(inputArray[i] == "ArrowDown") {
-        velocity.y += this.speed * elapsedTime/1000;
-        orientationArray[1] = true;
-      }
-      if(inputArray[i] == "ArrowLeft") {
-        velocity.x -= this.speed * elapsedTime/1000;
-        orientationArray[2] = true;
-      }
-      if(inputArray[i] == "ArrowRight") {
-        velocity.x += this.speed * elapsedTime/1000;
-        orientationArray[3] = true;
-      }
-    }
-    if(velocity.x != 0 || velocity.y != 0) {
-      this.screen.battleProgress += elapsedTime;
-    }
-    //if not going up and not going down, if they are going from side to side then change the vertical orientation to 0;
-    if(!orientationArray[0] && !orientationArray[1]) {
-      if(orientationArray[2] || orientationArray[3]) {
-        this.orientation.y = 0;
-      }
-    }
-    //if not going from side to side, and is going up or down then set horizontal orientation to 0;
-    else if (!orientationArray[2] && !orientationArray[3]) {
-      if(orientationArray[0] || orientationArray[1]) {
-        this.orientation.x = 0;
-      }
-    }
-    if(orientationArray[0]) {
-      this.orientation.y = -1;
-    }
-    if(orientationArray[1]) {
-      this.orientation.y = 1;
-    }
-    if(orientationArray[2]) {
-      this.orientation.x = -1;
-    }
-    if(orientationArray[3]) {
-      this.orientation.x = 1;
-    }
-
-    potentialPosition.x = this.position.x + velocity.x;
-    potentialPosition.y = this.position.y + velocity.y;
-    if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
-      this.position.x = potentialPosition.x;
-      this.position.y = potentialPosition.y;
-    }
-    //else check if they canmove in the x OR the y direction
-    else {
-      potentialPosition.y -= velocity.y;
-      if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
-        this.position.x = potentialPosition.x;
-      }
-      else {
-        potentialPosition.y += velocity.y;
-        potentialPosition.x -= velocity.x;
-        if(this.screen.environmentManager.checkPotentialPosition(potentialPosition)) {
-          this.position.y = potentialPosition.y;
-        }
-      }
-    }
-    this.focus = {x: this.position.x + (this.orientation.x * 16), y: this.position.y + (this.orientation.y * 16), length: 16};
-    this.areaTransitionCheck();
-  }
-
-}
-//This method is called by input and will check the player's focus for anything interactable, if something is found it takes the appropriate action
-Player.prototype.interact = function() {
-  if(this.screen.state == "explore") {
-    var target = null;
-    var self = this;
-    for(let i = 0 ; i < this.focus.length * this.focus.length ; i++) {
-      let pixel = {x: self.focus.x + i%self.focus.length, y: self.focus.y + Math.floor(i/16)};
-      for(let j = 0 ; j < this.screen.chestManager.assetList.length ; j++) {
-        if(!this.screen.chestManager.assetList[j].isOpened) {
-          let chestPos = this.screen.chestManager.assetList[j].position;
-          if(pixel.x > chestPos.x && pixel.x < chestPos.x + 16 && pixel.y > chestPos.y && pixel.y < chestPos.y + 16) {
-            target = this.screen.chestManager.assetList[j];
-            break;
-          }
-        }
-      }
-      for(let j = 0 ; j < this.screen.nPCManager.assetList.length ; j++) {
-        let nPCPos = this.screen.nPCManager.assetList[j].position;
-        if(pixel.x > nPCPos.x && pixel.x < nPCPos.x + 16 && pixel.y > nPCPos.y && pixel.y < nPCPos.y + 16) {
-          target = this.screen.nPCManager.assetList[j];
-        }
-      }
-      if (target != null) {
-        break;
-      }
-    }
-    if (target != null) {
-      target.interact();
-    }
-  }
-  else if(this.screen.state == "inDialogue") {
-    this.screen.dialogueBox.advance();
-  }
-  console.log("interact!");
-}
-Player.prototype.draw = function(ctx) {
-  //draw the player position
-  ctx.fillStyle = "rgb(0, 0, 250)";
-  ctx.fillRect(this.position.x, this.position.y, 16, 16);
-  if(this.focus != null) {
-    ctx.fillStyle = "rgba(100, 0, 100, 0.25)";
-    ctx.fillRect(this.focus.x, this.focus.y, this.focus.length, this.focus.length);
-  }
-}
-//This method is responsible for checking if the player hascollided with an area transition space and loads the appropriate new area
-Player.prototype.areaTransitionCheck = function() {
-  var self = this;
-  var playerEdge = {x: self.position.x + 16, y: self.position.y + 16};
-  var playerCentre = {x: self.position.x + 8, y: self.position.y + 8};
-  var currentTransitionAreas = this.screen.mapObject.layers[3].objects;
-
-  for(let  i = 0 ; i < currentTransitionAreas.length ; i++) {
-    let obj = currentTransitionAreas[i];
-    if(playerCentre.x > obj.x && playerCentre.y > obj.y && playerCentre.x < obj.x + obj.width && playerCentre.y < obj.y + obj.height) {
-      this.screen.game.setArea(obj.properties.destination);
-      this.position.x = obj.properties.destinationx;
-      this.position.y = obj.properties.destinationy;
-      this.screen.game.loadExplore();
-      console.log("areaTransition detected! placing player in " + obj.properties.destination + " at x = " + obj.properties.destinationx + "\t y = " + obj.properties.destinationy);
-      break;
-    }
-/*
-    if((playerEdge.x > currentTransitionAreas[i].x || this.position.x < currentTransitionAreas[i].x + currentTransitionAreas[i].width) && (playerEdge.y > currentTransitionAreas[i].y || this.position.y < currentTransitionAreas[i].y + currentTransitionAreas[i].height)) {
-      this.screen.game.setArea(currentTransitionAreas[i].properties.destination);
-      this.position.x = currentTransitionAreas[i].properties.destinationx;
-      this.position.y = currentTransitionAreas[i].properties.destinationy;
-      this.screen.game.loadExplore();
-      break;
-    }*/
-  }
-/*
-  if(this.screen.worldAreaID == 0){
-    if(playerCentre.x > 620) {
-      console.log("yeah");
-      this.screen.game.worldAreaID = 1;
-      this.position.x = 30;
-      this.screen.game.loadExplore();
-    }
-  }
-  else if(this.screen.worldAreaID == 1) {
-    if(playerCentre.x < 15) {
-      this.screen.game.worldAreaID = 0;
-      this.position.x = 610;
-      this.screen.game.loadExplore();
-    }
-  }*/
 }
 
 function ExploreScreenEnvironmentManager(screen) {
@@ -268,7 +94,6 @@ ExploreScreenEnvironmentManager.prototype.loadMap = function() {
 
 ExploreScreenEnvironmentManager.prototype.loadMapObject = function () {
   //var testObject = require("./testObject.json");
-  //console.log(testObject.type);
   if(this.screen.game.worldAreaID == 0) {
     var map = require("./maps/openingPlains.json");
     this.screen.mapObject = map;
@@ -277,17 +102,25 @@ ExploreScreenEnvironmentManager.prototype.loadMapObject = function () {
     var map = require("./maps/middlePlains.json");
     this.screen.mapObject = map;
   }
+  else if(this.screen.game.worldAreaID == 2) {
+    var map = require("./maps/largeField.json");
+    this.screen.mapObject = map;
+  }
 };
 ExploreScreenEnvironmentManager.prototype.draw = function(ctx) {
   for (let i = 0 ; i < this.map.length ; i++) {
     for(let j = 0 ; j < this.map[0].length ; j++) {
       if(this.map[i][j] == 3) {
         ctx.fillStyle = "rgb(0, 250, 0)";
-        ctx.fillRect(16*i, 16*j, 16, 16);
+        let worldPos = {x: 16*i, y: 16 * j};
+        let screenPos = this.screen.camera.getScreenPosition(worldPos);
+        ctx.fillRect(screenPos.x, screenPos.y, 16, 16);
       }
       else if (this.map[i][j] == 1) {
         ctx.fillStyle = "rgb(250, 0, 0)";
-        ctx.fillRect(16*i, 16*j, 16, 16);
+        let worldPos = {x: 16*i, y: 16 * j};
+        let screenPos = this.screen.camera.getScreenPosition(worldPos);
+        ctx.fillRect(screenPos.x, screenPos.y, 16, 16);
       }
       else if (this.map[i][j] == 2) {
         if(this.isChestOpened[0]) {
@@ -298,7 +131,9 @@ ExploreScreenEnvironmentManager.prototype.draw = function(ctx) {
           //ctx.fillStyle = "rgb(125, 50, 125)";
 
         }
-        ctx.fillRect(16*i, 16*j, 16, 16);
+        let worldPos = {x: 16*i, y: 16 * j};
+        let screenPos = this.screen.camera.getScreenPosition(worldPos);
+        ctx.fillRect(screenPos.x, screenPos.y, 16, 16);
       }
     }
   }
@@ -331,45 +166,103 @@ ExploreScreenEnvironmentManager.prototype.checkPotentialPosition = function(pote
     }
   }
 
+  //Also check to see if if is colliding with the player
+  {
+    let player = this.screen.player;
+    if(!player.isCurrentlyBeingCheckedForCollisions) {
+      //First check the unit's top left corner
+      if(potentialPosition.x > player.position.x && potentialPosition.x < player.position.x + player.length && potentialPosition.y > player.position.y && potentialPosition.y < player.position.y + player.height) {
+        isValidPosition = false;
+        console.log("player collision top left");
+      }
+      //Next check the unit's top right corner
+      if(potentialPosition.x + unitSize.x > player.position.x && potentialPosition.x + unitSize.x < player.position.x + player.length && potentialPosition.y > player.position.y && potentialPosition.y < player.position.y + player.height) {
+        isValidPosition = false;
+        console.log("player collision top right");
+      }
+      //Then check the unit's bottom right corner
+      if(potentialPosition.x + unitSize.x > player.position.x && potentialPosition.x + unitSize.x < player.position.x + player.length && potentialPosition.y + unitSize.y > player.position.y && potentialPosition.y + unitSize.y < player.position.y + player.height) {
+        isValidPosition = false;
+        console.log("player collision bottom right");
+      }
+      //Finally check the unit's bottom left corner
+      if(potentialPosition.x > player.position.x && potentialPosition.x < player.position.x + player.length && potentialPosition.y + unitSize.y > player.position.y && potentialPosition.y + unitSize.x < player.position.y + player.height) {
+        isValidPosition = false;
+        console.log("player collision bottom left");
+      }
+      //then check if the player is colliding with the units
+    }
+  }
+
   //Next check if there are any environmental objects(chests, NPCs) to collide with;
   //First NPCs
   for(let i = 0 ; i < this.screen.nPCManager.assetList.length ; i++) {
     let nPC = this.screen.nPCManager.assetList[i];
-    //First check the player's top left corner
-    if (potentialPosition.x < nPC.position.x + nPC.length && potentialPosition.x > nPC.position.x && potentialPosition.y < nPC.position.y + nPC.height && potentialPosition.y > nPC.position.y) {
-      isValidPosition = false;
-    }
-    //Next check the player's top right corner
-    if (potentialPosition.x + unitSize.x < nPC.position.x + unitSize.x + nPC.length && potentialPosition.x > nPC.position.x && potentialPosition.y < nPC.position.y + nPC.height && potentialPosition.y > nPC.position.y) {
-      isValidPosition = false;
-    }
-    //Then check the player's bottom right corner
-    if (potentialPosition.x + unitSize.x < nPC.position.x + nPC.length && potentialPosition.x + unitSize.x > nPC.position.x && potentialPosition.y + unitSize.y < nPC.position.y + nPC.height && potentialPosition.y + unitSize.y > nPC.position.y) {
-      isValidPosition = false;
-    }
-    //Finally check the player's bottom left corner
-    if (potentialPosition.x < nPC.position.x + nPC.length && potentialPosition.x > nPC.position.x && potentialPosition.y + unitSize.y < nPC.position.y + nPC.height && potentialPosition.y + unitSize.y > nPC.position.y) {
-      isValidPosition = false;
+    if(!nPC.isCurrentlyBeingCheckedForCollisions) {
+      //First check the unit's top left corner
+      if (potentialPosition.x < nPC.position.x + nPC.length && potentialPosition.x > nPC.position.x && potentialPosition.y < nPC.position.y + nPC.height && potentialPosition.y > nPC.position.y) {
+        isValidPosition = false;
+        console.log("npc collision top left");
+      }
+      //Next check the unit's top right corner
+      if (potentialPosition.x + unitSize.x < nPC.position.x + nPC.length && potentialPosition.x + unitSize.x > nPC.position.x && potentialPosition.y < nPC.position.y + nPC.height && potentialPosition.y > nPC.position.y) {
+        isValidPosition = false;
+        console.log("npc collision top right");
+      }
+      //Then check the unit's bottom right corner
+      if (potentialPosition.x + unitSize.x < nPC.position.x + nPC.length && potentialPosition.x + unitSize.x > nPC.position.x && potentialPosition.y + unitSize.y < nPC.position.y + nPC.height && potentialPosition.y + unitSize.y > nPC.position.y) {
+        isValidPosition = false;
+        console.log("npc collision bottom right");
+      }
+      //Finally check the unit's bottom left corner
+      if (potentialPosition.x < nPC.position.x + nPC.length && potentialPosition.x > nPC.position.x && potentialPosition.y + unitSize.y < nPC.position.y + nPC.height && potentialPosition.y + unitSize.y > nPC.position.y) {
+        isValidPosition = false;
+        console.log("npc collision bottom left");
+      }
+      //now check the other way wroundin case of a complete envolpment
+      if (potentialPosition.x > nPC.position.x + nPC.length && potentialPosition.x < nPC.position.x && potentialPosition.y > nPC.position.y + nPC.height && potentialPosition.y < nPC.position.y) {
+        isValidPosition = false;
+        console.log("npc collision top left");
+      }
+      //Next check the unit's top right corner
+      if (potentialPosition.x + unitSize.x > nPC.position.x + nPC.length && potentialPosition.x + unitSize.x < nPC.position.x && potentialPosition.y > nPC.position.y + nPC.height && potentialPosition.y < nPC.position.y) {
+        isValidPosition = false;
+        console.log("npc collision top right");
+      }
+      //Then check the unit's bottom right corner
+      if (potentialPosition.x + unitSize.x > nPC.position.x + nPC.length && potentialPosition.x + unitSize.x < nPC.position.x && potentialPosition.y + unitSize.y > nPC.position.y + nPC.height && potentialPosition.y + unitSize.y < nPC.position.y) {
+        isValidPosition = false;
+        console.log("npc collision bottom right");
+      }
+      //Finally check the unit's bottom left corner
+      if (potentialPosition.x > nPC.position.x + nPC.length && potentialPosition.x < nPC.position.x && potentialPosition.y + unitSize.y > nPC.position.y + nPC.height && potentialPosition.y + unitSize.y < nPC.position.y) {
+        isValidPosition = false;
+        console.log("npc collision bottom left");
+      }
     }
   }
   //Next chestStatusList
   for(let i = 0 ; i < this.screen.chestManager.assetList.length ; i++) {
     let chest = this.screen.chestManager.assetList[i];
-    //First check the player's top left corner
+    //First check the unit's top left corner
     if (potentialPosition.x < chest.position.x + chest.length && potentialPosition.x > chest.position.x && potentialPosition.y < chest.position.y + chest.height && potentialPosition.y > chest.position.y) {
       isValidPosition = false;
+      console.log("chest collision top left");
     }
-    //Next check the player's top right corner
-    if (potentialPosition.x + unitSize.x < chest.position.x + unitSize.x + chest.length && potentialPosition.x > chest.position.x && potentialPosition.y < chest.position.y + chest.height && potentialPosition.y > chest.position.y) {
+    //Next check the unit's top right corner
+    if (potentialPosition.x + unitSize.x < chest.position.x + chest.length && potentialPosition.x + unitSize.x > chest.position.x && potentialPosition.y < chest.position.y + chest.height && potentialPosition.y > chest.position.y) {
       isValidPosition = false;
+      console.log("chest collision top right");
     }
-    //Then check the player's bottom right corner
+    //Then check the unit's bottom right corner
     if (potentialPosition.x + unitSize.x < chest.position.x + chest.length && potentialPosition.x + unitSize.x > chest.position.x && potentialPosition.y + unitSize.y < chest.position.y + chest.height && potentialPosition.y + unitSize.y > chest.position.y) {
       isValidPosition = false;
+      console.log("chest collision bottom right");
     }
-    //Finally check the player's bottom left corner
+    //Finally check the unit's bottom left corner
     if (potentialPosition.x < chest.position.x + chest.length && potentialPosition.x > chest.position.x && potentialPosition.y + unitSize.y < chest.position.y + chest.height && potentialPosition.y + unitSize.y > chest.position.y) {
       isValidPosition = false;
+      console.log("chest collision bottom left");
     }
   }
 
@@ -377,6 +270,43 @@ ExploreScreenEnvironmentManager.prototype.checkPotentialPosition = function(pote
 }
 
 
+//This class is resposible for doing the calculations for drawing relative to the current camera position, it is also capable of chasing the player
+function Camera(screen) {
+  this.screen = screen;
+  this.scale = 1;
+  this.position = {x: 0, y: 0};
+  this.isCameraChasingPlayer = true;
+}
+Camera.prototype.setScreenPosition = function(worldPosition) {
+  var position = this.position;
+
+  var cameraPosition = {x: worldPosition.x - position.x, y: worldPosition.y - position.y};
+}
+Camera.prototype.update = function(gameTime, elapsedTime) {
+  if(this.isCameraChasingPlayer) {
+    let playerPosition = this.screen.player.position;
+
+    this.position = {x: playerPosition.x - 310 * this.scale, y: playerPosition.y - 240 * this.scale};
+    if(this.position.x < 0) {
+      this.position.x = 0;
+    }
+    if(this.position.x > this.screen.mapObject.tilewidth * this.screen.mapObject.layers[0].width - 640) {
+      this.position.x = this.screen.mapObject.tilewidth * this.screen.mapObject.layers[0].width - 640;
+    }
+    if(this.position.y < 0) {
+      this.position.y = 0;
+    }
+    if(this.position.y > this.screen.mapObject.tileheight * this.screen.mapObject.layers[0].height - 480) {
+      this.position.y = this.screen.mapObject.tileheight * this.screen.mapObject.layers[0].height - 480;
+    }
+  }
+}
+Camera.prototype.getScreenPosition = function (worldPosition) {
+  var screenPosition = {x: 0, y: 0};
+  screenPosition.x = worldPosition.x - this.position.x;
+  screenPosition.y = worldPosition.y - this.position.y;
+  return screenPosition;
+}
 
 function DialogueBox(screen) {
   this.screen = screen;
